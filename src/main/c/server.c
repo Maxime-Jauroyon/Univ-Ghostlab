@@ -32,27 +32,7 @@ int main(int argc, char **argv) {
                 while (1) {
                     gl_message_t msg = { 0 };
                     gl_read_message(sock2, &msg);
-                    printf("%s(", gl_message_definitions()[msg.type]->identifier);
-                    for (uint32_t i = 0; i < gl_message_definitions()[msg.type]->num_parameters; i++) {
-                        printf("%s = ", gl_message_parameter_definitions()[gl_message_definitions()[msg.type]->parameters[i]]->identifier);
-                        
-                        if (gl_message_parameter_definitions()[gl_message_definitions()[msg.type]->parameters[i]]->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT8) {
-                            printf("%u", msg.parameters_value[i].uint8_value);
-                        } else if (gl_message_parameter_definitions()[gl_message_definitions()[msg.type]->parameters[i]]->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT16) {
-                            printf("%hu", msg.parameters_value[i].uint16_value);
-                        } else if (gl_message_parameter_definitions()[gl_message_definitions()[msg.type]->parameters[i]]->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT32) {
-                            printf("%u", msg.parameters_value[i].uint32_value);
-                        } else if (gl_message_parameter_definitions()[gl_message_definitions()[msg.type]->parameters[i]]->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT64) {
-                            printf("%llu", msg.parameters_value[i].uint64_value);
-                        } else if (gl_message_parameter_definitions()[gl_message_definitions()[msg.type]->parameters[i]]->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING) {
-                            printf("%s", msg.parameters_value[i].string_value);
-                        }
-                        
-                        if (i != gl_message_definitions()[msg.type]->num_parameters - 1) {
-                            printf(", ");
-                        }
-                    }
-                    printf(")\n");
+                    gl_printf_message(&msg);
                 }
             }
             close(sock2);

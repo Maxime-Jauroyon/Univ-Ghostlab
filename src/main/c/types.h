@@ -23,13 +23,4 @@
 // Asserts a condition that terminates the program in case of error.
 #define gl_fatal_assert(condition) if (!(condition)) { goto error; } (void)0
 
-// Describes a buffer (a structure to send data through a socket).
-typedef struct gl_buffer_t {
-    // Length of the buffer.
-    uint16_t length;
-    
-    // Data of the buffer.
-    uint8_t *data;
-} gl_buffer_t;
-
 #endif /* GHOSTLAB_TYPES_H */

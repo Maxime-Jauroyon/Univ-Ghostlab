@@ -27,10 +27,13 @@
 #include <endian.h>
 #endif
 
-#define gl_is_tcp_eol(c) ((c) == '*')
-#define gl_is_udp_eol(c) ((c) == '+')
+#define gl_tcp_terminator '*'
+#define gl_udp_terminator '+'
+#define gl_separator ' '
+#define gl_is_tcp_eol(c) ((c) == gl_tcp_terminator)
+#define gl_is_udp_eol(c) ((c) == gl_udp_terminator)
 #define gl_is_eol(c) (gl_is_tcp_eol(c) || gl_is_udp_eol(c))
-#define gl_is_separator(c) ((c) == ' ' || gl_is_eol(c))
+#define gl_is_separator(c) ((c) == gl_separator || gl_is_eol(c))
 
 static uint8_t g_max_message_identifier_size = 0;
 
@@ -55,33 +58,182 @@ static uint8_t gl_calculate_max_message_identifier_size() {
 }
 
 static uint16_t gl_uint8_to_uint16(const uint8_t *n) {
-    uint16_t r = 0;
-    
-    r |= (uint16_t)n[0] << 8;
-    r |= (uint16_t)n[1] << 0;
+    uint16_t r =
+        (uint16_t)n[1] << 8 |
+        (uint16_t)n[0];
     
     return r;
 }
 
 static uint32_t gl_uint8_to_uint32(const uint8_t *n) {
-    uint32_t r = 0;
-    
-    r |= (uint32_t)n[0] << 16;
-    r |= (uint32_t)n[1] << 8;
-    r |= (uint32_t)n[2] << 0;
+    uint32_t r =
+        (uint32_t)n[3] << 24 |
+        (uint32_t)n[2] << 16 |
+        (uint32_t)n[1] << 8 |
+        (uint32_t)n[0];
     
     return r;
 }
 
 static uint64_t gl_uint8_to_uint64(const uint8_t *n) {
-    uint64_t r = 0;
-    
-    r |= (uint64_t)n[0] << 32;
-    r |= (uint64_t)n[1] << 16;
-    r |= (uint64_t)n[2] << 8;
-    r |= (uint64_t)n[3] << 0;
+    uint64_t r =
+        (uint64_t)n[7] << 56 |
+        (uint64_t)n[6] << 48 |
+        (uint64_t)n[5] << 40 |
+        (uint64_t)n[4] << 32 |
+        (uint64_t)n[3] << 24 |
+        (uint64_t)n[2] << 16 |
+        (uint64_t)n[1] << 8 |
+        (uint64_t)n[0];
     
     return r;
+}
+
+int gl_get_error() {
+    if (errno != 0) {
+        perror(GHOSTLAB_EXECUTABLE_NAME);
+    }
+    
+    return EXIT_FAILURE;
+}
+
+uint8_t *gl_string_from_cstring(const char *src) {
+    uint8_t *dst = 0;
+    
+    for (uint64_t i = 0; i < strlen(src); i++) {
+        gl_array_push(dst, (uint8_t)(src)[i]);
+    }
+    
+    return dst;
+}
+
+static int gl_write_uint8(uint8_t **buf, const uint8_t *n) {
+    gl_array_push(*buf, *n);
+    
+    return 1;
+}
+
+static int gl_write_uint16(uint8_t **buf, const uint16_t *n, gl_message_parameter_endian_conversion_t conversion_type) {
+    uint16_t v;
+    
+    if (conversion_type == GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_AS_LITTLE) {
+        v = htole16(*n);
+    } else if (conversion_type == GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_AS_BIG) { // NOLINT
+        v = htobe16(*n);
+    } else {
+        v = htons(*n);
+    }
+    
+    uint8_t *vp = (uint8_t *)&v;
+    gl_array_push(*buf, vp[0]);
+    gl_array_push(*buf, vp[1]);
+    
+    return 2;
+}
+
+static int gl_write_uint32(uint8_t **buf, const uint32_t *n, gl_message_parameter_endian_conversion_t conversion_type) {
+    uint32_t v;
+    
+    if (conversion_type == GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_AS_LITTLE) {
+        v = htole32(*n);
+    } else if (conversion_type == GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_AS_BIG) { // NOLINT
+        v = htobe32(*n);
+    } else {
+        v = htonl(*n);
+    }
+    
+    uint8_t *vp = (uint8_t *)&v;
+    gl_array_push(*buf, vp[0]);
+    gl_array_push(*buf, vp[1]);
+    gl_array_push(*buf, vp[2]);
+    gl_array_push(*buf, vp[3]);
+    
+    return 4;
+}
+
+static int gl_write_uint64(uint8_t **buf, const uint64_t *n, gl_message_parameter_endian_conversion_t conversion_type) {
+    uint64_t v;
+    
+    if (conversion_type == GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_AS_LITTLE) {
+        v = htole64(*n);
+    } else if (conversion_type == GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_AS_BIG) { // NOLINT
+        v = htobe64(*n);
+    } else {
+        v = htonll(*n);
+    }
+    
+    uint8_t *vp = (uint8_t *)&v;
+    gl_array_push(*buf, vp[0]);
+    gl_array_push(*buf, vp[1]);
+    gl_array_push(*buf, vp[2]);
+    gl_array_push(*buf, vp[3]);
+    gl_array_push(*buf, vp[4]);
+    gl_array_push(*buf, vp[5]);
+    gl_array_push(*buf, vp[6]);
+    gl_array_push(*buf, vp[7]);
+    
+    return 8;
+}
+
+static int gl_write_string(uint8_t **buf, const uint8_t **n) {
+    for (uint64_t i = 0; i < gl_array_get_size(*n); i++) {
+        gl_write_uint8(buf, &(*n)[i]);
+    }
+    
+    return gl_array_get_size(*n);
+}
+
+static int gl_write_cstring(uint8_t **buf, const char **n) {
+    for (uint64_t i = 0; i < strlen(*n); i++) {
+        gl_write_uint8(buf, (const uint8_t *)&(*n)[i]);
+    }
+    
+    return (int)strlen(*n);
+}
+
+int gl_write_message(int fd, struct gl_message_t *msg) {
+    uint8_t *buf = 0;
+    const gl_message_definition_t *msg_def = gl_message_definitions()[msg->type];
+    
+    gl_write_cstring(&buf, (const char **)&msg_def->identifier);
+    
+    for (uint8_t i = 0; i < msg_def->num_parameters; i++) {
+        char separator = gl_separator;
+        gl_write_uint8(&buf, (uint8_t *)&separator);
+        
+        const gl_message_parameter_definition_t *msg_param_def = gl_message_parameter_definitions()[msg_def->parameters[i]];
+    
+        if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT8) {
+            gl_write_uint8(&buf, &msg->parameters_value[i].uint8_value);
+        } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT16) {
+            gl_write_uint16(&buf, &msg->parameters_value[i].uint16_value, msg_param_def->endian_conversion);
+        } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT32) {
+            gl_write_uint32(&buf, &msg->parameters_value[i].uint32_value, msg_param_def->endian_conversion);
+        } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT64) {
+            gl_write_uint64(&buf, &msg->parameters_value[i].uint64_value, msg_param_def->endian_conversion);
+        } else {
+            gl_write_string(&buf, (const uint8_t **)&msg->parameters_value[i].string_value);
+        }
+    }
+    
+    if (msg_def->protocol == GL_MESSAGE_PROTOCOL_UDP) {
+        char terminator = gl_udp_terminator;
+        gl_write_uint8(&buf, (uint8_t *)&terminator);
+        gl_write_uint8(&buf, (uint8_t *)&terminator);
+        gl_write_uint8(&buf, (uint8_t *)&terminator);
+    } else {
+        char terminator = gl_tcp_terminator;
+        gl_write_uint8(&buf, (uint8_t *)&terminator);
+        gl_write_uint8(&buf, (uint8_t *)&terminator);
+        gl_write_uint8(&buf, (uint8_t *)&terminator);
+    }
+    
+    int size = gl_array_get_size(buf);
+    write(fd, buf, size);
+    
+    gl_array_free(buf);
+    
+    return size;
 }
 
 static int gl_read_uint8(int fd, uint8_t *n) {
@@ -107,23 +259,6 @@ static int gl_read_uint8_until_separator(int fd, uint8_t **dst, uint8_t *last_c,
     return gl_array_get_header(*dst)->size;
 }
 
-int gl_get_error() {
-    if (errno != 0) {
-        perror(GHOSTLAB_EXECUTABLE_NAME);
-    }
-    
-    return EXIT_FAILURE;
-}
-
-int gl_write_uint8(gl_buffer_t *buf, const uint8_t *n) {
-    buf->data = realloc(buf->data, buf->length + sizeof(uint8_t));
-    gl_assert(buf->data);
-    gl_assert(memcpy(buf->data + buf->length, n, sizeof(uint8_t)) != NULL);
-    buf->length += sizeof(uint8_t);
-    
-    return 0;
-}
-
 int gl_read_message(int fd, struct gl_message_t *dst) {
     uint16_t total_size = 0;
     
@@ -146,6 +281,7 @@ int gl_read_message(int fd, struct gl_message_t *dst) {
     }
     
     gl_array_free(identifier_buf);
+    
     gl_assert(msg_def);
     
     // Reads all parameters.
@@ -202,10 +338,8 @@ int gl_read_message(int fd, struct gl_message_t *dst) {
     }
     
     // Checks if the message was sent using the right protocol.
-    if (msg_def->protocol != GL_MESSAGE_PROTOCOL_BOTH) {
-        gl_assert(msg_def->protocol != GL_MESSAGE_PROTOCOL_TCP || gl_is_tcp_eol(last_c));
-        gl_assert(msg_def->protocol != GL_MESSAGE_PROTOCOL_UDP || gl_is_udp_eol(last_c));
-    }
+    gl_assert(msg_def->protocol != GL_MESSAGE_PROTOCOL_TCP || gl_is_tcp_eol(last_c));
+    gl_assert(msg_def->protocol != GL_MESSAGE_PROTOCOL_UDP || gl_is_udp_eol(last_c));
     
     // Reads ending characters.
     uint8_t c;
@@ -214,4 +348,46 @@ int gl_read_message(int fd, struct gl_message_t *dst) {
     total_size += 2;
     
     return total_size;
+}
+
+int gl_printf_string(uint8_t **str) {
+    printf("string(");
+    for (uint64_t i = 0; i < gl_array_get_size(*str); i++) {
+        printf("%c", (*str)[i]);
+    }
+    printf(")");
+}
+
+int gl_printf_message(struct gl_message_t *msg) {
+    const gl_message_definition_t *msg_def = gl_message_definitions()[msg->type];
+    
+    gl_assert(gl_array_get_size(msg->parameters_value) == msg_def->num_parameters);
+    
+    printf("%s(", msg_def->identifier);
+    
+    for (uint32_t i = 0; i < msg_def->num_parameters; i++) {
+        const gl_message_parameter_definition_t *msg_param_def = gl_message_parameter_definitions()[msg_def->parameters[i]];
+        
+        printf("%s = ", gl_message_parameter_definitions()[msg_def->parameters[i]]->identifier);
+        
+        if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT8) {
+            printf("uint_8(%u)", msg->parameters_value[i].uint8_value);
+        } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT16) {
+            printf("uint16_t(%hu)", msg->parameters_value[i].uint16_value);
+        } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT32) {
+            printf("uint32_t(%u)", msg->parameters_value[i].uint32_value);
+        } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT64) {
+            printf("uint64_t(%llu)", msg->parameters_value[i].uint64_value);
+        } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING) {
+            gl_printf_string(&msg->parameters_value[i].string_value);
+        }
+        
+        if (i != msg_def->num_parameters - 1) {
+            printf(", ");
+        }
+    }
+    
+    printf(")\n");
+    
+    return 0;
 }

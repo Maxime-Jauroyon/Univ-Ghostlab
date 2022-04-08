@@ -51,7 +51,7 @@ typedef enum gl_message_type_t {
     GL_MESSAGE_TYPE_GOBYE,
     GL_MESSAGE_TYPE_GLIS_REQ,
     GL_MESSAGE_TYPE_GLIS_RES,
-    GL_MESSAGE_TYPE_GLPYR,
+    GL_MESSAGE_TYPE_GPLYR,
     GL_MESSAGE_TYPE_MALL_REQ,
     GL_MESSAGE_TYPE_MALL_RES,
     GL_MESSAGE_TYPE_SEND_REQ,
@@ -70,7 +70,6 @@ typedef enum gl_message_type_t {
 typedef enum gl_message_protocol_t {
     GL_MESSAGE_PROTOCOL_TCP,
     GL_MESSAGE_PROTOCOL_UDP,
-    GL_MESSAGE_PROTOCOL_BOTH,
     
     GL_MESSAGE_PROTOCOL_TYPE_COUNT
 } gl_message_protocol_t;
