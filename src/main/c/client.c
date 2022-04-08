@@ -312,6 +312,7 @@ int main(int argc, char **argv) {
                 gl_message_t msg = {0};
                 gl_read_message(fd, &msg);
                 gl_printf_message(&msg);
+                gl_free_message(&msg);
             }
         }
         
