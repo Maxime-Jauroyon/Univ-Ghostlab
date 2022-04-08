@@ -1,3 +1,5 @@
 .DS_Store
 cmake-*/
 .idea/
+out
+school-uni-pr6.iml

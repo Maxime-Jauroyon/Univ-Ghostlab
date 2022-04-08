@@ -12,7 +12,7 @@ public class Client {
     private int widthMaze;
     private int numberOfghost;
     private String multicastAddr;
-    private String multicassPort;
+    private String multicastPort;
 
     private Client(String ipv4, int tcpPort, int udpPort){
         this.ipv4 = ipv4;
@@ -26,6 +26,26 @@ public class Client {
 
     public void setGameRegister(int gameRegister) {
         this.gameRegister = gameRegister;
+    }
+
+    public void setHeigthMaze(int heigthMaze) {
+        this.heigthMaze = heigthMaze;
+    }
+
+    public void setWidthMaze(int widthMaze) {
+        this.widthMaze = widthMaze;
+    }
+
+    public void setNumberOfghost(int numberOfghost) {
+        this.numberOfghost = numberOfghost;
+    }
+
+    public void setMulticastAddr(String multicastAddr) {
+        this.multicastAddr = multicastAddr;
+    }
+
+    public void setMulticassPort(String multicassPort) {
+        this.multicastPort = multicassPort;
     }
 
     public void launchGame(){
@@ -54,22 +74,29 @@ public class Client {
                 String question = "Would you create a new game or join an existant game ? ";
                 question += "Or would you know some information about game ? (register/new/size/list/game/quit)";
 
-                iip.putQuestionOnIntroductionPhase(tcpSocket, br, pw, question,
+                int state = iip.putQuestionOnIntroductionPhase(tcpSocket, br, pw, question,
                         new String[]{"register","new","size","list","game","quit"}, sc);
+
+                if(state == 0){
+                    break;
+                }
 
                 System.out.println("I'am at the end of the register phase");
 
                 question = "Would you start the game ? ";
                 question += "Or would you know some information about game ? (start/unregister/size/list/game/quit)";
-                int state = iip.putQuestionOnIntroductionPhase(tcpSocket, br, pw, question,
+                state = iip.putQuestionOnIntroductionPhase(tcpSocket, br, pw, question,
                         new String[]{"start","unregister","size","list","game","quit"}, sc);
 
-
-                if(state == 2){
+                if(state == 0){
+                    break;
+                }else if(state == 2){
                     continue;
                 }
 
                 System.out.println("Enter in main phase of the game");
+
+
 
             }
 
