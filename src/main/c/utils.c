@@ -148,18 +148,20 @@ int gl_read_message(int fd, struct gl_message_t *dst) {
     gl_array_free(identifier_buf);
     gl_assert(msg_def);
     
-    // Reads the parameters.
+    // Reads all parameters.
     for (uint32_t i = 0; i < msg_def->num_parameters; i++) {
         gl_assert(!gl_is_eol(last_c));
     
         const gl_message_parameter_definition_t  *msg_param_def = gl_message_parameter_definitions()[msg_def->parameters[i]];
         uint8_t *parameter_value_buf = 0;
     
+        // Reads the parameter value.
         gl_assert(gl_read_uint8_until_separator(fd, &parameter_value_buf, &last_c, msg_param_def->length, msg_param_def->precise_length) != 0);
         total_size += gl_array_get_header(parameter_value_buf)->size + 1;
     
         gl_message_parameter_t parameter;
     
+        // Convert if necessary.
         if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT8) {
             parameter = (gl_message_parameter_t) { .uint8_value = parameter_value_buf[0] };
         } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT16) {
