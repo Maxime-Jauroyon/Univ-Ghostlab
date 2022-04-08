@@ -47,51 +47,61 @@ public class InteractionIntroductionPhase {
 
             int state = getQuestionOnIntroductionPhase(br, choice);
             if(state == 1){
-                return 0;
-            }else if(state == 2){
                 return 1;
+            }else if(state == 2){
+                return 2;
             }
         }
     }
 
     public int getQuestionOnIntroductionPhase(BufferedReader br, String clientChoice) throws IOException {
         String message = br.readLine();
+        String[] list = message.split(" ");
         if(message.startsWith("REGOK")) {
-            client.setGameRegister(Integer.parseInt(message.substring(6, Utils.findEndIndex(message, 6, '*'))));
+            client.setGameRegister(Integer.parseInt(list[1].substring(0, list[1].length()-3)));
             return 1;
         }else if(message.startsWith("WELCO")){
-
+            client.setGameRegister(Integer.parseInt(list[1]));
+            client.setHeigthMaze(Integer.parseInt(list[2]));
+            client.setWidthMaze(Integer.parseInt(list[3]));
+            client.setNumberOfghost(Integer.parseInt(list[4]));
+            client.setMulticastAddr(list[5]);
+            client.setMulticastAddr(list[6].substring(0, list[6].length()-3));
             return 1;
         }else if(message.startsWith("LIST!") || message.startsWith("GAMES")) {
             String gameId = "";
             boolean startWithList = message.startsWith("LIST!");
             if (startWithList) {
-                gameId = message.substring(6, Utils.findEndIndex(message, 6, ' '));
+                gameId = list[1];
             }
-            int startIndex = ((message).startsWith("LIST!")) ? 8 : 6;
-            int numberOf = Integer.parseInt(message.substring(startIndex, Utils.findEndIndex(message, startIndex, '*')));
+
+            String getCorrectNumberOf = (startWithList)? list[2].substring(0, list[2].length()-3):
+                    list[1].substring(0, list[1].length()-3);
+            int numberOf = Integer.parseInt(getCorrectNumberOf);
+
             for (int i = 0; i < numberOf; i++) {
                 message = br.readLine();
+                list = message.split(" ");
                 if (startWithList) {
-                    String playerId = message.substring(6, Utils.findEndIndex(message, 6, '*'));
+                    String playerId = list[1].substring(0, list[1].length()-3);
                     System.out.println("Game id : " + gameId + " and player id inside the game : " + playerId);
                 } else {
-                    gameId = message.substring(7, Utils.findEndIndex(message, 7, ' '));
-                    String nbPlayer = message.substring(9, Utils.findEndIndex(message, 9, '*'));
+                    gameId = list[1];
+                    String nbPlayer = list[2].substring(0, list[2].length()-3);
                     System.out.println("Game id : " + gameId + " and number of player inside the game : "
                             + nbPlayer);
                 }
             }
 
         }else if(message.startsWith("SIZE!")) {
-            String gameId = message.substring(6, Utils.findEndIndex(message, 6, ' '));
-            String height = message.substring(8, Utils.findEndIndex(message, 8, ' '));
-            String width = message.substring(10, Utils.findEndIndex(message, 10, '*'));
+            String gameId = list[1];
+            String height = list[2];
+            String width = list[3].substring(0, list[3].length()-3);
             System.out.println("Game id : " + gameId + " , height : " + height +
                     " et width : " + width + " of the maze");
 
         }else if(message.startsWith("UNROK")){
-            String gameId = message.substring(6, Utils.findEndIndex(message, 6, '*'));
+            String gameId = list[1].substring(0, list[1].length()-3);
             System.out.println("Unregister of game : " + gameId);
             return 2;
 
@@ -100,6 +110,6 @@ public class InteractionIntroductionPhase {
             System.out.println("Error : Wrong using of " + clientChoice);
         }
 
-        return 0;
+        return 1;
     }
 }
