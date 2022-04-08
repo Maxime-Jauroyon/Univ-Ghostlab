@@ -2,102 +2,128 @@
 
 static const gl_message_parameter_definition_t gl_message_parameter_n = {
     .identifier = "n",
+    .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT8,
     .length = 1,
     .precise_length = true,
-    .endianness = GL_MESSAGE_PARAMETER_ENDIANNESS_DEFAULT
+    .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
+    .has_max_value = false
 };
 
 static const gl_message_parameter_definition_t gl_message_parameter_m = {
     .identifier = "m",
+    .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT8,
     .length = 1,
     .precise_length = true,
-    .endianness = GL_MESSAGE_PARAMETER_ENDIANNESS_DEFAULT
+    .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
+    .has_max_value = false
 };
 
 static const gl_message_parameter_definition_t gl_message_parameter_s = {
     .identifier = "s",
+    .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT8,
     .length = 1,
     .precise_length = true,
-    .endianness = GL_MESSAGE_PARAMETER_ENDIANNESS_DEFAULT
+    .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
+    .has_max_value = false
 };
 
 static const gl_message_parameter_definition_t gl_message_parameter_id = {
     .identifier = "id",
+    .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING,
     .length = 8,
     .precise_length = true,
-    .endianness = GL_MESSAGE_PARAMETER_ENDIANNESS_DEFAULT
+    .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE
 };
 
 static const gl_message_parameter_definition_t gl_message_parameter_port = {
     .identifier = "port",
+    .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING,
     .length = 4,
     .precise_length = true,
-    .endianness = GL_MESSAGE_PARAMETER_ENDIANNESS_DEFAULT
+    .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
+    .has_max_value = false
 };
 
 static const gl_message_parameter_definition_t gl_message_parameter_h = {
     .identifier = "h",
+    .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT16,
     .length = 2,
     .precise_length = true,
-    .endianness = GL_MESSAGE_PARAMETER_ENDIANNESS_LITTLE,
-    .max_conversion_value = 1000
+    .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_AS_LITTLE,
+    .has_max_value = true,
+    .max_value = 1000
 };
 
 static const gl_message_parameter_definition_t gl_message_parameter_w = {
     .identifier = "w",
+    .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT16,
     .length = 2,
     .precise_length = true,
-    .endianness = GL_MESSAGE_PARAMETER_ENDIANNESS_LITTLE,
-    .max_conversion_value = 1000
+    .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_AS_LITTLE,
+    .has_max_value = true,
+    .max_value = 1000
 };
 
 static const gl_message_parameter_definition_t gl_message_parameter_f = {
     .identifier = "f",
+    .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT8,
     .length = 1,
     .precise_length = true,
-    .endianness = GL_MESSAGE_PARAMETER_ENDIANNESS_DEFAULT
+    .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE
 };
 
 static const gl_message_parameter_definition_t gl_message_parameter_ip = {
     .identifier = "ip",
+    .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING,
     .length = 15,
     .precise_length = true,
-    .endianness = GL_MESSAGE_PARAMETER_ENDIANNESS_DEFAULT
+    .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
+    .has_max_value = false
 };
 
 static const gl_message_parameter_definition_t gl_message_parameter_x = {
     .identifier = "x",
+    .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING,
     .length = 3,
     .precise_length = true,
-    .endianness = GL_MESSAGE_PARAMETER_ENDIANNESS_DEFAULT
+    .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
+    .has_max_value = false
 };
 
 static const gl_message_parameter_definition_t gl_message_parameter_y = {
     .identifier = "y",
+    .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING,
     .length = 3,
     .precise_length = true,
-    .endianness = GL_MESSAGE_PARAMETER_ENDIANNESS_DEFAULT
+    .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
+    .has_max_value = false
 };
 
 static const gl_message_parameter_definition_t gl_message_parameter_d = {
     .identifier = "d",
+    .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING,
     .length = 3,
     .precise_length = true,
-    .endianness = GL_MESSAGE_PARAMETER_ENDIANNESS_DEFAULT
+    .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
+    .has_max_value = false
 };
 
 static const gl_message_parameter_definition_t gl_message_parameter_p = {
     .identifier = "p",
+    .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING,
     .length = 4,
     .precise_length = true,
-    .endianness = GL_MESSAGE_PARAMETER_ENDIANNESS_DEFAULT
+    .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
+    .has_max_value = false
 };
 
 static const gl_message_parameter_definition_t gl_message_parameter_mess = {
     .identifier = "mess",
+    .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING,
     .length = 200,
     .precise_length = false,
-    .endianness = GL_MESSAGE_PARAMETER_ENDIANNESS_DEFAULT
+    .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
+    .has_max_value = false
 };
 
 static const gl_message_parameter_definition_t *gl_message_parameter_definitions_array[] = {
@@ -122,7 +148,7 @@ static const gl_message_parameter_definition_t *gl_message_parameter_definitions
 static const gl_message_definition_t gl_message_game = {
     .identifier = "GAMES",
     .num_parameters = 1,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP,
+    .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_N
     }
@@ -131,7 +157,7 @@ static const gl_message_definition_t gl_message_game = {
 static const gl_message_definition_t gl_message_ogame = {
     .identifier = "OGAMES",
     .num_parameters = 2,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP,
+    .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_M,
         GL_MESSAGE_PARAMETER_TYPE_S
@@ -141,7 +167,7 @@ static const gl_message_definition_t gl_message_ogame = {
 static const gl_message_definition_t gl_message_newpl = {
     .identifier = "NEWPL",
     .num_parameters = 2,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP,
+    .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_ID,
         GL_MESSAGE_PARAMETER_TYPE_PORT
@@ -151,7 +177,7 @@ static const gl_message_definition_t gl_message_newpl = {
 static const gl_message_definition_t gl_message_regis = {
     .identifier = "REGIS",
     .num_parameters = 3,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP,
+    .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_ID,
         GL_MESSAGE_PARAMETER_TYPE_PORT,
@@ -162,7 +188,7 @@ static const gl_message_definition_t gl_message_regis = {
 static const gl_message_definition_t gl_message_regok = {
     .identifier = "REGOK",
     .num_parameters = 1,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP,
+    .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_M
     }
@@ -171,25 +197,25 @@ static const gl_message_definition_t gl_message_regok = {
 static const gl_message_definition_t gl_message_regno = {
     .identifier = "REGNO",
     .num_parameters = 0,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP
+    .protocol = GL_MESSAGE_PROTOCOL_TCP
 };
 
 static const gl_message_definition_t gl_message_start = {
     .identifier = "START",
     .num_parameters = 0,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP
+    .protocol = GL_MESSAGE_PROTOCOL_TCP
 };
 
 static const gl_message_definition_t gl_message_unreg = {
     .identifier = "UNREG",
     .num_parameters = 0,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP
+    .protocol = GL_MESSAGE_PROTOCOL_TCP
 };
 
 static const gl_message_definition_t gl_message_unrok = {
     .identifier = "UNROK",
     .num_parameters = 1,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP,
+    .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_M
     }
@@ -198,13 +224,13 @@ static const gl_message_definition_t gl_message_unrok = {
 static const gl_message_definition_t gl_message_dunno = {
     .identifier = "DUNNO",
     .num_parameters = 0,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP
+    .protocol = GL_MESSAGE_PROTOCOL_TCP
 };
 
 static const gl_message_definition_t gl_message_size_req = {
     .identifier = "SIZE?",
     .num_parameters = 1,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP,
+    .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_M
     }
@@ -213,7 +239,7 @@ static const gl_message_definition_t gl_message_size_req = {
 static const gl_message_definition_t gl_message_size_res = {
     .identifier = "SIZE!",
     .num_parameters = 3,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP,
+    .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_M,
         GL_MESSAGE_PARAMETER_TYPE_H,
@@ -224,7 +250,7 @@ static const gl_message_definition_t gl_message_size_res = {
 static const gl_message_definition_t gl_message_list_req = {
     .identifier = "LIST?",
     .num_parameters = 1,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP,
+    .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_M
     }
@@ -233,7 +259,7 @@ static const gl_message_definition_t gl_message_list_req = {
 static const gl_message_definition_t gl_message_list_res = {
     .identifier = "LIST!",
     .num_parameters = 2,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP,
+    .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_M,
         GL_MESSAGE_PARAMETER_TYPE_S
@@ -243,7 +269,7 @@ static const gl_message_definition_t gl_message_list_res = {
 static const gl_message_definition_t gl_message_playr = {
     .identifier = "PLAYR",
     .num_parameters = 1,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP,
+    .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_ID
     }
@@ -252,13 +278,13 @@ static const gl_message_definition_t gl_message_playr = {
 static const gl_message_definition_t gl_message_game_req = {
     .identifier = "GAME?",
     .num_parameters = 0,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP
+    .protocol = GL_MESSAGE_PROTOCOL_TCP
 };
 
 static const gl_message_definition_t gl_message_welco = {
     .identifier = "WELCO",
     .num_parameters = 6,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP,
+    .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_M,
         GL_MESSAGE_PARAMETER_TYPE_H,
@@ -272,7 +298,7 @@ static const gl_message_definition_t gl_message_welco = {
 static const gl_message_definition_t gl_message_posit = {
     .identifier = "POSIT",
     .num_parameters = 3,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP,
+    .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_ID,
         GL_MESSAGE_PARAMETER_TYPE_X,
@@ -283,7 +309,7 @@ static const gl_message_definition_t gl_message_posit = {
 static const gl_message_definition_t gl_message_upmov = {
     .identifier = "UPMOV",
     .num_parameters = 1,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP,
+    .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_D
     }
@@ -292,7 +318,7 @@ static const gl_message_definition_t gl_message_upmov = {
 static const gl_message_definition_t gl_message_domov = {
     .identifier = "DOMOV",
     .num_parameters = 1,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP,
+    .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_D
     }
@@ -301,7 +327,7 @@ static const gl_message_definition_t gl_message_domov = {
 static const gl_message_definition_t gl_message_lemov = {
     .identifier = "LEMOV",
     .num_parameters = 1,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP,
+    .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_D
     }
@@ -310,7 +336,7 @@ static const gl_message_definition_t gl_message_lemov = {
 static const gl_message_definition_t gl_message_rimov = {
     .identifier = "RIMOV",
     .num_parameters = 1,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP,
+    .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_D
     }
@@ -319,7 +345,7 @@ static const gl_message_definition_t gl_message_rimov = {
 static const gl_message_definition_t gl_message_move_res = {
     .identifier = "MOVE!",
     .num_parameters = 2,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP,
+    .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_X,
         GL_MESSAGE_PARAMETER_TYPE_Y
@@ -329,7 +355,7 @@ static const gl_message_definition_t gl_message_move_res = {
 static const gl_message_definition_t gl_message_movef = {
     .identifier = "MOVEF",
     .num_parameters = 3,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP,
+    .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_X,
         GL_MESSAGE_PARAMETER_TYPE_Y,
@@ -340,26 +366,26 @@ static const gl_message_definition_t gl_message_movef = {
 static const gl_message_definition_t gl_message_iquit = {
     .identifier = "IQUIT",
     .num_parameters = 0,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP,
+    .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .parameters = { }
 };
 
 static const gl_message_definition_t gl_message_gobye = {
     .identifier = "GOBYE",
     .num_parameters = 0,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP
+    .protocol = GL_MESSAGE_PROTOCOL_TCP
 };
 
 static const gl_message_definition_t gl_message_glis_req = {
     .identifier = "GLIS?",
     .num_parameters = 0,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP
+    .protocol = GL_MESSAGE_PROTOCOL_TCP
 };
 
 static const gl_message_definition_t gl_message_glis_res = {
     .identifier = "GLIS!",
     .num_parameters = 1,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP,
+    .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_S,
     }
@@ -368,7 +394,7 @@ static const gl_message_definition_t gl_message_glis_res = {
 static const gl_message_definition_t gl_message_gplyr = {
     .identifier = "GPLYR",
     .num_parameters = 4,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP,
+    .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_ID,
         GL_MESSAGE_PARAMETER_TYPE_X,
@@ -380,7 +406,7 @@ static const gl_message_definition_t gl_message_gplyr = {
 static const gl_message_definition_t gl_message_mall_req = {
     .identifier = "MALL?",
     .num_parameters = 1,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP,
+    .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_MESS,
     }
@@ -389,13 +415,13 @@ static const gl_message_definition_t gl_message_mall_req = {
 static const gl_message_definition_t gl_message_mall_res = {
     .identifier = "MALL!",
     .num_parameters = 0,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP
+    .protocol = GL_MESSAGE_PROTOCOL_TCP
 };
 
 static const gl_message_definition_t gl_message_send_req = {
     .identifier = "SEND?",
     .num_parameters = 2,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP,
+    .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_ID,
         GL_MESSAGE_PARAMETER_TYPE_MESS,
@@ -405,19 +431,19 @@ static const gl_message_definition_t gl_message_send_req = {
 static const gl_message_definition_t gl_message_send_res = {
     .identifier = "SEND!",
     .num_parameters = 0,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP
+    .protocol = GL_MESSAGE_PROTOCOL_TCP
 };
 
 static const gl_message_definition_t gl_message_glis_nsend = {
     .identifier = "NSEND",
     .num_parameters = 0,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_TCP
+    .protocol = GL_MESSAGE_PROTOCOL_TCP
 };
 
 static const gl_message_definition_t gl_message_ghost = {
     .identifier = "GHOST",
     .num_parameters = 2,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_UDP,
+    .protocol = GL_MESSAGE_PROTOCOL_UDP,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_X,
         GL_MESSAGE_PARAMETER_TYPE_Y
@@ -427,7 +453,7 @@ static const gl_message_definition_t gl_message_ghost = {
 static const gl_message_definition_t gl_message_score = {
     .identifier = "SCORE",
     .num_parameters = 4,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_UDP,
+    .protocol = GL_MESSAGE_PROTOCOL_UDP,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_ID,
         GL_MESSAGE_PARAMETER_TYPE_P,
@@ -439,7 +465,7 @@ static const gl_message_definition_t gl_message_score = {
 static const gl_message_definition_t gl_message_messa = {
     .identifier = "MESSA",
     .num_parameters = 2,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_UDP,
+    .protocol = GL_MESSAGE_PROTOCOL_UDP,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_ID,
         GL_MESSAGE_PARAMETER_TYPE_MESS
@@ -449,7 +475,7 @@ static const gl_message_definition_t gl_message_messa = {
 static const gl_message_definition_t gl_message_endga = {
     .identifier = "ENDGA",
     .num_parameters = 2,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_UDP,
+    .protocol = GL_MESSAGE_PROTOCOL_UDP,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_ID,
         GL_MESSAGE_PARAMETER_TYPE_P
@@ -459,7 +485,7 @@ static const gl_message_definition_t gl_message_endga = {
 static const gl_message_definition_t gl_message_messp = {
     .identifier = "MESSP",
     .num_parameters = 2,
-    .protocol = GL_MESSAGE_PROTOCOL_TYPE_UDP,
+    .protocol = GL_MESSAGE_PROTOCOL_UDP,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_ID,
         GL_MESSAGE_PARAMETER_TYPE_MESS

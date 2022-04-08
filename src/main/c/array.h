@@ -64,7 +64,7 @@ typedef struct gl_array_header_t {
 #define gl_array_remove(a, i) (((a) ? memmove((a) + (i), (a) + (i) + 1, (gl_array_get_size(a) - (i) - 1 * sizeof(*(a))) : 0), (a) ? --gl_array_get_header(a)->size : 0)
 
 // Frees the data of an array (must be called to deallocated memory).
-#define gl_array_free(a) ((*(void **)&(a)) = _gl_array_free((void *)(a)))
+#define gl_array_free(a) ((*(void **)&(a)) = internal_gl_array_free((void *)(a)))
 
 // Internal function.
 // Sets the capacity of the array for a given type.

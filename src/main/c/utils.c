@@ -9,9 +9,26 @@
 
 #ifdef __APPLE__
 #include <sys/syslimits.h>
+#include <libkern/OSByteOrder.h>
+#define GL_BIG_ENDIAN __DARWIN_BYTE_ORDER == __DARWIN_BIG_ENDIAN
+#define GL_LITTLE_ENDIAN __DARWIN_BYTE_ORDER == __DARWIN_LITTLE_ENDIAN
+#define htobe16(x) OSSwapHostToBigInt16(x)
+#define htobe32(x) OSSwapHostToBigInt32(x)
+#define htobe64(x) OSSwapHostToBigInt64(x)
+#define htole16(x) OSSwapHostToLittleInt16(x)
+#define htole32(x) OSSwapHostToLittleInt32(x)
+#define htole64(x) OSSwapHostToLittleInt64(x)
+#define be16toh(x) OSSwapBigToHostInt16(x)
+#define be32toh(x) OSSwapBigToHostInt32(x)
+#define be64toh(x) OSSwapBigToHostInt64(x)
+#define le16toh(x) OSSwapLittleToHostInt16(x)
+#define le32toh(x) OSSwapLittleToHostInt32(x)
+#define le64toh(x) OSSwapLittleToHostInt64(x)
 #else
 #include <limits.h>
 #include <endian.h>
+#define GL_BIG_ENDIAN __BYTE_ORDER == __BIG_ENDIAN
+#define GL_LITTLE_ENDIAN __BYTE_ORDER == __LITTLE_ENDIAN
 #endif
 
 #define gl_is_tcp_eol(c) ((c) == '*')
@@ -62,6 +79,36 @@ static uint16_t calculate_max_message_parameter_value_size() {
     return g_max_message_parameter_value_size;
 }
 
+static uint16_t uint8_to_uint16(const uint8_t *n) {
+    uint16_t r = 0;
+    
+    r |= (uint16_t)n[0] << 8;
+    r |= (uint16_t)n[1] << 0;
+    
+    return r;
+}
+
+static uint32_t uint8_to_uint32(const uint8_t *n) {
+    uint32_t r = 0;
+    
+    r |= (uint32_t)n[0] << 16;
+    r |= (uint32_t)n[1] << 8;
+    r |= (uint32_t)n[2] << 0;
+    
+    return r;
+}
+
+static uint64_t uint8_to_uint64(const uint8_t *n) {
+    uint64_t r = 0;
+    
+    r |= (uint64_t)n[0] << 32;
+    r |= (uint64_t)n[1] << 16;
+    r |= (uint64_t)n[2] << 8;
+    r |= (uint64_t)n[3] << 0;
+    
+    return r;
+}
+
 int gl_get_error() {
     if (errno != 0) {
         perror(GHOSTLAB_EXECUTABLE_NAME);
@@ -91,37 +138,35 @@ int gl_read_uint16(int fd, uint16_t *n) {
     return 0;
 }
 
-int gl_read_string(int fd, uint8_t **dst, uint16_t *dst_i, uint8_t *last_c, uint16_t max_size, bool precise_size) {
+int gl_read_string(int fd, uint8_t **dst, uint8_t *last_c, uint16_t max_size, bool precise_size) {
     uint8_t c = 0;
-    uint16_t i = 0;
     
     while (!gl_is_separator(c)) {
         if (c != 0) {
-            (*dst)[(*dst_i)++] = c;
-            gl_assert(i++ <= max_size);
+            gl_array_push(*dst, c);
+            gl_assert(gl_array_get_header(*dst)->size <= max_size);
         }
     
         gl_assert(gl_read_uint8(fd, &c) != 0);
     }
     
-    gl_assert(!precise_size || i == max_size);
+    gl_assert(!precise_size || gl_array_get_header(*dst)->size == max_size);
     
     *last_c = c;
     
-    return i;
+    return gl_array_get_header(*dst)->size;
 }
 
 int gl_read_message(int fd, struct gl_message_t *dst) {
-    uint16_t total_length = 0;
+    uint16_t total_size = 0;
     
     uint8_t last_c = 0;
-    uint8_t identifier_buf[calculate_max_message_identifier_size() + 1];
-    uint16_t identifier_length = 0;
+    uint8_t *identifier_buf = 0;
     
     // Reads the message type name.
-    gl_assert(gl_read_string(fd, (uint8_t **)&identifier_buf, &identifier_length, &last_c, calculate_max_message_identifier_size(), false) != 0);
-    identifier_buf[identifier_length] = 0;
-    total_length += identifier_length;
+    gl_assert(gl_read_string(fd, &identifier_buf, &last_c, calculate_max_message_identifier_size(), false) != 0);
+    gl_array_push(identifier_buf, 0);
+    total_size += gl_array_get_header(identifier_buf)->size;
     
     // Finds the message type.
     const gl_message_definition_t *msg_def;
@@ -133,6 +178,7 @@ int gl_read_message(int fd, struct gl_message_t *dst) {
         }
     }
     
+    gl_array_free(identifier_buf);
     gl_assert(msg_def);
     
     // Reads the parameters.
@@ -140,23 +186,62 @@ int gl_read_message(int fd, struct gl_message_t *dst) {
         gl_assert(!gl_is_eol(last_c));
     
         const gl_message_parameter_definition_t  *msg_param_def = gl_message_parameter_definitions()[msg_def->parameters[i]];
-        uint8_t parameter_value_buf[calculate_max_message_parameter_value_size()];
-        uint16_t parameter_value_length = 0;
+        uint8_t *parameter_value_buf = 0;
     
-        gl_assert(gl_read_string(fd, (uint8_t **)&parameter_value_buf, &parameter_value_length, &last_c, msg_param_def->length, msg_param_def->precise_length) != 0);
-        total_length += parameter_value_length;
+        gl_assert(gl_read_string(fd, &parameter_value_buf, &last_c, msg_param_def->length, msg_param_def->precise_length) != 0);
+        total_size += gl_array_get_header(parameter_value_buf)->size + 1;
+    
+        gl_message_parameter_t parameter;
+    
+        if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT8) {
+            parameter = (gl_message_parameter_t) { .uint8_value = parameter_value_buf[0] };
+        } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT16) {
+            uint16_t n = uint8_to_uint16(parameter_value_buf);
+            if (msg_param_def->endian_conversion == GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_AS_LITTLE) {
+                n = le16toh(n);
+            } else if (msg_param_def->endian_conversion == GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_AS_BIG) { // NOLINT
+                n = be16toh(n);
+            } else {
+                n = ntohs(n);
+            }
+            parameter = (gl_message_parameter_t) { .uint16_value = msg_param_def->has_max_value && n > (uint16_t )msg_param_def->max_value ? (uint16_t )msg_param_def->max_value : n };
+        } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT32) {
+            uint32_t n = uint8_to_uint32(parameter_value_buf);
+            if (msg_param_def->endian_conversion == GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_AS_LITTLE) {
+                n = le32toh(n);
+            } else if (msg_param_def->endian_conversion == GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_AS_BIG) { // NOLINT
+                n = be32toh(n);
+            } else {
+                n = ntohl(n);
+            }
+            parameter = (gl_message_parameter_t) { .uint32_value = msg_param_def->has_max_value && n > (uint32_t )msg_param_def->max_value ? (uint32_t )msg_param_def->max_value : n };
+        } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT64) {
+            uint64_t n = uint8_to_uint64(parameter_value_buf);
+            if (msg_param_def->endian_conversion == GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_AS_LITTLE) {
+                n = le64toh(n);
+            } else if (msg_param_def->endian_conversion == GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_AS_BIG) { // NOLINT
+                n = be64toh(n);
+            } else {
+                n = ntohll(n);
+            }
+            parameter = (gl_message_parameter_t) { .uint64_value = msg_param_def->has_max_value && n > (uint64_t )msg_param_def->max_value ? (uint64_t )msg_param_def->max_value : n };
+        } else {
+            parameter = (gl_message_parameter_t) { .string_value = parameter_value_buf };
+        }
         
-        gl_array_push(dst->parameters_data, gl_array_create_from_carray(parameter_value_buf, parameter_value_length));
+        gl_array_push(dst->parameters_value, parameter);
     }
     
-    if (msg_def->protocol != GL_MESSAGE_PROTOCOL_TYPE_BOTH) {
-        gl_assert(msg_def->protocol != GL_MESSAGE_PROTOCOL_TYPE_TCP || gl_is_tcp_eol(last_c));
-        gl_assert(msg_def->protocol != GL_MESSAGE_PROTOCOL_TYPE_UDP || gl_is_udp_eol(last_c));
+    // Checks if the message was sent using the right protocol.
+    if (msg_def->protocol != GL_MESSAGE_PROTOCOL_BOTH) {
+        gl_assert(msg_def->protocol != GL_MESSAGE_PROTOCOL_TCP || gl_is_tcp_eol(last_c));
+        gl_assert(msg_def->protocol != GL_MESSAGE_PROTOCOL_UDP || gl_is_udp_eol(last_c));
     }
     
-    // Read ending characters
+    // Reads ending characters.
     gl_assert(gl_read_uint8(fd, 0) != 0);
     gl_assert(gl_read_uint8(fd, 0) != 0);
+    total_size += 2;
     
-    return total_length;
+    return total_size;
 }

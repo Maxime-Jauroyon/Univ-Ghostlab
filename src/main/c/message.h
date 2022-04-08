@@ -68,27 +68,39 @@ typedef enum gl_message_type_t {
 } gl_message_type_t;
 
 typedef enum gl_message_protocol_t {
-    GL_MESSAGE_PROTOCOL_TYPE_TCP,
-    GL_MESSAGE_PROTOCOL_TYPE_UDP,
-    GL_MESSAGE_PROTOCOL_TYPE_BOTH,
+    GL_MESSAGE_PROTOCOL_TCP,
+    GL_MESSAGE_PROTOCOL_UDP,
+    GL_MESSAGE_PROTOCOL_BOTH,
     
     GL_MESSAGE_PROTOCOL_TYPE_COUNT
 } gl_message_protocol_t;
 
-typedef enum gl_message_parameter_endianness_t {
-    GL_MESSAGE_PARAMETER_ENDIANNESS_DEFAULT,
-    GL_MESSAGE_PARAMETER_ENDIANNESS_BIG,
-    GL_MESSAGE_PARAMETER_ENDIANNESS_LITTLE,
+typedef enum gl_message_parameter_endian_conversion_t {
+    GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
+    GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_AS_BIG,
+    GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_AS_LITTLE,
     
     GL_MESSAGE_PARAMETER_ENDIANNESS_COUNT
-} gl_message_parameter_endianness_t;
+} gl_message_parameter_endian_conversion_t;
+
+typedef enum gl_message_parameter_value_type_t {
+    GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING,
+    GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT8,
+    GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT16,
+    GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT32,
+    GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT64,
+    
+    GL_MESSAGE_PARAMETER_VALUE_TYPE_COUNT
+} gl_message_parameter_value_type_t;
 
 typedef struct gl_message_parameter_definition_t {
     const char *identifier;
+    const gl_message_parameter_value_type_t value_type;
     const uint16_t length;
     const bool precise_length;
-    const gl_message_parameter_endianness_t endianness;
-    const int max_conversion_value;
+    const gl_message_parameter_endian_conversion_t endian_conversion;
+    const bool has_max_value;
+    const uint64_t max_value;
 } gl_message_parameter_definition_t;
 
 typedef struct gl_message_definition_t {
@@ -98,9 +110,19 @@ typedef struct gl_message_definition_t {
     const gl_message_parameter_type_t parameters[];
 } gl_message_definition_t;
 
+typedef struct gl_message_parameter_t {
+    union {
+        uint8_t *string_value;
+        uint8_t uint8_value;
+        uint16_t uint16_value;
+        uint32_t uint32_value;
+        uint64_t uint64_value;
+    };
+} gl_message_parameter_t;
+
 typedef struct gl_message_t {
     gl_message_type_t type;
-    uint8_t **parameters_data;
+    gl_message_parameter_t *parameters_value;
 } gl_message_t;
 
 const gl_message_parameter_definition_t **gl_message_parameter_definitions();
