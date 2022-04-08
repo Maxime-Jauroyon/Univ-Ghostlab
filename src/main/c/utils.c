@@ -10,8 +10,6 @@
 #ifdef __APPLE__
 #include <sys/syslimits.h>
 #include <libkern/OSByteOrder.h>
-#define GL_BIG_ENDIAN __DARWIN_BYTE_ORDER == __DARWIN_BIG_ENDIAN
-#define GL_LITTLE_ENDIAN __DARWIN_BYTE_ORDER == __DARWIN_LITTLE_ENDIAN
 #define htobe16(x) OSSwapHostToBigInt16(x)
 #define htobe32(x) OSSwapHostToBigInt32(x)
 #define htobe64(x) OSSwapHostToBigInt64(x)
@@ -27,8 +25,6 @@
 #else
 #include <limits.h>
 #include <endian.h>
-#define GL_BIG_ENDIAN __BYTE_ORDER == __BIG_ENDIAN
-#define GL_LITTLE_ENDIAN __BYTE_ORDER == __LITTLE_ENDIAN
 #endif
 
 #define gl_is_tcp_eol(c) ((c) == '*')
@@ -37,7 +33,6 @@
 #define gl_is_separator(c) ((c) == ' ' || gl_is_eol(c))
 
 static uint8_t g_max_message_identifier_size = 0;
-static uint16_t g_max_message_parameter_value_size = 0;
 
 static uint8_t calculate_max_message_identifier_size() {
     if (g_max_message_identifier_size != 0) {
@@ -57,26 +52,6 @@ static uint8_t calculate_max_message_identifier_size() {
     g_max_message_identifier_size = max;
     
     return g_max_message_identifier_size;
-}
-
-static uint16_t calculate_max_message_parameter_value_size() {
-    if (g_max_message_parameter_value_size != 0) {
-        return g_max_message_parameter_value_size;
-    }
-    
-    uint16_t max = 0;
-    
-    for (uint32_t i = 0; i < GL_MESSAGE_PARAMETER_TYPE_COUNT; i++) {
-        uint16_t max_length = gl_message_parameter_definitions()[i]->length;
-        
-        if (max_length > max) {
-            max = max_length;
-        }
-    }
-    
-    g_max_message_parameter_value_size = max;
-    
-    return g_max_message_parameter_value_size;
 }
 
 static uint16_t uint8_to_uint16(const uint8_t *n) {
@@ -239,8 +214,9 @@ int gl_read_message(int fd, struct gl_message_t *dst) {
     }
     
     // Reads ending characters.
-    gl_assert(gl_read_uint8(fd, 0) != 0);
-    gl_assert(gl_read_uint8(fd, 0) != 0);
+    uint8_t c;
+    gl_assert(gl_read_uint8(fd, &c) != 0);
+    gl_assert(gl_read_uint8(fd, &c) != 0);
     total_size += 2;
     
     return total_size;
