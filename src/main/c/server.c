@@ -23,20 +23,23 @@ int main(int argc, char **argv) {
         if (r < 0) {
             goto error;
         }
+    
+        struct sockaddr_in client;
+        socklen_t size_client = sizeof(client);
+        int fd = accept(sock, (struct sockaddr *)&client, &size_client);
         
-        while (1) {
-            struct sockaddr_in client;
-            socklen_t size_client = sizeof(client);
-            int sock2 = accept(sock, (struct sockaddr *)&client, &size_client);
-            if (sock2 >= 0) {
-                while (1) {
-                    gl_message_t msg = { 0 };
-                    gl_read_message(sock2, &msg);
+        if (fd >= 0) {
+            for (uint8_t i = 0; i < 39; i++) {
+                {
+                    gl_message_t msg = {0};
+                    gl_read_message(fd, &msg);
                     gl_printf_message(&msg);
+                    gl_write_message(fd, &msg);
                 }
             }
-            close(sock2);
         }
+    
+        close(fd);
     }
     
     return EXIT_SUCCESS;

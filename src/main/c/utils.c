@@ -30,10 +30,11 @@
 #define gl_tcp_terminator '*'
 #define gl_udp_terminator '+'
 #define gl_separator ' '
-#define gl_is_tcp_eol(c) ((c) == gl_tcp_terminator)
-#define gl_is_udp_eol(c) ((c) == gl_udp_terminator)
-#define gl_is_eol(c) (gl_is_tcp_eol(c) || gl_is_udp_eol(c))
-#define gl_is_separator(c) ((c) == gl_separator || gl_is_eol(c))
+#define gl_is_tcp_terminator(c) ((c) == gl_tcp_terminator)
+#define gl_is_udp_terminator(c) ((c) == gl_udp_terminator)
+#define gl_is_terminator(c) (gl_is_tcp_terminator(c) || gl_is_udp_terminator(c))
+#define gl_is_separator(c) ((c) == gl_separator)
+#define gl_is_separator_or_terminator(c) (gl_is_separator(c) || gl_is_terminator(c))
 
 static uint8_t g_max_message_identifier_size = 0;
 
@@ -240,10 +241,10 @@ static int gl_read_uint8(int fd, uint8_t *n) {
     return (int)read(fd, n, sizeof(uint8_t));
 }
 
-static int gl_read_uint8_until_separator(int fd, uint8_t **dst, uint8_t *last_c, uint16_t max_size, bool precise_size) {
+static int gl_read_uint8_until_separator(int fd, uint8_t **dst, uint8_t *last_c, uint16_t max_size, bool precise_size, bool allow_spaces) {
     uint8_t c = 0;
     
-    while (!gl_is_separator(c)) {
+    while (allow_spaces ? !gl_is_terminator(c) : !gl_is_separator_or_terminator(c)) {
         if (c != 0) {
             gl_array_push(*dst, c);
             gl_assert(gl_array_get_header(*dst)->size <= max_size);
@@ -266,7 +267,7 @@ int gl_read_message(int fd, struct gl_message_t *dst) {
     uint8_t *identifier_buf = 0;
     
     // Reads the message type name.
-    gl_assert(gl_read_uint8_until_separator(fd, &identifier_buf, &last_c, gl_calculate_max_message_identifier_size(), false) != 0);
+    gl_assert(gl_read_uint8_until_separator(fd, &identifier_buf, &last_c, gl_calculate_max_message_identifier_size(), false, false) != 0);
     gl_array_push(identifier_buf, 0);
     total_size += gl_array_get_header(identifier_buf)->size;
     
@@ -286,13 +287,13 @@ int gl_read_message(int fd, struct gl_message_t *dst) {
     
     // Reads all parameters.
     for (uint32_t i = 0; i < msg_def->num_parameters; i++) {
-        gl_assert(!gl_is_eol(last_c));
+        gl_assert(!gl_is_terminator(last_c));
     
         const gl_message_parameter_definition_t  *msg_param_def = gl_message_parameter_definitions()[msg_def->parameters[i]];
         uint8_t *parameter_value_buf = 0;
     
         // Reads the parameter value.
-        gl_assert(gl_read_uint8_until_separator(fd, &parameter_value_buf, &last_c, msg_param_def->length, msg_param_def->precise_length) != 0);
+        gl_assert(gl_read_uint8_until_separator(fd, &parameter_value_buf, &last_c, msg_param_def->length, msg_param_def->precise_length, msg_param_def->allow_space) != 0);
         total_size += gl_array_get_header(parameter_value_buf)->size + 1;
     
         gl_message_parameter_t parameter;
@@ -338,8 +339,8 @@ int gl_read_message(int fd, struct gl_message_t *dst) {
     }
     
     // Checks if the message was sent using the right protocol.
-    gl_assert(msg_def->protocol != GL_MESSAGE_PROTOCOL_TCP || gl_is_tcp_eol(last_c));
-    gl_assert(msg_def->protocol != GL_MESSAGE_PROTOCOL_UDP || gl_is_udp_eol(last_c));
+    gl_assert(msg_def->protocol != GL_MESSAGE_PROTOCOL_TCP || gl_is_tcp_terminator(last_c));
+    gl_assert(msg_def->protocol != GL_MESSAGE_PROTOCOL_UDP || gl_is_udp_terminator(last_c));
     
     // Reads ending characters.
     uint8_t c;
@@ -351,11 +352,9 @@ int gl_read_message(int fd, struct gl_message_t *dst) {
 }
 
 int gl_printf_string(uint8_t **str) {
-    printf("string(");
     for (uint64_t i = 0; i < gl_array_get_size(*str); i++) {
         printf("%c", (*str)[i]);
     }
-    printf(")");
 }
 
 int gl_printf_message(struct gl_message_t *msg) {
@@ -363,31 +362,61 @@ int gl_printf_message(struct gl_message_t *msg) {
     
     gl_assert(gl_array_get_size(msg->parameters_value) == msg_def->num_parameters);
     
-    printf("%s(", msg_def->identifier);
+    printf("%s", msg_def->identifier);
     
-    for (uint32_t i = 0; i < msg_def->num_parameters; i++) {
+    for (uint8_t i = 0; i < msg_def->num_parameters; i++) {
         const gl_message_parameter_definition_t *msg_param_def = gl_message_parameter_definitions()[msg_def->parameters[i]];
         
-        printf("%s = ", gl_message_parameter_definitions()[msg_def->parameters[i]]->identifier);
+        printf(" ");
         
         if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT8) {
-            printf("uint_8(%u)", msg->parameters_value[i].uint8_value);
+            printf("%u", msg->parameters_value[i].uint8_value);
         } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT16) {
-            printf("uint16_t(%hu)", msg->parameters_value[i].uint16_value);
+            printf("%hu", msg->parameters_value[i].uint16_value);
         } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT32) {
-            printf("uint32_t(%u)", msg->parameters_value[i].uint32_value);
+            printf("%u", msg->parameters_value[i].uint32_value);
         } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT64) {
-            printf("uint64_t(%llu)", msg->parameters_value[i].uint64_value);
+            printf("%llu", msg->parameters_value[i].uint64_value);
         } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING) {
             gl_printf_string(&msg->parameters_value[i].string_value);
         }
-        
-        if (i != msg_def->num_parameters - 1) {
-            printf(", ");
+    }
+    
+    if (msg_def->protocol == GL_MESSAGE_PROTOCOL_UDP) {
+        printf("%c", gl_udp_terminator);
+        printf("%c", gl_udp_terminator);
+        printf("%c", gl_udp_terminator);
+    } else {
+        printf("%c", gl_tcp_terminator);
+        printf("%c", gl_tcp_terminator);
+        printf("%c", gl_tcp_terminator);
+    }
+    
+    printf("\n");
+    
+    return 0;
+}
+
+int gl_add_parameter_to_message(struct gl_message_t *msg, struct gl_message_parameter_t msg_param) {
+    gl_array_push(msg->parameters_value, msg_param);
+    
+    return 0;
+}
+
+int gl_free_message(struct gl_message_t *msg) {
+    const gl_message_definition_t *msg_def = gl_message_definitions()[msg->type];
+    
+    for (uint8_t i = 0; i < msg_def->num_parameters; i++) {
+        const gl_message_parameter_definition_t *msg_param_def = gl_message_parameter_definitions()[msg_def->parameters[i]];
+    
+        if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING) {
+            gl_array_free(msg->parameters_value[i].string_value);
         }
     }
     
-    printf(")\n");
+    if (msg_def->num_parameters > 0) {
+        gl_array_free(msg->parameters_value);
+    }
     
     return 0;
 }

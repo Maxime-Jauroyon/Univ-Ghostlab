@@ -97,6 +97,7 @@ typedef struct gl_message_parameter_definition_t {
     const gl_message_parameter_value_type_t value_type;
     const uint16_t length;
     const bool precise_length;
+    const bool allow_space;
     const gl_message_parameter_endian_conversion_t endian_conversion;
     const bool has_max_value;
     const uint64_t max_value;

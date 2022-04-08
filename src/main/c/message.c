@@ -5,6 +5,7 @@ static const gl_message_parameter_definition_t gl_message_parameter_n = {
     .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT8,
     .length = 1,
     .precise_length = true,
+    .allow_space = false,
     .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
     .has_max_value = false
 };
@@ -14,6 +15,7 @@ static const gl_message_parameter_definition_t gl_message_parameter_m = {
     .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT8,
     .length = 1,
     .precise_length = true,
+    .allow_space = false,
     .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
     .has_max_value = false
 };
@@ -23,6 +25,7 @@ static const gl_message_parameter_definition_t gl_message_parameter_s = {
     .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT8,
     .length = 1,
     .precise_length = true,
+    .allow_space = false,
     .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
     .has_max_value = false
 };
@@ -32,7 +35,9 @@ static const gl_message_parameter_definition_t gl_message_parameter_id = {
     .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING,
     .length = 8,
     .precise_length = true,
-    .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE
+    .allow_space = false,
+    .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
+    .has_max_value = false
 };
 
 static const gl_message_parameter_definition_t gl_message_parameter_port = {
@@ -40,6 +45,7 @@ static const gl_message_parameter_definition_t gl_message_parameter_port = {
     .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING,
     .length = 4,
     .precise_length = true,
+    .allow_space = false,
     .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
     .has_max_value = false
 };
@@ -49,6 +55,7 @@ static const gl_message_parameter_definition_t gl_message_parameter_h = {
     .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT16,
     .length = 2,
     .precise_length = true,
+    .allow_space = false,
     .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_AS_LITTLE,
     .has_max_value = true,
     .max_value = 1000
@@ -59,6 +66,7 @@ static const gl_message_parameter_definition_t gl_message_parameter_w = {
     .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT16,
     .length = 2,
     .precise_length = true,
+    .allow_space = false,
     .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_AS_LITTLE,
     .has_max_value = true,
     .max_value = 1000
@@ -69,7 +77,9 @@ static const gl_message_parameter_definition_t gl_message_parameter_f = {
     .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT8,
     .length = 1,
     .precise_length = true,
-    .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE
+    .allow_space = false,
+    .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
+    .has_max_value = false
 };
 
 static const gl_message_parameter_definition_t gl_message_parameter_ip = {
@@ -77,6 +87,7 @@ static const gl_message_parameter_definition_t gl_message_parameter_ip = {
     .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING,
     .length = 15,
     .precise_length = true,
+    .allow_space = false,
     .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
     .has_max_value = false
 };
@@ -86,6 +97,7 @@ static const gl_message_parameter_definition_t gl_message_parameter_x = {
     .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING,
     .length = 3,
     .precise_length = true,
+    .allow_space = false,
     .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
     .has_max_value = false
 };
@@ -95,6 +107,7 @@ static const gl_message_parameter_definition_t gl_message_parameter_y = {
     .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING,
     .length = 3,
     .precise_length = true,
+    .allow_space = false,
     .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
     .has_max_value = false
 };
@@ -104,6 +117,7 @@ static const gl_message_parameter_definition_t gl_message_parameter_d = {
     .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING,
     .length = 3,
     .precise_length = true,
+    .allow_space = false,
     .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
     .has_max_value = false
 };
@@ -113,6 +127,7 @@ static const gl_message_parameter_definition_t gl_message_parameter_p = {
     .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING,
     .length = 4,
     .precise_length = true,
+    .allow_space = false,
     .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
     .has_max_value = false
 };
@@ -122,6 +137,7 @@ static const gl_message_parameter_definition_t gl_message_parameter_mess = {
     .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING,
     .length = 200,
     .precise_length = false,
+    .allow_space = true,
     .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
     .has_max_value = false
 };
