@@ -1,3 +1,7 @@
+package interaction;
+import client.Client;
+import client.Utils;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -35,16 +39,37 @@ public class InteractionInGamePhase extends InteractionPerPhase {
             if(choice.equals("move")){
                 String moveState = putQuestionOnMoveChoice("Where do you want to go ? (left/right/top/bottom)",
                         new String[]{"left","right","top","bottom"}, sc);
-            }/*else if(choice.equals("list")){
+            }else if(choice.equals("quit")){
+                clientSender = "IQUIT***\n";
+            }
 
-            }*/
+            pw.print(clientSender);
+            pw.flush();
+
+            int state = getQuestionInGamePhase(br, choice);
+            if(state == 1){
+                return 1;
+            }else if(state == 2){
+                return 2;
+            }
         }
 
-        return 0;
     }
 
-    public int getQuestionOnIntroductionPhase(BufferedReader br, String clientChoice) throws IOException {
+    public int getQuestionInGamePhase(BufferedReader br, String clientChoice) throws IOException {
+        System.out.println("test");
+        String message = br.readLine();
+        System.out.println(message);
+        String[] list = message.split(" ");
+        if(list[0].equals("MOVE!")){
 
+        }else if(list[0].equals("GOBYE***")){
+            System.out.println("Connection closing");
+            if(!client.getSocket().isClosed()){
+                client.getSocket().close();
+            }
+            return 1;
+        }
         return 0;
     }
 }
