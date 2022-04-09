@@ -4,11 +4,10 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class InteractionIntroductionPhase {
-    private final Client client;
+public class InteractionIntroductionPhase extends InteractionPerPhase {
 
     public InteractionIntroductionPhase(Client client){
-        this.client = client;
+        super(client);
     }
 
     public int putQuestionOnIntroductionPhase(Socket tcpSocket, BufferedReader br, PrintWriter pw,
@@ -68,6 +67,9 @@ public class InteractionIntroductionPhase {
             client.setMulticastAddr(list[5]);
             client.setMulticastAddr(list[6].substring(0, list[6].length()-3));
             return 1;
+        }else if(message.startsWith("POSIT")){
+            client.setIdPlayer(list[1]);
+            client.setStartedPos(Integer.getInteger(list[2]), Integer.parseInt(list[3].substring(0, list[2].length()-3)));
         }else if(message.startsWith("LIST!") || message.startsWith("GAMES")) {
             String gameId = "";
             boolean startWithList = message.startsWith("LIST!");

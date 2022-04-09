@@ -13,11 +13,16 @@ public class Client {
     private int numberOfghost;
     private String multicastAddr;
     private String multicastPort;
+    private String idPlayer;
+    private final int[] startedPos;
+    private final int[] currentPos;
 
     private Client(String ipv4, int tcpPort, int udpPort){
         this.ipv4 = ipv4;
         this.tcpPort = tcpPort;
         this.udpPort = udpPort;
+        startedPos = new int[2];
+        currentPos = new int[2];
     }
 
     public int getUdpPort() {
@@ -48,6 +53,20 @@ public class Client {
         this.multicastPort = multicassPort;
     }
 
+    public void setIdPlayer(String idPlayer) {
+        this.idPlayer = idPlayer;
+    }
+
+    public void setStartedPos(int h, int w){
+        startedPos[0] = h;
+        startedPos[1] = w;
+    }
+
+    public void setCurrentPos(int h, int w){
+        currentPos[0] = h;
+        currentPos[1] = w;
+    }
+
     public void launchGame(){
         try{
             System.out.println("ipv4 : " + ipv4 + " , tcpPort : " + tcpPort + " udpPort : " + udpPort);
@@ -71,6 +90,7 @@ public class Client {
                 }
 
                 InteractionIntroductionPhase iip = new InteractionIntroductionPhase(this);
+                InteractionInGamePhase iigp = new InteractionInGamePhase(this);
                 String question = "Would you create a new game or join an existant game ? ";
                 question += "Or would you know some information about game ? (register/new/size/list/game/quit)";
 
@@ -96,6 +116,11 @@ public class Client {
 
                 System.out.println("Enter in main phase of the game");
 
+                iip.getQuestionOnIntroductionPhase(br, "");
+
+                question = "What to you want to do ? (move/list/messall/messto/quit)";
+                state = iigp.putQuestionOnGamePhase(tcpSocket, br, pw, question,
+                        new String[]{"move","list","messall","messto","quit"}, sc);
 
 
             }
