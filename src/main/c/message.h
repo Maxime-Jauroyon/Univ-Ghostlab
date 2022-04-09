@@ -69,17 +69,13 @@ typedef enum gl_message_type_t {
 
 typedef enum gl_message_protocol_t {
     GL_MESSAGE_PROTOCOL_TCP,
-    GL_MESSAGE_PROTOCOL_UDP,
-    
-    GL_MESSAGE_PROTOCOL_TYPE_COUNT
+    GL_MESSAGE_PROTOCOL_UDP
 } gl_message_protocol_t;
 
 typedef enum gl_message_parameter_endian_conversion_t {
     GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
     GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_AS_BIG,
-    GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_AS_LITTLE,
-    
-    GL_MESSAGE_PARAMETER_ENDIANNESS_COUNT
+    GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_AS_LITTLE
 } gl_message_parameter_endian_conversion_t;
 
 typedef enum gl_message_parameter_value_type_t {
@@ -87,9 +83,7 @@ typedef enum gl_message_parameter_value_type_t {
     GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT8,
     GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT16,
     GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT32,
-    GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT64,
-    
-    GL_MESSAGE_PARAMETER_VALUE_TYPE_COUNT
+    GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT64
 } gl_message_parameter_value_type_t;
 
 typedef struct gl_message_parameter_definition_t {
@@ -105,8 +99,8 @@ typedef struct gl_message_parameter_definition_t {
 
 typedef struct gl_message_definition_t {
     const char *identifier;
-    const uint8_t num_parameters;
     const gl_message_protocol_t protocol;
+    const uint8_t num_parameters;
     const gl_message_parameter_type_t parameters[];
 } gl_message_definition_t;
 

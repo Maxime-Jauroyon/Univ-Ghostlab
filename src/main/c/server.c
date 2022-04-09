@@ -45,15 +45,15 @@ int main(int argc, char **argv) {
     while ((opt = getopt_long(argc, argv, "p:I:P:hv", opts, 0)) != -1) {
         switch (opt) {
         case 'p':
-            // TODO: Check if port is valid
+            // TODO: Check if port is valid, if invalid use default
             server_port = strdup(optarg);
             break;
         case 'I':
-            // TODO: Check if ip is valid
+            // TODO: Check if ip is valid, if invalid use default
             multicast_ip = strdup(optarg);
             break;
         case 'P':
-            // TODO: Check if port is valid
+            // TODO: Check if port is valid, if invalid use default
             multicast_port = strdup(optarg);
             break;
         case 'h':

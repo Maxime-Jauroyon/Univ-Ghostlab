@@ -48,19 +48,19 @@ int main(int argc, char **argv) {
     while ((opt = getopt_long(argc, argv, "i:p:n:u:hv", opts, 0)) != -1) {
         switch (opt) {
         case 'i':
-            // TODO: Check if ip is valid
+            // TODO: Check if ip is valid, if invalid use default
             server_ip = strdup(optarg);
             break;
         case 'p':
-            // TODO: Check if port is valid
+            // TODO: Check if port is valid, if invalid use default
             server_port = strdup(optarg);
             break;
         case 'n':
-            // TODO: Check if name is valid
+            // TODO: Check if name is valid, if invalid use default
             player_name = strdup(optarg);
             break;
         case 'u':
-            // TODO: Check if port is valid
+            // TODO: Check if port is valid, if invalid use default
             udp_port = strdup(optarg);
             break;
         case 'h':
