@@ -54,6 +54,20 @@ public class Serveur {
         pw.flush();
     }
 
+    private static void callRIMOV(PrintWriter pw){
+        pw.print("MOVE! 003 001***\n");
+        pw.flush();
+    }
+
+    private static void callGLIS(PrintWriter pw){
+        pw.print("GLIS! 2***\n");
+        pw.flush();
+        pw.print("[GPLYR leotom22 002 003 0010***\n");
+        pw.flush();
+        pw.print("[GPLYR leotom23 003 004 0011***\n");
+        pw.flush();
+    }
+
     private static void someStartCommands(Socket socket, BufferedReader br, PrintWriter pw) throws IOException {
         while(true){
             String clientMessage = br.readLine();
@@ -92,6 +106,11 @@ public class Serveur {
                 callIQUIT(pw);
                 socket.close();
                 return;
+            }else if(clientMessage.contains("MOV")){
+                System.out.println(clientMessage);
+                callRIMOV(pw);
+            }else if(clientMessage.startsWith("GLIS?")){
+                callGLIS(pw);
             }
         }
     }

@@ -22,6 +22,7 @@ public class Client {
     private String idPlayer;
     private final int[] startedPos;
     private final int[] currentPos;
+    private int score;
 
 
 
@@ -31,6 +32,7 @@ public class Client {
         datagramSocketReceived = new DatagramSocket(udpPort);
         startedPos = new int[2];
         currentPos = new int[2];
+        score = 0;
     }
 
 
@@ -76,8 +78,14 @@ public class Client {
     }
 
     public void setCurrentPos(int h, int w){
+        System.out.println("Your position on the maze are : (" +  h + "," + w + ")");
         currentPos[0] = h;
         currentPos[1] = w;
+    }
+
+    public void setScore(int score) {
+        System.out.println("Your score are : " + score);
+        this.score = score;
     }
 
     public void launchGame() throws IOException, InterruptedException {
@@ -119,7 +127,6 @@ public class Client {
             t1.start();
             t1.join();
 
-            System.out.println(socket.isClosed());
             if(socket.isClosed()){
                 break;
             }
