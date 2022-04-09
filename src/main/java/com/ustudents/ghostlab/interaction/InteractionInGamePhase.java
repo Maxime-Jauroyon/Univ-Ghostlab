@@ -5,7 +5,6 @@ import client.Utils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.Socket;
 import java.util.Scanner;
 
 public class InteractionInGamePhase extends InteractionPerPhase {
@@ -27,7 +26,6 @@ public class InteractionInGamePhase extends InteractionPerPhase {
             }
         }
 
-
         if(choice.equals("left")){
             return "LEMOV " + nbMove + "***\n";
         }else if(choice.equals("right")){
@@ -39,8 +37,9 @@ public class InteractionInGamePhase extends InteractionPerPhase {
         }
     }
 
-    public int putQuestionOnGamePhase(BufferedReader br, PrintWriter pw,
-                                              String question, String[] correctAnswers, Scanner sc) throws IOException {
+    public void putQuestionOnGamePhase(BufferedReader br, PrintWriter pw,
+                                       String question, String[] correctAnswers,
+                                       Scanner sc) throws IOException {
 
         while(true){
             String choice = Utils.gameStepChoice(question, correctAnswers, sc);
@@ -51,8 +50,15 @@ public class InteractionInGamePhase extends InteractionPerPhase {
                                 "(left/right/up/down)", "How much case would you move ? ",
                                  new String[]{"left","right","up","down"}, sc);
 
-            }else if(choice.equals("list")){
+            }else if(choice.equals("list")) {
                 clientSender = "GLIS?***\n";
+            }else if(choice.equals("messall")) {
+                String message = Utils.getInput("What do you say to all members of the game ?", sc, 3);
+                clientSender = "MALL? " + message.substring(0, 200) + "***\n";
+            }else if(choice.equals("messto")){
+                String playerId = Utils.getInput("Who is the player ?", sc, 0);
+                String message = Utils.getInput("What do you say to ?", sc, 3);
+                clientSender = "SEND? " + playerId + " " + message.substring(0, 200) + "***\n";
             } else if(choice.equals("quit")){
                 clientSender = "IQUIT***\n";
             }
@@ -60,12 +66,10 @@ public class InteractionInGamePhase extends InteractionPerPhase {
             pw.print(clientSender);
             pw.flush();
 
-            int state = getQuestionInGamePhase(br);
-            if(state == 1){
-                return 1;
-            }else if(state == 2){
-                return 2;
-            }
+            if(choice.equals("messall") || choice.equals("messto"))
+                continue;
+
+            getQuestionInGamePhase(br);
         }
 
     }
@@ -82,7 +86,7 @@ public class InteractionInGamePhase extends InteractionPerPhase {
         }
     }
 
-    public int getQuestionInGamePhase(BufferedReader br) throws IOException {
+    public void getQuestionInGamePhase(BufferedReader br) throws IOException {
         String message = br.readLine();
         String[] list = message.split(" ");
 
@@ -100,8 +104,6 @@ public class InteractionInGamePhase extends InteractionPerPhase {
             if(!client.getSocket().isClosed()){
                 client.getSocket().close();
             }
-            return 1;
         }
-        return 0;
     }
 }

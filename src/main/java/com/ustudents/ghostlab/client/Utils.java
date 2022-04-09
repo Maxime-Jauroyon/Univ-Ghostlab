@@ -47,7 +47,8 @@ public class Utils {
             return false;
 
         for(char c: answer.toCharArray()){
-            if((flag == 0 && (c < 33 || c > 126)) || (flag == 1 && (c < 48 || c > 57)))
+            if((flag == 0 && (c < 33 || c > 126)) || (flag == 1 && (c < 48 || c > 57))
+                || (flag == 3 && (c < 33 || c > 126)))
                 return false;
         }
         return true;
