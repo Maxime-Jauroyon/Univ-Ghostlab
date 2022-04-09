@@ -68,10 +68,10 @@ static uint16_t gl_uint8_to_uint16(const uint8_t *n) {
 
 static uint32_t gl_uint8_to_uint32(const uint8_t *n) {
     uint32_t r =
-        (uint32_t)n[3] << 24 |
-        (uint32_t)n[2] << 16 |
-        (uint32_t)n[1] << 8 |
-        (uint32_t)n[0];
+        (uint32_t)n[3] << 24 | // Je met le dernier uint8_t sur les bits 24 à 32 du uint32_t
+        (uint32_t)n[2] << 16 | // Je met le 3ème uint8_t sur les bits 16 à 24 du uint32_t
+        (uint32_t)n[1] << 8 | // Je met le 2ème uint8_t sur les bits 8 à 16 du uint32_t
+        (uint32_t)n[0]; // Je met le premier uint8_t sur les bits 0 à 8 du uint32_t
     
     return r;
 }

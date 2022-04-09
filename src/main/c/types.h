@@ -17,6 +17,16 @@
 #define GHOSTLAB_EXECUTABLE_NAME "server"
 #endif
 
+#define GHOSTLAB_VERSION "1.0.0"
+#define GHOSTLAB_DEFAULT_SERVER_IP "127.0.0.1"
+#define GHOSTLAB_DEFAULT_SERVER_PORT "4785"
+#define GHOSTLAB_DEFAULT_MULTICAST_IP "231.1.2.4"
+#define GHOSTLAB_DEFAULT_MULTICAST_PORT "7759"
+#define GHOSTLAB_DEFAULT_UDP_PORT "5541"
+
+// Prints an error message.
+#define error(message) fprintf(stderr, GHOSTLAB_EXECUTABLE_NAME ": " message)
+
 // Asserts a condition that returns `-1` in case of error.
 #define gl_assert(condition) if (!(condition)) { return -1; } (void)0
 

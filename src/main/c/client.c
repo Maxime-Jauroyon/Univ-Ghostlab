@@ -5,11 +5,92 @@
 #include <printf.h>
 #include <unistd.h>
 #include <string.h>
+#include <errno.h>
+#include <getopt.h>
 #include "utils.h"
 #include "array.h"
 #include "message.h"
 
+static const char g_help[] =
+    "usage: " GHOSTLAB_EXECUTABLE_NAME " [options]\n"
+    "\n"
+    "ghostlab is an online matchmaking based game where you take upon yourself to become the best ghost hunter!\n"
+    "\n"
+    "options:\n"
+    "\t-i, --ip <server ip>                 defines the ip to connect to (" GHOSTLAB_DEFAULT_SERVER_IP " by default).\n"
+    "\t-p, --port <server tcp port>         defines the port to connect to (" GHOSTLAB_DEFAULT_SERVER_PORT " by default).\n"
+    "\t-n, --name <player name>             defines the name to use when connected to a match (will be asked later if not provided).\n"
+    "\t-u, --udp-port,  <client udp port>   defines the udp port to use to communicate with other players (" GHOSTLAB_DEFAULT_UDP_PORT " used by default).\n"
+    "\t-h, --help                           displays this help message and exits.\n"
+    "\t-v, --version                        displays the program's version and exits.\n";
+
 int main(int argc, char **argv) {
+    errno = 0;
+    int exit_code = EXIT_SUCCESS;
+    
+    char *server_ip = 0;
+    char *server_port = 0;
+    char *player_name = 0;
+    char *udp_port = 0;
+    
+    static struct option opts[] =
+        {
+            { "ip", required_argument, 0, 'i' },
+            { "port", required_argument, 0, 'p' },
+            { "name", required_argument, 0, 'n' },
+            { "udp-port", required_argument, 0, 'u' },
+            { "help", no_argument, 0, 'h' },
+            { "version", no_argument, 0, 'v' },
+            {0, 0, 0, 0}
+        };
+    int used_unknown_opt = 0;
+    int opt;
+    while ((opt = getopt_long(argc, argv, "i:p:n:u:hv", opts, 0)) != -1) {
+        switch (opt) {
+        case 'i':
+            // TODO: Check if ip is valid
+            server_ip = strdup(optarg);
+            break;
+        case 'p':
+            // TODO: Check if port is valid
+            server_port = strdup(optarg);
+            break;
+        case 'n':
+            // TODO: Check if name is valid
+            player_name = strdup(optarg);
+            break;
+        case 'u':
+            // TODO: Check if port is valid
+            udp_port = strdup(optarg);
+            break;
+        case 'h':
+            printf("%s", g_help);
+            goto cleanup;
+        case 'v':
+            printf("version: " GHOSTLAB_VERSION);
+            goto cleanup;
+        case '?':
+            used_unknown_opt = 1;
+            break;
+        default:
+            fprintf(stderr, "option not yet implemented `%c`!\n", opt);
+        }
+    }
+    
+    if (used_unknown_opt) {
+        error("use `-h` for more informations.\n");
+    }
+    
+    if (!server_ip) {
+        server_ip = strdup(GHOSTLAB_DEFAULT_SERVER_IP);
+    }
+    if (!server_port) {
+        server_ip = strdup(GHOSTLAB_DEFAULT_SERVER_PORT);
+    }
+    if (!udp_port) {
+        udp_port = strdup(GHOSTLAB_DEFAULT_UDP_PORT);
+    }
+    
     struct sockaddr_in adress_sock;
     adress_sock.sin_family = AF_INET;
     adress_sock.sin_port = htons(4243);
@@ -319,5 +400,24 @@ int main(int argc, char **argv) {
         close(fd);
     }
     
-    return EXIT_SUCCESS;
+    goto cleanup;
+    
+    error:
+    exit_code = gl_get_error();
+    
+    cleanup:
+    if (server_ip) {
+        free(server_ip);
+    }
+    if (server_port) {
+        free(server_port);
+    }
+    if (player_name) {
+        free(player_name);
+    }
+    if (udp_port) {
+        free(udp_port);
+    }
+    
+    return exit_code;
 }
