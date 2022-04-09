@@ -35,6 +35,11 @@ public class Serveur {
         pw.flush();
     }
 
+    private static void callWelcome(PrintWriter pw){
+        pw.print("WELCO 0 20 20 3 224.0.1.4 6677***\n");
+        pw.flush();
+    }
+
     private static void someCommands(BufferedReader br, PrintWriter pw) throws IOException {
         while(true){
             String clientMessage = br.readLine();
@@ -49,6 +54,8 @@ public class Serveur {
                 callListMessage(pw);
             }else if(clientMessage.startsWith("GAME?")){
                 callGameMessage(pw);
+            }else if(clientMessage.startsWith("START")){
+                callWelcome(pw);
             }
 
             pw.flush();
