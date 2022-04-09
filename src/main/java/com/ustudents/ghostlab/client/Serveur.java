@@ -54,7 +54,7 @@ public class Serveur {
         pw.flush();
     }
 
-    private static void someStartCommands(BufferedReader br, PrintWriter pw) throws IOException {
+    private static void someStartCommands(Socket socket, BufferedReader br, PrintWriter pw) throws IOException {
         while(true){
             String clientMessage = br.readLine();
             if(clientMessage.startsWith("REGIS") || clientMessage.startsWith("NEWPL")){
@@ -70,6 +70,10 @@ public class Serveur {
                 callGameMessage(pw);
             }else if(clientMessage.startsWith("START")){
                 callWelcome(pw);
+                return;
+            }else if(clientMessage.startsWith("IQUIT")){
+                callIQUIT(pw);
+                socket.close();
                 return;
             }
 
@@ -101,16 +105,9 @@ public class Serveur {
                 BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 PrintWriter pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
                 callGameMessage(pw); //game command
-                someStartCommands(br, pw);
-                //System.out.println("Received message : " + br.readLine());
-                //callGameMessage(pw);
-                //callListMessage(pw);//list command
-                //callSizeMessage(pw);//size command
-                //callUnregister(pw);//unregister command
-                //callNewGame(pw);//new game command
+                someStartCommands(socket, br, pw);
                 callPOSIT(pw);
                 someGameCommands(socket, br, pw);
-                //socket.close();
             }
 
 

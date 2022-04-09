@@ -15,7 +15,7 @@ public class InteractionIntroductionPhase extends InteractionPerPhase {
         super(client);
     }
 
-    public int putQuestionOnIntroductionPhase(Socket tcpSocket, BufferedReader br, PrintWriter pw,
+    public int putQuestionOnIntroductionPhase(BufferedReader br, PrintWriter pw,
                                                String question, String[] correctAnswers, Scanner sc) throws IOException {
         while(true){
             String choice = Utils.gameStepChoice(question, correctAnswers, sc);
@@ -41,9 +41,7 @@ public class InteractionIntroductionPhase extends InteractionPerPhase {
             }else if(choice.equals("start")){
                 clientSender = "START***\n";
             }else if(choice.equals("quit")){
-                System.out.println("Connection closing");
-                tcpSocket.close();
-                return 0;
+                clientSender = "IQUIT***\n";
             }
 
             pw.print(clientSender);
@@ -54,6 +52,8 @@ public class InteractionIntroductionPhase extends InteractionPerPhase {
                 return 1;
             }else if(state == 2){
                 return 2;
+            }else if(state == 3){
+                return 3;
             }
         }
     }
@@ -61,10 +61,10 @@ public class InteractionIntroductionPhase extends InteractionPerPhase {
     public int getQuestionInIntroductionPhase(BufferedReader br, String clientChoice) throws IOException {
         String message = br.readLine();
         String[] list = message.split(" ");
-        if(message.startsWith("REGOK")) {
+        if(list[0].equals("REGOK")) {
             client.setGameRegister(Integer.parseInt(list[1].substring(0, list[1].length()-3)));
             return 1;
-        }else if(message.startsWith("WELCO")){
+        }else if(list[0].equals("WELCO")){
             client.setGameRegister(Integer.parseInt(list[1]));
             client.setHeigthMaze(Integer.parseInt(list[2]));
             client.setWidthMaze(Integer.parseInt(list[3]));
@@ -72,10 +72,10 @@ public class InteractionIntroductionPhase extends InteractionPerPhase {
             client.setMulticastAddr(list[5]);
             client.setMulticastAddr(list[6].substring(0, list[6].length()-3));
             return 1;
-        }else if(message.startsWith("POSIT")){
+        }else if(list[0].equals("POSIT")){
             client.setIdPlayer(list[1]);
             client.setStartedPos(Integer.parseInt(list[2]), Integer.parseInt(list[3].substring(0, list[3].length()-3)));
-        }else if(message.startsWith("LIST!") || message.startsWith("GAMES")) {
+        }else if(list[0].equals("LIST!") || list[0].equals("GAMES")) {
             String gameId = "";
             boolean startWithList = message.startsWith("LIST!");
             if (startWithList) {
@@ -100,19 +100,25 @@ public class InteractionIntroductionPhase extends InteractionPerPhase {
                 }
             }
 
-        }else if(message.startsWith("SIZE!")) {
+        }else if(list[0].equals("SIZE!")) {
             String gameId = list[1];
             String height = list[2];
             String width = list[3].substring(0, list[3].length()-3);
             System.out.println("Game id : " + gameId + " , height : " + height +
                     " et width : " + width + " of the maze");
 
-        }else if(message.startsWith("UNROK")){
+        }else if(list[0].equals("UNROK")){
             String gameId = list[1].substring(0, list[1].length()-3);
             System.out.println("Unregister of game : " + gameId);
             return 2;
 
             //TODO: make function to explain all existant error in program
+        }else if(list[0].equals("GOBYE***")){
+            System.out.println("Connection closing");
+            if(!client.getSocket().isClosed()){
+                client.getSocket().close();
+            }
+            return 3;
         }else{
             System.out.println("Error : Wrong using of " + clientChoice);
         }

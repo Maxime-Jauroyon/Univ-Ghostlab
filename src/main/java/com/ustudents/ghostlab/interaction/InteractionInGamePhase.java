@@ -29,7 +29,7 @@ public class InteractionInGamePhase extends InteractionPerPhase {
         return "";
     }
 
-    public int putQuestionOnGamePhase(Socket tcpSocket, BufferedReader br, PrintWriter pw,
+    public int putQuestionOnGamePhase(BufferedReader br, PrintWriter pw,
                                               String question, String[] correctAnswers, Scanner sc) throws IOException {
 
         while(true){
