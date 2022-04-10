@@ -4,7 +4,6 @@ project(ghostlab VERSION 1.0.0 LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
 
-set(COMMON_LIB "")
 set(COMMON_SRC
         src/main/c/array.c
         src/main/c/array.h
