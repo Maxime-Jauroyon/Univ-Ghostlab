@@ -64,66 +64,22 @@ typedef struct gl_array_header_t {
 #define gl_array_remove(a, i) (((a) ? memmove((a) + (i), (a) + (i) + 1, (gl_array_get_size(a) - (i) - 1 * sizeof(*(a))) : 0), (a) ? --gl_array_get_header(a)->size : 0)
 
 // Frees the data of an array (must be called to deallocated memory).
-#define gl_array_free(a) ((*(void **)&(a)) = internal_gl_array_free((void *)(a)))
+#define gl_array_free(a) (internal_gl_array_free((void *)(a)), (*(void **)&(a)) = 0)
 
 // Internal function.
 // Sets the capacity of the array for a given type.
-static inline void *internal_gl_array_set_capacity(void *array, uint64_t capacity, uint64_t item_size) {
-    uint8_t *header = array ? (uint8_t *)gl_array_get_header(array) : 0;
-    
-    const uint64_t header_size = sizeof(gl_array_header_t);
-    const uint64_t size = gl_array_get_size(array);
-    const uint64_t memory = capacity ? item_size * capacity + header_size : 0;
-    
-    header = (uint8_t *)realloc(header, memory);
-    
-    if (!header) {
-        return 0;
-    }
-    
-    ((gl_array_header_t *)header)->size = size < capacity ? size : capacity;
-    ((gl_array_header_t *)header)->capacity = capacity;
-    
-    return header + header_size;
-}
+void *internal_gl_array_set_capacity(void *array, uint64_t capacity, uint64_t item_size);
 
 // Internal function.
 // Geometrically grows the array to hold at least a given number of items of a given type.
-static inline void *internal_gl_array_grow(void *array, uint64_t to_at_least, uint64_t item_size) {
-    const uint64_t capacity = gl_array_get_capacity(array);
-    
-    if (capacity >= to_at_least) {
-        return array;
-    }
-    
-    const uint64_t min_new_capacity = capacity ? capacity * 2 : 16;
-    const uint64_t new_capacity = min_new_capacity > to_at_least ? min_new_capacity : to_at_least;
-    
-    return internal_gl_array_set_capacity(array, new_capacity, item_size);
-}
+void *internal_gl_array_grow(void *array, uint64_t to_at_least, uint64_t item_size);
 
 // Internal function.
 // Initializes an array from a C array pointer.
-static inline void *internal_gl_array_create_from_carray(const void *ptr, uint64_t size, uint64_t item_size) {
-    void *array = internal_gl_array_set_capacity(0, size, item_size);
-    gl_array_get_header(array)->size = size;
-    memcpy(array, ptr, size * item_size);
-    
-    return array;
-}
+void *internal_gl_array_create_from_carray(const void *ptr, uint64_t size, uint64_t item_size);
 
 // Internal function.
 // Frees data of the array.
-static inline void *internal_gl_array_free(void *array) {
-    uint8_t *header = array ? (uint8_t *)gl_array_get_header(array) : 0;
-    
-    if (header == 0) {
-        return 0;
-    }
-    
-    free(header);
-    
-    return 0;
-}
+void internal_gl_array_free(void *array);
 
 #endif /* GHOSTLAB_ARRAY_H */

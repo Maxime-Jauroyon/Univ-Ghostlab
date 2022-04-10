@@ -71,7 +71,7 @@ int main(int argc, char **argv) {
     }
     
     if (used_unknown_opt) {
-        error("use `-h` for more informations.\n");
+        gl_error("use `-h` for more informations.\n");
     }
     
     if (!server_port) {
@@ -105,10 +105,10 @@ int main(int argc, char **argv) {
             for (uint8_t i = 0; i < 39; i++) {
                 {
                     gl_message_t msg = {0};
-                    gl_read_message(fd, &msg);
-                    gl_printf_message(&msg);
-                    gl_write_message(fd, &msg);
-                    gl_free_message(&msg);
+                    gl_message_read(fd, &msg);
+                    gl_message_printf(&msg);
+                    gl_message_write(fd, &msg);
+                    gl_message_free(&msg);
                 }
             }
         }
@@ -119,7 +119,7 @@ int main(int argc, char **argv) {
     goto cleanup;
     
     error:
-    exit_code = gl_get_error();
+    exit_code = gl_error_get(errno);
     
     cleanup:
     if (server_port) {

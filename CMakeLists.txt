@@ -6,9 +6,12 @@ set(CMAKE_C_STANDARD 99)
 
 set(COMMON_LIB "")
 set(COMMON_SRC
+        src/main/c/array.c
         src/main/c/array.h
         src/main/c/message.c
         src/main/c/message.h
+        src/main/c/string.c
+        src/main/c/string.h
         src/main/c/types.h
         src/main/c/utils.c
         src/main/c/utils.h)

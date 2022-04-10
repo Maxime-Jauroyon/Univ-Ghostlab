@@ -3,24 +3,31 @@
 
 #include "types.h"
 
-struct gl_message_t;
-struct gl_message_parameter_t;
+#define gl_is_tcp_terminator(c) ((c) == GHOSTLAB_TCP_TERMINATOR)
+#define gl_is_udp_terminator(c) ((c) == GHOSTLAB_UDP_TERMINATOR)
+#define gl_is_separator(c) ((c) == GHOSTLAB_SEPARATOR)
+#define gl_is_terminator(c) (gl_is_tcp_terminator(c) || gl_is_udp_terminator(c))
+#define gl_is_separator_or_terminator(c) (gl_is_separator(c) || gl_is_terminator(c))
 
-// Checks `errno` to call `perror` if needed and returns `EXIT_FAILURE`.
-int gl_get_error();
+// Checks `errno` to call `perror` if needed and returns `0`.
+int gl_error_get(int err);
 
-uint8_t *gl_string_from_cstring(const char *src);
+uint16_t gl_uint8_to_uint16(const uint8_t *n, gl_conversion_type_t conversion_type);
 
-int gl_write_message(int fd, struct gl_message_t *dst);
+uint32_t gl_uint8_to_uint32(const uint8_t *n, gl_conversion_type_t conversion_type);
 
-int gl_read_message(int fd, struct gl_message_t *dst);
+uint64_t gl_uint8_to_uint64(const uint8_t *n, gl_conversion_type_t conversion_type);
 
-int gl_printf_string(uint8_t **str);
+int gl_uint8_write(uint8_t **buf, const uint8_t *n);
 
-int gl_printf_message(struct gl_message_t *msg);
+int gl_uint16_write(uint8_t **buf, const uint16_t *n, gl_conversion_type_t conversion_type);
 
-int gl_add_parameter_to_message(struct gl_message_t *msg, struct gl_message_parameter_t msg_param);
+int gl_uint32_write(uint8_t **buf, const uint32_t *n, gl_conversion_type_t conversion_type);
 
-int gl_free_message(struct gl_message_t *msg);
+int gl_uint64_write(uint8_t **buf, const uint64_t *n, gl_conversion_type_t conversion_type);
+
+int gl_uint8_read(int fd, uint8_t *n);
+
+int gl_uint8_read_until_separator(int fd, uint8_t **dst, uint8_t *last_c, uint16_t max_size, bool precise_size, bool allow_spaces);
 
 #endif /* GHOSTLAB_UTILS_H */

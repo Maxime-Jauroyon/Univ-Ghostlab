@@ -1,162 +1,170 @@
 #include "message.h"
+#include <string.h>
+#include <unistd.h>
+#include <printf.h>
+#include "array.h"
+#include "utils.h"
+#include "string.h"
 
-static const gl_message_parameter_definition_t gl_message_parameter_n = {
+static uint8_t g_max_message_identifier_size = 0;
+
+static const gl_message_parameter_definition_t g_message_parameter_n = {
     .identifier = "n",
     .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT8,
-    .length = 1,
-    .precise_length = true,
-    .allow_space = false,
-    .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
-    .has_max_value = false
+    .value_length = 1,
+    .force_exact_length = true,
+    .can_contain_spaces = false,
+    .conversion_type = GL_CONVERSION_TYPE_AUTOMATIC,
+    .has_max_uint_value = false
 };
 
-static const gl_message_parameter_definition_t gl_message_parameter_m = {
+static const gl_message_parameter_definition_t g_message_parameter_m = {
     .identifier = "m",
     .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT8,
-    .length = 1,
-    .precise_length = true,
-    .allow_space = false,
-    .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
-    .has_max_value = false
+    .value_length = 1,
+    .force_exact_length = true,
+    .can_contain_spaces = false,
+    .conversion_type = GL_CONVERSION_TYPE_AUTOMATIC,
+    .has_max_uint_value = false
 };
 
-static const gl_message_parameter_definition_t gl_message_parameter_s = {
+static const gl_message_parameter_definition_t g_message_parameter_s = {
     .identifier = "s",
     .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT8,
-    .length = 1,
-    .precise_length = true,
-    .allow_space = false,
-    .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
-    .has_max_value = false
+    .value_length = 1,
+    .force_exact_length = true,
+    .can_contain_spaces = false,
+    .conversion_type = GL_CONVERSION_TYPE_AUTOMATIC,
+    .has_max_uint_value = false
 };
 
-static const gl_message_parameter_definition_t gl_message_parameter_id = {
+static const gl_message_parameter_definition_t g_message_parameter_id = {
     .identifier = "id",
     .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING,
-    .length = 8,
-    .precise_length = true,
-    .allow_space = false,
-    .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
-    .has_max_value = false
+    .value_length = 8,
+    .force_exact_length = true,
+    .can_contain_spaces = false,
+    .conversion_type = GL_CONVERSION_TYPE_AUTOMATIC,
+    .has_max_uint_value = false
 };
 
-static const gl_message_parameter_definition_t gl_message_parameter_port = {
+static const gl_message_parameter_definition_t g_message_parameter_port = {
     .identifier = "port",
     .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING,
-    .length = 4,
-    .precise_length = true,
-    .allow_space = false,
-    .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
-    .has_max_value = false
+    .value_length = 4,
+    .force_exact_length = true,
+    .can_contain_spaces = false,
+    .conversion_type = GL_CONVERSION_TYPE_AUTOMATIC,
+    .has_max_uint_value = false
 };
 
-static const gl_message_parameter_definition_t gl_message_parameter_h = {
+static const gl_message_parameter_definition_t g_message_parameter_h = {
     .identifier = "h",
     .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT16,
-    .length = 2,
-    .precise_length = true,
-    .allow_space = false,
-    .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_AS_LITTLE,
-    .has_max_value = true,
-    .max_value = 1000
+    .value_length = 2,
+    .force_exact_length = true,
+    .can_contain_spaces = false,
+    .conversion_type = GL_CONVERSION_TYPE_LITTLE_ENDIAN,
+    .has_max_uint_value = true,
+    .max_value_uint = 1000
 };
 
-static const gl_message_parameter_definition_t gl_message_parameter_w = {
+static const gl_message_parameter_definition_t g_message_parameter_w = {
     .identifier = "w",
     .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT16,
-    .length = 2,
-    .precise_length = true,
-    .allow_space = false,
-    .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_AS_LITTLE,
-    .has_max_value = true,
-    .max_value = 1000
+    .value_length = 2,
+    .force_exact_length = true,
+    .can_contain_spaces = false,
+    .conversion_type = GL_CONVERSION_TYPE_LITTLE_ENDIAN,
+    .has_max_uint_value = true,
+    .max_value_uint = 1000
 };
 
-static const gl_message_parameter_definition_t gl_message_parameter_f = {
+static const gl_message_parameter_definition_t g_message_parameter_f = {
     .identifier = "f",
     .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT8,
-    .length = 1,
-    .precise_length = true,
-    .allow_space = false,
-    .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
-    .has_max_value = false
+    .value_length = 1,
+    .force_exact_length = true,
+    .can_contain_spaces = false,
+    .conversion_type = GL_CONVERSION_TYPE_AUTOMATIC,
+    .has_max_uint_value = false
 };
 
-static const gl_message_parameter_definition_t gl_message_parameter_ip = {
+static const gl_message_parameter_definition_t g_message_parameter_ip = {
     .identifier = "ip",
     .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING,
-    .length = 15,
-    .precise_length = true,
-    .allow_space = false,
-    .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
-    .has_max_value = false
+    .value_length = 15,
+    .force_exact_length = true,
+    .can_contain_spaces = false,
+    .conversion_type = GL_CONVERSION_TYPE_AUTOMATIC,
+    .has_max_uint_value = false
 };
 
-static const gl_message_parameter_definition_t gl_message_parameter_x = {
+static const gl_message_parameter_definition_t g_message_parameter_x = {
     .identifier = "x",
     .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING,
-    .length = 3,
-    .precise_length = true,
-    .allow_space = false,
-    .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
-    .has_max_value = false
+    .value_length = 3,
+    .force_exact_length = true,
+    .can_contain_spaces = false,
+    .conversion_type = GL_CONVERSION_TYPE_AUTOMATIC,
+    .has_max_uint_value = false
 };
 
-static const gl_message_parameter_definition_t gl_message_parameter_y = {
+static const gl_message_parameter_definition_t g_message_parameter_y = {
     .identifier = "y",
     .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING,
-    .length = 3,
-    .precise_length = true,
-    .allow_space = false,
-    .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
-    .has_max_value = false
+    .value_length = 3,
+    .force_exact_length = true,
+    .can_contain_spaces = false,
+    .conversion_type = GL_CONVERSION_TYPE_AUTOMATIC,
+    .has_max_uint_value = false
 };
 
-static const gl_message_parameter_definition_t gl_message_parameter_d = {
+static const gl_message_parameter_definition_t g_message_parameter_d = {
     .identifier = "d",
     .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING,
-    .length = 3,
-    .precise_length = true,
-    .allow_space = false,
-    .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
-    .has_max_value = false
+    .value_length = 3,
+    .force_exact_length = true,
+    .can_contain_spaces = false,
+    .conversion_type = GL_CONVERSION_TYPE_AUTOMATIC,
+    .has_max_uint_value = false
 };
 
-static const gl_message_parameter_definition_t gl_message_parameter_p = {
+static const gl_message_parameter_definition_t g_message_parameter_p = {
     .identifier = "p",
     .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING,
-    .length = 4,
-    .precise_length = true,
-    .allow_space = false,
-    .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
-    .has_max_value = false
+    .value_length = 4,
+    .force_exact_length = true,
+    .can_contain_spaces = false,
+    .conversion_type = GL_CONVERSION_TYPE_AUTOMATIC,
+    .has_max_uint_value = false
 };
 
-static const gl_message_parameter_definition_t gl_message_parameter_mess = {
+static const gl_message_parameter_definition_t g_message_parameter_mess = {
     .identifier = "mess",
     .value_type = GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING,
-    .length = 200,
-    .precise_length = false,
-    .allow_space = true,
-    .endian_conversion = GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
-    .has_max_value = false
+    .value_length = 200,
+    .force_exact_length = false,
+    .can_contain_spaces = true,
+    .conversion_type = GL_CONVERSION_TYPE_AUTOMATIC,
+    .has_max_uint_value = false
 };
 
 static const gl_message_parameter_definition_t *gl_message_parameter_definitions_array[] = {
-    [GL_MESSAGE_PARAMETER_TYPE_N] = &gl_message_parameter_n,
-    [GL_MESSAGE_PARAMETER_TYPE_M] = &gl_message_parameter_m,
-    [GL_MESSAGE_PARAMETER_TYPE_S] = &gl_message_parameter_s,
-    [GL_MESSAGE_PARAMETER_TYPE_ID] = &gl_message_parameter_id,
-    [GL_MESSAGE_PARAMETER_TYPE_PORT] = &gl_message_parameter_port,
-    [GL_MESSAGE_PARAMETER_TYPE_H] = &gl_message_parameter_h,
-    [GL_MESSAGE_PARAMETER_TYPE_W] = &gl_message_parameter_w,
-    [GL_MESSAGE_PARAMETER_TYPE_F] = &gl_message_parameter_f,
-    [GL_MESSAGE_PARAMETER_TYPE_IP] = &gl_message_parameter_ip,
-    [GL_MESSAGE_PARAMETER_TYPE_X] = &gl_message_parameter_x,
-    [GL_MESSAGE_PARAMETER_TYPE_Y] = &gl_message_parameter_y,
-    [GL_MESSAGE_PARAMETER_TYPE_D] = &gl_message_parameter_d,
-    [GL_MESSAGE_PARAMETER_TYPE_P] = &gl_message_parameter_p,
-    [GL_MESSAGE_PARAMETER_TYPE_MESS] = &gl_message_parameter_mess,
+    [GL_MESSAGE_PARAMETER_TYPE_N] = &g_message_parameter_n,
+    [GL_MESSAGE_PARAMETER_TYPE_M] = &g_message_parameter_m,
+    [GL_MESSAGE_PARAMETER_TYPE_S] = &g_message_parameter_s,
+    [GL_MESSAGE_PARAMETER_TYPE_ID] = &g_message_parameter_id,
+    [GL_MESSAGE_PARAMETER_TYPE_PORT] = &g_message_parameter_port,
+    [GL_MESSAGE_PARAMETER_TYPE_H] = &g_message_parameter_h,
+    [GL_MESSAGE_PARAMETER_TYPE_W] = &g_message_parameter_w,
+    [GL_MESSAGE_PARAMETER_TYPE_F] = &g_message_parameter_f,
+    [GL_MESSAGE_PARAMETER_TYPE_IP] = &g_message_parameter_ip,
+    [GL_MESSAGE_PARAMETER_TYPE_X] = &g_message_parameter_x,
+    [GL_MESSAGE_PARAMETER_TYPE_Y] = &g_message_parameter_y,
+    [GL_MESSAGE_PARAMETER_TYPE_D] = &g_message_parameter_d,
+    [GL_MESSAGE_PARAMETER_TYPE_P] = &g_message_parameter_p,
+    [GL_MESSAGE_PARAMETER_TYPE_MESS] = &g_message_parameter_mess,
     
     [GL_MESSAGE_PARAMETER_TYPE_COUNT] = 0
 };
@@ -551,6 +559,199 @@ static const gl_message_definition_t *gl_message_definitions_array[] = {
     
     [GL_MESSAGE_TYPE_COUNT] = 0
 };
+
+static uint8_t gl_calculate_max_message_identifier_size() {
+    if (g_max_message_identifier_size != 0) {
+        return g_max_message_identifier_size;
+    }
+    
+    uint8_t max = 0;
+    
+    for (uint32_t i = 0; i < GL_MESSAGE_TYPE_COUNT; i++) {
+        uint8_t name_size = strlen(gl_message_definitions()[i]->identifier);
+        
+        if (name_size > max) {
+            max = name_size;
+        }
+    }
+    
+    g_max_message_identifier_size = max;
+    
+    return g_max_message_identifier_size;
+}
+
+int gl_message_write(int fd, struct gl_message_t *dst) {
+    uint8_t *buf = 0;
+    const gl_message_definition_t *msg_def = gl_message_definitions()[dst->type];
+    
+    gl_write_cstring(&buf, (const char **)&msg_def->identifier);
+    
+    for (uint8_t i = 0; i < msg_def->num_parameters; i++) {
+        char separator = GHOSTLAB_SEPARATOR;
+        gl_uint8_write(&buf, (uint8_t *) &separator);
+        
+        const gl_message_parameter_definition_t *msg_param_def = gl_message_parameter_definitions()[msg_def->parameters[i]];
+        
+        if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT8) {
+            gl_uint8_write(&buf, &dst->parameters_value[i].uint8_value);
+        } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT16) {
+            gl_uint16_write(&buf, &dst->parameters_value[i].uint16_value, msg_param_def->conversion_type);
+        } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT32) {
+            gl_uint32_write(&buf, &dst->parameters_value[i].uint32_value, msg_param_def->conversion_type);
+        } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT64) {
+            gl_uint64_write(&buf, &dst->parameters_value[i].uint64_value, msg_param_def->conversion_type);
+        } else {
+            gl_write_string(&buf, (const uint8_t **)&dst->parameters_value[i].string_value);
+        }
+    }
+    
+    if (msg_def->protocol == GL_MESSAGE_PROTOCOL_UDP) {
+        char terminator = GHOSTLAB_UDP_TERMINATOR;
+        gl_uint8_write(&buf, (uint8_t *) &terminator);
+        gl_uint8_write(&buf, (uint8_t *) &terminator);
+        gl_uint8_write(&buf, (uint8_t *) &terminator);
+    } else {
+        char terminator = GHOSTLAB_TCP_TERMINATOR;
+        gl_uint8_write(&buf, (uint8_t *) &terminator);
+        gl_uint8_write(&buf, (uint8_t *) &terminator);
+        gl_uint8_write(&buf, (uint8_t *) &terminator);
+    }
+    
+    int size = gl_array_get_size(buf);
+    write(fd, buf, size);
+    
+    gl_array_free(buf);
+    
+    return size;
+}
+
+int gl_message_read(int fd, struct gl_message_t *dst) {
+    uint16_t total_size = 0;
+    
+    uint8_t last_c = 0;
+    uint8_t *identifier_buf = 0;
+    
+    // Reads the message type name.
+    gl_assert(gl_uint8_read_until_separator(fd, &identifier_buf, &last_c, gl_calculate_max_message_identifier_size(), false, false) != 0);
+    gl_array_push(identifier_buf, 0);
+    total_size += gl_array_get_header(identifier_buf)->size;
+    
+    // Finds the message type.
+    const gl_message_definition_t *msg_def;
+    for (uint32_t i = 0; i < GL_MESSAGE_TYPE_COUNT; i++) {
+        msg_def = gl_message_definitions()[i];
+        if (strcmp((const char *)identifier_buf, msg_def->identifier) == 0) {
+            dst->type = i;
+            break;
+        }
+    }
+    
+    gl_array_free(identifier_buf);
+    gl_assert(msg_def);
+    
+    // Reads all parameters.
+    for (uint32_t i = 0; i < msg_def->num_parameters; i++) {
+        gl_assert(!gl_is_terminator(last_c));
+        
+        const gl_message_parameter_definition_t  *msg_param_def = gl_message_parameter_definitions()[msg_def->parameters[i]];
+        uint8_t *parameter_value_buf = 0;
+        
+        // Reads the parameter value.
+        gl_assert(gl_uint8_read_until_separator(fd, &parameter_value_buf, &last_c, msg_param_def->value_length,
+                                                msg_param_def->force_exact_length, msg_param_def->can_contain_spaces) != 0);
+        total_size += gl_array_get_header(parameter_value_buf)->size + 1;
+        
+        gl_message_parameter_t parameter;
+        
+        // Convert if necessary.
+        if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT8) {
+            parameter = (gl_message_parameter_t) { .uint8_value = parameter_value_buf[0] };
+        } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT16) {
+            uint16_t n = gl_uint8_to_uint16(parameter_value_buf, msg_param_def->conversion_type);
+            parameter = (gl_message_parameter_t) { .uint16_value = msg_param_def->has_max_uint_value && n > (uint16_t )msg_param_def->max_value_uint ? (uint16_t )msg_param_def->max_value_uint : n };
+        } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT32) {
+            uint32_t n = gl_uint8_to_uint32(parameter_value_buf, msg_param_def->conversion_type);
+            parameter = (gl_message_parameter_t) { .uint32_value = msg_param_def->has_max_uint_value && n > (uint32_t )msg_param_def->max_value_uint ? (uint32_t )msg_param_def->max_value_uint : n };
+        } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT64) {
+            uint64_t n = gl_uint8_to_uint64(parameter_value_buf, msg_param_def->conversion_type);
+            parameter = (gl_message_parameter_t) { .uint64_value = msg_param_def->has_max_uint_value && n > (uint64_t )msg_param_def->max_value_uint ? (uint64_t )msg_param_def->max_value_uint : n };
+        } else {
+            parameter = (gl_message_parameter_t) { .string_value = parameter_value_buf };
+        }
+        
+        gl_array_push(dst->parameters_value, parameter);
+    }
+    
+    // Checks if the message was sent using the right protocol.
+    gl_assert(msg_def->protocol != GL_MESSAGE_PROTOCOL_TCP || gl_is_tcp_terminator(last_c));
+    gl_assert(msg_def->protocol != GL_MESSAGE_PROTOCOL_UDP || gl_is_udp_terminator(last_c));
+    
+    // Reads ending characters.
+    uint8_t c;
+    gl_assert(gl_uint8_read(fd, &c) != 0);
+    gl_assert(gl_uint8_read(fd, &c) != 0);
+    total_size += 2;
+    
+    return total_size;
+}
+
+int gl_message_printf(struct gl_message_t *msg) {
+    const gl_message_definition_t *msg_def = gl_message_definitions()[msg->type];
+    gl_assert(gl_array_get_size(msg->parameters_value) == msg_def->num_parameters);
+    printf("%s", msg_def->identifier);
+    
+    for (uint8_t i = 0; i < msg_def->num_parameters; i++) {
+        const gl_message_parameter_definition_t *msg_param_def = gl_message_parameter_definitions()[msg_def->parameters[i]];
+        
+        printf(" ");
+        
+        if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT8) {
+            printf("%u", msg->parameters_value[i].uint8_value);
+        } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT16) {
+            printf("%hu", msg->parameters_value[i].uint16_value);
+        } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT32) {
+            printf("%u", msg->parameters_value[i].uint32_value);
+        } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT64) {
+            printf("%llu", msg->parameters_value[i].uint64_value);
+        } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING) {
+            gl_string_printf(&msg->parameters_value[i].string_value);
+        }
+    }
+    
+    if (msg_def->protocol == GL_MESSAGE_PROTOCOL_UDP) {
+        printf("%c%c%c", GHOSTLAB_UDP_TERMINATOR, GHOSTLAB_UDP_TERMINATOR, GHOSTLAB_UDP_TERMINATOR);
+    } else {
+        printf("%c%c%c", GHOSTLAB_TCP_TERMINATOR, GHOSTLAB_TCP_TERMINATOR, GHOSTLAB_TCP_TERMINATOR);
+    }
+    
+    printf("\n");
+    
+    return 0;
+}
+
+int gl_message_push_parameter(struct gl_message_t *msg, struct gl_message_parameter_t msg_param) {
+    gl_array_push(msg->parameters_value, msg_param);
+    
+    return 0;
+}
+
+int gl_message_free(struct gl_message_t *msg) {
+    const gl_message_definition_t *msg_def = gl_message_definitions()[msg->type];
+    
+    for (uint8_t i = 0; i < msg_def->num_parameters; i++) {
+        const gl_message_parameter_definition_t *msg_param_def = gl_message_parameter_definitions()[msg_def->parameters[i]];
+        
+        if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING) {
+            gl_array_free(msg->parameters_value[i].string_value);
+        }
+    }
+    
+    if (msg_def->num_parameters > 0) {
+        gl_array_free(msg->parameters_value);
+    }
+    
+    return 0;
+}
 
 const gl_message_parameter_definition_t **gl_message_parameter_definitions() {
     return gl_message_parameter_definitions_array;

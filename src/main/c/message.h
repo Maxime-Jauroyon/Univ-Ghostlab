@@ -22,6 +22,25 @@ typedef enum gl_message_parameter_type_t {
     GL_MESSAGE_PARAMETER_TYPE_COUNT
 } gl_message_parameter_type_t;
 
+typedef enum gl_message_parameter_value_type_t {
+    GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING,
+    GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT8,
+    GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT16,
+    GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT32,
+    GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT64
+} gl_message_parameter_value_type_t;
+
+typedef struct gl_message_parameter_definition_t {
+    const char *identifier;
+    const gl_message_parameter_value_type_t value_type;
+    const uint16_t value_length;
+    const bool force_exact_length;
+    const bool can_contain_spaces;
+    const gl_conversion_type_t conversion_type;
+    const bool has_max_uint_value;
+    const uint64_t max_value_uint;
+} gl_message_parameter_definition_t;
+
 typedef enum gl_message_type_t {
     GL_MESSAGE_TYPE_GAMES,
     GL_MESSAGE_TYPE_OGAMES,
@@ -72,31 +91,6 @@ typedef enum gl_message_protocol_t {
     GL_MESSAGE_PROTOCOL_UDP
 } gl_message_protocol_t;
 
-typedef enum gl_message_parameter_endian_conversion_t {
-    GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_NONE,
-    GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_AS_BIG,
-    GL_MESSAGE_PARAMETER_ENDIAN_CONVERSION_AS_LITTLE
-} gl_message_parameter_endian_conversion_t;
-
-typedef enum gl_message_parameter_value_type_t {
-    GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING,
-    GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT8,
-    GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT16,
-    GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT32,
-    GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT64
-} gl_message_parameter_value_type_t;
-
-typedef struct gl_message_parameter_definition_t {
-    const char *identifier;
-    const gl_message_parameter_value_type_t value_type;
-    const uint16_t length;
-    const bool precise_length;
-    const bool allow_space;
-    const gl_message_parameter_endian_conversion_t endian_conversion;
-    const bool has_max_value;
-    const uint64_t max_value;
-} gl_message_parameter_definition_t;
-
 typedef struct gl_message_definition_t {
     const char *identifier;
     const gl_message_protocol_t protocol;
@@ -118,6 +112,16 @@ typedef struct gl_message_t {
     gl_message_type_t type;
     gl_message_parameter_t *parameters_value;
 } gl_message_t;
+
+int gl_message_write(int fd, struct gl_message_t *dst);
+
+int gl_message_read(int fd, struct gl_message_t *dst);
+
+int gl_message_printf(struct gl_message_t *msg);
+
+int gl_message_push_parameter(struct gl_message_t *msg, struct gl_message_parameter_t msg_param);
+
+int gl_message_free(struct gl_message_t *msg);
 
 const gl_message_parameter_definition_t **gl_message_parameter_definitions();
 

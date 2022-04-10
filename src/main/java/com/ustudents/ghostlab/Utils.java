@@ -40,8 +40,8 @@ public class Utils {
     }
 
     public static boolean answerIsCorrectInput(String answer, int flag){
-        if((flag == 0 && answer.length() != 8) || (flag == 1 && (answer.length() > 3 || answer.length() < 1))
-                || (flag == 2 && (answer.length() > 5 || answer.length() < 1)))
+        if((flag == 0 && answer.value_length() != 8) || (flag == 1 && (answer.value_length() > 3 || answer.value_length() < 1))
+                || (flag == 2 && (answer.value_length() > 5 || answer.value_length() < 1)))
             return false;
 
         for(char c: answer.toCharArray()){
@@ -62,7 +62,7 @@ public class Utils {
     }
 
     public static boolean commandsArgsFormatIsCorrect(String[] args){
-        if(args.length != 3 || !Utils.answerIsCorrectInput(args[1], 2)
+        if(args.value_length != 3 || !Utils.answerIsCorrectInput(args[1], 2)
                 || !Utils.answerIsCorrectInput(args[2], 2))
             return false;
 
