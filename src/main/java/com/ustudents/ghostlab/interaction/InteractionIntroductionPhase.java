@@ -61,7 +61,9 @@ public class InteractionIntroductionPhase extends InteractionPerPhase {
     public int getQuestionInIntroductionPhase(BufferedReader br, String clientChoice) throws IOException {
         String message = br.readLine();
         String[] list = message.split(" ");
+        System.out.println(list[0]);
         if(list[0].equals("REGOK")) {
+            System.out.println("Je suis la !");
             client.setGameRegister(Integer.parseInt(list[1].substring(0, list[1].length()-3)));
             return 1;
         }else if(list[0].equals("WELCO")){

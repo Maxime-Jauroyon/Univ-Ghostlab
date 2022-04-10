@@ -15,7 +15,8 @@ public class TCPRunnable implements Runnable{
     private final Scanner sc;
 
 
-    public TCPRunnable(Client client, BufferedReader br, PrintWriter pw,
+    public TCPRunnable(Client client,
+                       BufferedReader br, PrintWriter pw,
                        Scanner sc){
 
         this.client = client;
@@ -27,10 +28,10 @@ public class TCPRunnable implements Runnable{
     @Override
     public void run() {
         try{
-
             String question = "What to you want to do ? (move/list/messall/messto/quit)";
             InteractionInGamePhase iigp = new InteractionInGamePhase(client);
             iigp.putQuestionOnGamePhase(br, pw, question, new String[]{"move","list","messall","messto","quit"}, sc);
+            System.out.println("Je m'appelle Léo100");
 
         }catch (Exception e){
             e.printStackTrace();
