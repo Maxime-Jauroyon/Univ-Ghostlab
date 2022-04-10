@@ -1,3 +1,7 @@
+package interaction;
+
+import client.Client;
+
 public abstract class InteractionPerPhase {
     protected final Client client;
 
