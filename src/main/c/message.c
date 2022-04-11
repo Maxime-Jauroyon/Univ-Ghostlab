@@ -1,7 +1,7 @@
 #include "message.h"
 #include <string.h>
 #include <unistd.h>
-#include <printf.h>
+#include <stdio.h>
 #include "array.h"
 #include "utils.h"
 #include "string.h"
@@ -712,7 +712,11 @@ int gl_message_printf(struct gl_message_t *msg) {
         } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT32) {
             printf("%u", msg->parameters_value[i].uint32_value);
         } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT64) {
+#ifdef __APPLE__
             printf("%llu", msg->parameters_value[i].uint64_value);
+#else
+            printf("%lu", msg->parameters_value[i].uint64_value);
+#endif
         } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING) {
             gl_string_printf(&msg->parameters_value[i].string_value);
         }

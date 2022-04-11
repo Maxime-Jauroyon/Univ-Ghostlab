@@ -1,6 +1,6 @@
 #include "string.h"
 #include <string.h>
-#include <printf.h>
+#include <stdio.h>
 #include "array.h"
 #include "utils.h"
 
