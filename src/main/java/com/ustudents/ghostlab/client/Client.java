@@ -4,6 +4,7 @@ import interaction.InteractionInGamePhase;
 import interaction.InteractionIntroductionPhase;
 import runnable.TCPRunnable;
 import runnable.UDPMulticastRunnable;
+import runnable.UDPRunnable;
 
 import java.io.*;
 import java.net.DatagramSocket;
@@ -15,15 +16,14 @@ import static java.lang.System.exit;
 
 public class Client {
     private final Socket socket;
-    private DatagramSocket datagramSocketSender;
-    private DatagramSocket datagramSocketReceived;
+    private final DatagramSocket datagramSocket;
     private String username;
     private int gameRegistered;
     private int heigthMaze;
     private int widthMaze;
     private int numberOfghost;
     private String multicastAddr;
-    private String multicastPort;
+    private int multicastPort;
     private String idPlayer;
     private final int[] startedPos;
     private final int[] currentPos;
@@ -34,8 +34,7 @@ public class Client {
     private Client(String ipv4, int tcpPort, String username, int udpPort) throws IOException {
         socket = new Socket(ipv4, tcpPort);
         this.username = username;
-        datagramSocketSender = new DatagramSocket();
-        datagramSocketReceived = new DatagramSocket(udpPort);
+        datagramSocket = new DatagramSocket(udpPort);
         startedPos = new int[2];
         currentPos = new int[2];
         score = 0;
@@ -46,7 +45,7 @@ public class Client {
     }
 
     public int getUdpPort() {
-        return datagramSocketReceived.getLocalPort();
+        return datagramSocket.getLocalPort();
     }
 
     public String getUsername() {
@@ -77,8 +76,8 @@ public class Client {
         this.multicastAddr = multicastAddr;
     }
 
-    public void setMulticassPort(String multicassPort) {
-        this.multicastPort = multicassPort;
+    public void setMulticastPort(int multicastPort) {
+        this.multicastPort = multicastPort;
     }
 
     public void setIdPlayer(String idPlayer) {
@@ -122,8 +121,6 @@ public class Client {
                 return;
             }
 
-            System.out.println("I'am at the end of the register phase");
-
             question = "Would you start the game ? ";
             question += "Or would you know some information about game ? (start/unregister/size/list/game/quit)";
             state = iip.putQuestionOnIntroductionPhase(br, pw, question,
@@ -135,18 +132,18 @@ public class Client {
                 continue;
             }
 
-            System.out.println("Enter in main phase of the game");
             iip.getQuestionInIntroductionPhase(br, "");
 
-            Thread udpMulticastThread = new Thread(new UDPMulticastRunnable(socket));
             Thread tcpThread = new Thread(new TCPRunnable(this, br, pw, sc));
-
+            Thread udpMulticastThread = new Thread(new UDPMulticastRunnable(socket, multicastAddr, multicastPort));
+            Thread udpTread = new Thread(new UDPRunnable(socket, datagramSocket));
 
             tcpThread.start();
             udpMulticastThread.start();
+            udpTread.start();
             tcpThread.join();
             udpMulticastThread.join();
-
+            udpTread.join();
 
         }
     }

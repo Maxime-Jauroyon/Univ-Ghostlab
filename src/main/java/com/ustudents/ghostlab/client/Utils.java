@@ -31,7 +31,7 @@ public class Utils {
     public static String gameStepChoice(String question, String[] correctAnswers, Scanner sc){
         String userAnswer;
         while(true){
-            System.out.println(question );
+            System.out.println(question);
             userAnswer = sc.next();
             if(answerIsCorrect(correctAnswers, userAnswer)){
                 return userAnswer;
@@ -56,13 +56,20 @@ public class Utils {
 
     public static String getInput(String question, Scanner sc, int flag){
         while(true){
-            System.out.print(question);
+            System.out.println(question);
             Scanner sc1 = new Scanner(System.in);
             String temp = sc1.nextLine();
             if(answerIsCorrectInput(temp, flag)){
                 return temp;
             }
         }
+    }
+
+    public static String messageToSend(){
+        Scanner temp = new Scanner(System.in);
+        System.out.println("Your message : ");
+        String message = temp.nextLine();
+        return (message.length() > 200)? message.substring(0, 200): message;
     }
 
     public static String test(Scanner sc){
@@ -73,20 +80,18 @@ public class Utils {
         return res;
     }
 
-    /*public static boolean commandsArgsFormatIsCorrect(String[] args){
-        if(args.length == 0)
-            return true;
-        if(args.length != 3 || !Utils.answerIsCorrectInput(args[1], 2)
-                || !Utils.answerIsCorrectInput(args[2], 2))
-            return false;
-
-        try {
-            return Inet4Address.getByName(args[0]).getHostAddress().equals(args[0]);
+    public static void printAllMessage(String receivedMessage, String type){
+        String[] list = receivedMessage.split(" ");
+        System.out.print("[" + type +  " : " + list[1] + "] : ");
+        for(int i = 2; i < list.length; i++){
+            if(i == list.length-1){
+                System.out.print(list[i].substring(0, list[i].length()-3) + " ");
+            }else{
+                System.out.print(list[i] + " ");
+            }
         }
-        catch (UnknownHostException ex) {
-            return false;
-        }
-    }*/
+        System.out.println();
+    }
 
     private static boolean checkServerIp(String[] args){
         try {

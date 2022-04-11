@@ -1,11 +1,7 @@
 package client;
 
-import client.Utils;
-
-import javax.xml.crypto.Data;
 import java.io.*;
 import java.net.*;
-import java.nio.charset.StandardCharsets;
 
 public class Serveur {
 
@@ -41,7 +37,7 @@ public class Serveur {
     }
 
     private static void callWelcome(PrintWriter pw){
-        pw.print("WELCO 0 20 20 3 224.0.1.4 6677***\n");
+        pw.print("WELCO 0 20 20 3 231.1.2.4### 7759***\n");
         pw.flush();
     }
 
@@ -72,12 +68,25 @@ public class Serveur {
     private static void callMALL(PrintWriter pw, String toSend) throws IOException {
         pw.print("MALL!***\n");
         pw.flush();
-        byte[] data = toSend.getBytes();
+        String message = "MESSA " + "leotom22" + " " + toSend + "+++";
+        byte[] data = message.getBytes();
         DatagramSocket dso= new DatagramSocket();
         InetSocketAddress ia=new InetSocketAddress("231.1.2.4",7759);
         DatagramPacket paquet=new DatagramPacket(data,data.length,ia);
         dso.send(paquet);
     }
+
+    private static void callSEND(PrintWriter pw, String username, String toSend) throws IOException {
+        pw.print("SEND!***\n");
+        pw.flush();
+        String message = "MESSP " + username + " " + toSend + "+++";
+        byte[] data = message.getBytes();
+        DatagramSocket dso= new DatagramSocket();
+        InetSocketAddress ia=new InetSocketAddress("127.0.0.1",5541);
+        DatagramPacket paquet=new DatagramPacket(data,data.length,ia);
+        dso.send(paquet);
+    }
+
 
     private static void someStartCommands(Socket socket, BufferedReader br, PrintWriter pw) throws IOException {
         while(true){
@@ -128,6 +137,8 @@ public class Serveur {
                 callGLIS(pw);
             }else if(clientMessage.startsWith("MALL?")){
                 callMALL(pw, clientMessage.substring(6, clientMessage.length()-3));
+            }else if(clientMessage.startsWith("SEND?")){
+                callSEND(pw, list[1], clientMessage.substring(15, clientMessage.length()-3));
             }
         }
     }
