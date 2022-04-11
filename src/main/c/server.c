@@ -11,6 +11,7 @@
 #include <errno.h>
 #include "utils.h"
 #include "message.h"
+#include "network.h"
 
 static const char g_help[] =
     "usage: " GHOSTLAB_EXECUTABLE_NAME " [options]\n"
@@ -85,37 +86,18 @@ int main(int argc, char **argv) {
         multicast_port = strdup(GHOSTLAB_DEFAULT_MULTICAST_PORT);
     }
     
-    int sock = socket(PF_INET,SOCK_STREAM,0);
-    struct sockaddr_in address_sock;
-    address_sock.sin_family = AF_INET;
-    address_sock.sin_port = htons(4243);
-    address_sock.sin_addr.s_addr = htonl(INADDR_ANY);
+    int server_fd = gl_socket_create(GHOSTLAB_DEFAULT_SERVER_IP, GHOSTLAB_DEFAULT_SERVER_PORT, GL_SOCKET_TYPE_SERVER);
+    int client_fd = gl_socket_server_accept_client(server_fd);
     
-    int r = bind(sock, (struct sockaddr *)&address_sock, sizeof(struct sockaddr_in));
-    if (!r) {
-        r = listen(sock, 0);
-        if (r < 0) {
-            goto error;
-        }
-    
-        struct sockaddr_in client;
-        socklen_t size_client = sizeof(client);
-        int fd = accept(sock, (struct sockaddr *)&client, &size_client);
-        
-        if (fd >= 0) {
-            for (uint8_t i = 0; i < 39; i++) {
-                {
-                    gl_message_t msg = {0};
-                    gl_message_read(fd, &msg);
-                    gl_message_printf(&msg);
-                    gl_message_write(fd, &msg);
-                    gl_message_free(&msg);
-                }
-            }
-        }
-    
-        close(fd);
+    for (uint8_t i = 0; i < 39; i++) {
+        gl_message_t msg = {0};
+        gl_message_read(client_fd, &msg);
+        gl_message_printf(&msg);
+        gl_message_write(client_fd, &msg);
+        gl_message_free(&msg);
     }
+    
+    gl_socket_close(client_fd);
     
     goto cleanup;
     

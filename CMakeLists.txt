@@ -9,6 +9,8 @@ set(COMMON_SRC
         src/main/c/array.h
         src/main/c/message.c
         src/main/c/message.h
+        src/main/c/network.c
+        src/main/c/network.h
         src/main/c/string.c
         src/main/c/string.h
         src/main/c/types.h
