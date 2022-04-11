@@ -18,7 +18,7 @@ ifeq ($(shell uname), Linux)
 	COMMON_LIB = -pthread
 endif
 
-all: cassini saturnd
+all: server client
 
 server:
 	$(CC) $(CCFLAGS) $(COMMON_LIB) $(COMMON_SRC) src/main/c/server.c -DGHOSTLAB_SERVER -o server
