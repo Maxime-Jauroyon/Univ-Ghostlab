@@ -7,6 +7,7 @@
 #include <string.h>
 #include <errno.h>
 #include <getopt.h>
+#include <stdio.h>
 #include "utils.h"
 #include "string.h"
 #include "message.h"

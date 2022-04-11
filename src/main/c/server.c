@@ -5,6 +5,7 @@
 #include <printf.h>
 #include <unistd.h>
 #include <string.h>
+#include <stdio.h>
 #include <inttypes.h>
 #include <getopt.h>
 #include <errno.h>
