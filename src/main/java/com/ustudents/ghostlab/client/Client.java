@@ -3,10 +3,12 @@ package client;
 import interaction.InteractionInGamePhase;
 import interaction.InteractionIntroductionPhase;
 import runnable.TCPRunnable;
+import runnable.UDPMulticastRunnable;
 
 import java.io.*;
 import java.net.DatagramSocket;
 import java.net.Socket;
+import java.security.spec.ECField;
 import java.util.Scanner;
 
 public class Client {
@@ -34,7 +36,6 @@ public class Client {
         currentPos = new int[2];
         score = 0;
     }
-
 
     public Socket getSocket() {
         return socket;
@@ -73,6 +74,7 @@ public class Client {
     }
 
     public void setStartedPos(int h, int w){
+        System.out.println("Your position on the maze are : (" +  h + "," + w + ")");
         startedPos[0] = h;
         startedPos[1] = w;
     }
@@ -94,6 +96,7 @@ public class Client {
         PrintWriter pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
 
         while(true){
+
             InteractionIntroductionPhase iip = new InteractionIntroductionPhase(this);
             iip.getQuestionInIntroductionPhase(br, "");
 
@@ -123,13 +126,14 @@ public class Client {
             System.out.println("Enter in main phase of the game");
             iip.getQuestionInIntroductionPhase(br, "");
 
-            Thread t1 = new Thread(new TCPRunnable(this, br, pw, sc));
-            t1.start();
-            t1.join();
+            Thread udpMulticastThread = new Thread(new UDPMulticastRunnable(socket));
+            Thread tcpThread = new Thread(new TCPRunnable(this, br, pw, sc));
 
-            if(socket.isClosed()){
-                break;
-            }
+
+            tcpThread.start();
+            udpMulticastThread.start();
+            tcpThread.join();
+            udpMulticastThread.join();
 
 
         }
@@ -137,7 +141,6 @@ public class Client {
 
     public static void main(String[] args){
         try{
-
             if(Utils.commandsArgsFormatIsCorrect(args)){
                 Client c = new Client(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]));
                 c.launchGame();

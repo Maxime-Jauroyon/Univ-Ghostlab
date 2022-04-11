@@ -2,9 +2,10 @@ package client;
 
 import client.Utils;
 
+import javax.xml.crypto.Data;
 import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.*;
+import java.nio.charset.StandardCharsets;
 
 public class Serveur {
 
@@ -68,11 +69,24 @@ public class Serveur {
         pw.flush();
     }
 
+    private static void callMALL(PrintWriter pw, String toSend) throws IOException {
+        pw.print("MALL!***\n");
+        pw.flush();
+        byte[] data = toSend.getBytes();
+        DatagramSocket dso= new DatagramSocket();
+        InetSocketAddress ia=new InetSocketAddress("231.1.2.4",7759);
+        DatagramPacket paquet=new DatagramPacket(data,data.length,ia);
+        dso.send(paquet);
+    }
+
     private static void someStartCommands(Socket socket, BufferedReader br, PrintWriter pw) throws IOException {
         while(true){
             String clientMessage = br.readLine();
+            System.out.println(clientMessage);
             if(clientMessage.startsWith("REGIS") || clientMessage.startsWith("NEWPL")){
+                System.out.println("Je suis la !");
                 pw.print("REGOK 0***\n");
+                pw.flush();
             }else if(clientMessage.startsWith("UNREG")){
                 pw.print("UNROK 0***\n");
             }else if(clientMessage.startsWith("SIZE?")){
@@ -92,7 +106,7 @@ public class Serveur {
             }
 
             pw.flush();
-            if(clientMessage.startsWith("UNREG") || clientMessage.startsWith("LIST?")){
+            if(clientMessage.startsWith("UNREG")){
                 callGameMessage(pw);
             }
         }
@@ -101,6 +115,7 @@ public class Serveur {
     private static void someGameCommands(Socket socket, BufferedReader br, PrintWriter pw) throws IOException {
         while (true) {
             String clientMessage = br.readLine();
+            String[] list = clientMessage.split(" ");
             System.out.println(clientMessage);
             if(clientMessage.startsWith("IQUIT")){
                 callIQUIT(pw);
@@ -111,6 +126,8 @@ public class Serveur {
                 callRIMOV(pw);
             }else if(clientMessage.startsWith("GLIS?")){
                 callGLIS(pw);
+            }else if(clientMessage.startsWith("MALL?")){
+                callMALL(pw, clientMessage.substring(6, clientMessage.length()-3));
             }
         }
     }

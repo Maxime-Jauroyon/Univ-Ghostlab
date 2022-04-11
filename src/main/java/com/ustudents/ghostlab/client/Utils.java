@@ -30,7 +30,7 @@ public class Utils {
     public static String gameStepChoice(String question, String[] correctAnswers, Scanner sc){
         String userAnswer;
         while(true){
-            System.out.println(question);
+            System.out.println(question );
             userAnswer = sc.next();
             if(answerIsCorrect(correctAnswers, userAnswer)){
                 return userAnswer;
@@ -47,8 +47,7 @@ public class Utils {
             return false;
 
         for(char c: answer.toCharArray()){
-            if((flag == 0 && (c < 33 || c > 126)) || (flag == 1 && (c < 48 || c > 57))
-                || (flag == 3 && (c < 33 || c > 126)))
+            if((flag == 0 && (c < 33 || c > 126)) || (flag == 1 && (c < 48 || c > 57)))
                 return false;
         }
         return true;
@@ -57,11 +56,20 @@ public class Utils {
     public static String getInput(String question, Scanner sc, int flag){
         while(true){
             System.out.print(question);
-            String temp = sc.next();
+            Scanner sc1 = new Scanner(System.in);
+            String temp = sc1.nextLine();
             if(answerIsCorrectInput(temp, flag)){
                 return temp;
             }
         }
+    }
+
+    public static String test(Scanner sc){
+        String res = sc.next();
+        while(sc.hasNext()){
+            res += sc.next();
+        }
+        return res;
     }
 
     public static boolean commandsArgsFormatIsCorrect(String[] args){
