@@ -20,6 +20,8 @@
 #else
 #include <limits.h>
 #include <endian.h>
+#define htonll(x) htobe64(x)
+#define ntohll(x) be64toh(x)
 #endif
 
 // Checks `errno` to call `perror` if needed and returns `0`.
