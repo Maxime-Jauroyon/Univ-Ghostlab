@@ -26,8 +26,9 @@ public class InteractionIntroductionPhase extends InteractionPerPhase {
                 String gameId = Utils.getInput("Now choose your game id number : ", sc, 1);
                 clientSender = "REGIS " + username + " " + client.getUdpPort() + " " + gameId + "***\n";
             }else if(choice.equals("new")){
-                String username = Utils.getInput("Now choose your username : ", sc, 0);
-                clientSender = "NEWPL " + username + " " + client.getUdpPort() + "***\n";
+                if(client.getUsername() == null)
+                    client.setUsername(Utils.getInput("Now choose your username : ", sc, 0));
+                clientSender = "NEWPL " + client.getUsername() + " " + client.getUdpPort() + "***\n";
             }else if(choice.equals("unregister")){
                 clientSender = "UNREG***\n";
             }else if(choice.equals("size")){

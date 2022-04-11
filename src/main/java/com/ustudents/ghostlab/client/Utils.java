@@ -5,6 +5,7 @@ import java.net.UnknownHostException;
 import java.util.Scanner;
 
 public class Utils {
+
     public static int findEndIndex(String message, int startIndex, char endChar){
         while(message.charAt(startIndex) != endChar){
             startIndex++;
@@ -72,7 +73,9 @@ public class Utils {
         return res;
     }
 
-    public static boolean commandsArgsFormatIsCorrect(String[] args){
+    /*public static boolean commandsArgsFormatIsCorrect(String[] args){
+        if(args.length == 0)
+            return true;
         if(args.length != 3 || !Utils.answerIsCorrectInput(args[1], 2)
                 || !Utils.answerIsCorrectInput(args[2], 2))
             return false;
@@ -83,5 +86,27 @@ public class Utils {
         catch (UnknownHostException ex) {
             return false;
         }
+    }*/
+
+    private static boolean checkServerIp(String[] args){
+        try {
+            return Inet4Address.getByName(args[1]).getHostAddress().equals(args[1]);
+        }
+        catch (UnknownHostException ex) {
+            return false;
+        }
+    }
+
+    public static boolean commandsArgsFormatAreCorrect(String[] args, int flag){
+        if(args.length%2 != 0)
+            return false;
+        else if(flag == 0){
+            return checkServerIp(args);
+        }else if(flag == 1){
+            return Utils.answerIsCorrectInput(args[1], 2);
+        }else if(flag == 2){
+            return Utils.answerIsCorrectInput(args[1], 0);
+        }
+        return false;
     }
 }
