@@ -1,7 +1,7 @@
 .PHONY: all distclean server client
 
 CC = gcc
-CCFLAGS = -Wall -std=gnu99
+CCFLAGS = -Wall -Wno-unused-label -std=gnu99
 
 COMMON_SRC = \
 	src/main/c/array.c \
