@@ -118,7 +118,7 @@ int main(int argc, char **argv) {
             gl_message_t msg = { .type = GL_MESSAGE_TYPE_NEWPL, 0 };
             gl_message_push_parameter(&msg,
                                       (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring("hugoboss")});
-            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring("4242")});
+            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number("4242", 4)});
             gl_message_write(fd, &msg);
             gl_message_free(&msg);
         }
@@ -127,7 +127,7 @@ int main(int argc, char **argv) {
             gl_message_t msg = { .type = GL_MESSAGE_TYPE_REGIS, 0 };
             gl_message_push_parameter(&msg,
                                       (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring("hugoboss")});
-            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring("4242")});
+            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number("4242", 4)});
             gl_message_push_parameter(&msg, (gl_message_parameter_t) {.uint8_value =  5});
             gl_message_write(fd, &msg);
             gl_message_free(&msg);
@@ -222,9 +222,8 @@ int main(int argc, char **argv) {
             gl_message_push_parameter(&msg, (gl_message_parameter_t) {.uint16_value = 543});
             gl_message_push_parameter(&msg, (gl_message_parameter_t) {.uint16_value = 654});
             gl_message_push_parameter(&msg, (gl_message_parameter_t) {.uint8_value = 12});
-            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring(
-                "127.0.0.1######")});
-            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring("4242")});
+            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_ip("127.0.0.1")});
+            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number("4242", 4)});
             gl_message_write(fd, &msg);
             gl_message_free(&msg);
         }
@@ -233,53 +232,53 @@ int main(int argc, char **argv) {
             gl_message_t msg = { .type = GL_MESSAGE_TYPE_POSIT, 0 };
             gl_message_push_parameter(&msg,
                                       (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring("hugoboss")});
-            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring("043")});
-            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring("053")});
+            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number("43", 3)});
+            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number("53", 3)});
             gl_message_write(fd, &msg);
             gl_message_free(&msg);
         }
     
         {
             gl_message_t msg = { .type = GL_MESSAGE_TYPE_UPMOV, 0 };
-            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring("023")});
+            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number("23", 3)});
             gl_message_write(fd, &msg);
             gl_message_free(&msg);
         }
     
         {
             gl_message_t msg = { .type = GL_MESSAGE_TYPE_DOMOV, 0 };
-            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring("023")});
+            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number("23", 3)});
             gl_message_write(fd, &msg);
             gl_message_free(&msg);
         }
     
         {
             gl_message_t msg = { .type = GL_MESSAGE_TYPE_LEMOV, 0 };
-            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring("023")});
+            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number("23", 3)});
             gl_message_write(fd, &msg);
             gl_message_free(&msg);
         }
     
         {
             gl_message_t msg = { .type = GL_MESSAGE_TYPE_RIMOV, 0 };
-            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring("023")});
+            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number("23", 3)});
             gl_message_write(fd, &msg);
             gl_message_free(&msg);
         }
     
         {
             gl_message_t msg = { .type = GL_MESSAGE_TYPE_MOVE_RES, 0 };
-            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring("023")});
-            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring("023")});
+            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number("23", 3)});
+            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number("23", 3)});
             gl_message_write(fd, &msg);
             gl_message_free(&msg);
         }
     
         {
             gl_message_t msg = { .type = GL_MESSAGE_TYPE_MOVEF, 0 };
-            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring("023")});
-            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring("023")});
-            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring("0023")});
+            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number("23", 3)});
+            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number("23", 3)});
+            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number("23", 4)});
             gl_message_write(fd, &msg);
             gl_message_free(&msg);
         }
@@ -313,9 +312,9 @@ int main(int argc, char **argv) {
             gl_message_t msg = { .type = GL_MESSAGE_TYPE_GPLYR, 0 };
             gl_message_push_parameter(&msg,
                                       (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring("hugoboss")});
-            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring("043")});
-            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring("053")});
-            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring("0053")});
+            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number("43", 3)});
+            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number("53", 3)});
+            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number("53", 4)});
             gl_message_write(fd, &msg);
             gl_message_free(&msg);
         }
@@ -358,8 +357,8 @@ int main(int argc, char **argv) {
     
         {
             gl_message_t msg = { .type = GL_MESSAGE_TYPE_GHOST, 0 };
-            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring("023")});
-            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring("023")});
+            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number("23", 3)});
+            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number("23", 3)});
             gl_message_write(fd, &msg);
             gl_message_free(&msg);
         }
@@ -368,9 +367,9 @@ int main(int argc, char **argv) {
             gl_message_t msg = { .type = GL_MESSAGE_TYPE_SCORE, 0 };
             gl_message_push_parameter(&msg,
                                       (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring("hugoboss")});
-            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring("0056")});
-            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring("023")});
-            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring("023")});
+            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number("56", 4)});
+            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number("23", 3)});
+            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number("23", 3)});
             gl_message_write(fd, &msg);
             gl_message_free(&msg);
         }
@@ -389,7 +388,7 @@ int main(int argc, char **argv) {
             gl_message_t msg = { .type = GL_MESSAGE_TYPE_ENDGA, 0 };
             gl_message_push_parameter(&msg,
                                       (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring("hugoboss")});
-            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring("0054")});
+            gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number("54", 4)});
             gl_message_write(fd, &msg);
             gl_message_free(&msg);
         }

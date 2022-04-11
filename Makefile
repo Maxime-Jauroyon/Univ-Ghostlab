@@ -1,4 +1,4 @@
-.PHONY: all distclean server client
+.PHONY: all server client distclean
 
 CC = gcc
 CCFLAGS = -Wall -Wno-unused-label -Wno-unused-value -Wno-implicit-function-declaration -std=gnu99

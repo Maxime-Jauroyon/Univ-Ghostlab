@@ -21,10 +21,10 @@ if (UNIX AND NOT APPLE)
     set(COMMON_LIB Threads::Threads)
 endif()
 
-add_executable(client src/main/c/client.c ${COMMON_SRC})
-target_compile_definitions(client PRIVATE GHOSTLAB_CLIENT)
-target_link_libraries(client PRIVATE ${COMMON_LIB})
-
 add_executable(server src/main/c/server.c ${COMMON_SRC})
-target_compile_definitions(server PRIVATE GHOSTLAB_SERVER)
 target_link_libraries(server PRIVATE ${COMMON_LIB})
+target_compile_definitions(server PRIVATE GHOSTLAB_SERVER)
+
+add_executable(client src/main/c/client.c ${COMMON_SRC})
+target_link_libraries(client PRIVATE ${COMMON_LIB})
+target_compile_definitions(client PRIVATE GHOSTLAB_CLIENT)

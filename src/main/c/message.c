@@ -581,8 +581,13 @@ static uint8_t gl_calculate_max_message_identifier_size() {
 }
 
 int gl_message_write(int fd, struct gl_message_t *dst) {
-    uint8_t *buf = 0;
+    gl_assert(dst);
+    
     const gl_message_definition_t *msg_def = gl_message_definitions()[dst->type];
+    
+    gl_assert(msg_def->num_parameters == gl_array_get_size(dst->parameters_value));
+    
+    uint8_t *buf = 0;
     
     gl_write_cstring(&buf, (const char **)&msg_def->identifier);
     
@@ -601,6 +606,7 @@ int gl_message_write(int fd, struct gl_message_t *dst) {
         } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT64) {
             gl_uint64_write(&buf, &dst->parameters_value[i].uint64_value, msg_param_def->conversion_type);
         } else {
+            gl_assert(!msg_param_def->force_exact_length || msg_param_def->value_length == gl_array_get_size(dst->parameters_value[i].string_value));
             gl_write_string(&buf, (const uint8_t **)&dst->parameters_value[i].string_value);
         }
     }
@@ -676,11 +682,14 @@ int gl_message_read(int fd, struct gl_message_t *dst) {
             uint64_t n = gl_uint8_to_uint64(parameter_value_buf, msg_param_def->conversion_type);
             parameter = (gl_message_parameter_t) { .uint64_value = msg_param_def->has_max_uint_value && n > (uint64_t )msg_param_def->max_value_uint ? (uint64_t )msg_param_def->max_value_uint : n };
         } else {
+            gl_assert(!msg_param_def->force_exact_length || msg_param_def->value_length == gl_array_get_size(parameter_value_buf));
             parameter = (gl_message_parameter_t) { .string_value = parameter_value_buf };
         }
         
         gl_array_push(dst->parameters_value, parameter);
     }
+    
+    gl_assert(msg_def->num_parameters == gl_array_get_size(dst->parameters_value));
     
     // Checks if the message was sent using the right protocol.
     gl_assert(msg_def->protocol != GL_MESSAGE_PROTOCOL_TCP || gl_is_tcp_terminator(last_c));
