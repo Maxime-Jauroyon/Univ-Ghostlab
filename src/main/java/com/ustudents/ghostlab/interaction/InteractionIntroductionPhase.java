@@ -26,8 +26,9 @@ public class InteractionIntroductionPhase extends InteractionPerPhase {
                 String gameId = Utils.getInput("Now choose your game id number : ", sc, 1);
                 clientSender = "REGIS " + username + " " + client.getUdpPort() + " " + gameId + "***\n";
             }else if(choice.equals("new")){
-                String username = Utils.getInput("Now choose your username : ", sc, 0);
-                clientSender = "NEWPL " + username + " " + client.getUdpPort() + "***\n";
+                if(client.getUsername() == null)
+                    client.setUsername(Utils.getInput("Now choose your username : ", sc, 0));
+                clientSender = "NEWPL " + client.getUsername() + " " + client.getUdpPort() + "***\n";
             }else if(choice.equals("unregister")){
                 clientSender = "UNREG***\n";
             }else if(choice.equals("size")){
@@ -61,9 +62,7 @@ public class InteractionIntroductionPhase extends InteractionPerPhase {
     public int getQuestionInIntroductionPhase(BufferedReader br, String clientChoice) throws IOException {
         String message = br.readLine();
         String[] list = message.split(" ");
-        System.out.println(list[0]);
         if(list[0].equals("REGOK")) {
-            System.out.println("Je suis la !");
             client.setGameRegister(Integer.parseInt(list[1].substring(0, list[1].length()-3)));
             return 1;
         }else if(list[0].equals("WELCO")){
@@ -71,8 +70,8 @@ public class InteractionIntroductionPhase extends InteractionPerPhase {
             client.setHeigthMaze(Integer.parseInt(list[2]));
             client.setWidthMaze(Integer.parseInt(list[3]));
             client.setNumberOfghost(Integer.parseInt(list[4]));
-            client.setMulticastAddr(list[5]);
-            client.setMulticastAddr(list[6].substring(0, list[6].length()-3));
+            client.setMulticastAddr(list[5].substring(0, list[5].length()-3));
+            client.setMulticastPort(Integer.parseInt(list[6].substring(0, list[6].length()-3)));
             return 1;
         }else if(list[0].equals("POSIT")){
             client.setIdPlayer(list[1]);
@@ -93,12 +92,11 @@ public class InteractionIntroductionPhase extends InteractionPerPhase {
                 list = message.split(" ");
                 if (startWithList) {
                     String playerId = list[1].substring(0, list[1].length()-3);
-                    System.out.println("Game id : " + gameId + " and player id inside the game : " + playerId);
+                    System.out.println("[Game " + gameId + "] : " + playerId + " is currently in the game");
                 } else {
                     gameId = list[1];
                     String nbPlayer = list[2].substring(0, list[2].length()-3);
-                    System.out.println("Game id : " + gameId + " and number of player inside the game : "
-                            + nbPlayer);
+                    System.out.println("[Game " + gameId + "] : He has " + nbPlayer + " player(s) in the waiting room");
                 }
             }
 
@@ -106,12 +104,12 @@ public class InteractionIntroductionPhase extends InteractionPerPhase {
             String gameId = list[1];
             String height = list[2];
             String width = list[3].substring(0, list[3].length()-3);
-            System.out.println("Game id : " + gameId + " , height : " + height +
-                    " et width : " + width + " of the maze");
+            System.out.println("[Game " + gameId + "] : " + height + " of height" +
+                    " by " + width + " of width");
 
         }else if(list[0].equals("UNROK")){
             String gameId = list[1].substring(0, list[1].length()-3);
-            System.out.println("Unregister of game : " + gameId);
+            System.out.println("[Game " + gameId + "] : Your are unregister");
             return 2;
 
             //TODO: make function to explain all existant error in program

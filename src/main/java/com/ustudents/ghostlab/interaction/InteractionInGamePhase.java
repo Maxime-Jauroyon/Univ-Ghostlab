@@ -56,16 +56,10 @@ public class InteractionInGamePhase extends InteractionPerPhase {
             }else if(choice.equals("list")) {
                 clientSender = "GLIS?***\n";
             }else if(choice.equals("messall")) {
-                Scanner temp = new Scanner(System.in);
-                System.out.println("Your message : ");
-                String message = temp.nextLine();
-                message = (message.length() > 200)? message.substring(0, 200): message;
-                System.out.println("Message : " + message);
-                clientSender = "MALL? " + message + "***\n";
+                clientSender = "MALL? " + Utils.messageToSend() + "***\n";
             }else if(choice.equals("messto")){
                 String playerId = Utils.getInput("Who is the player ?", sc, 0);
-                String message = Utils.getInput("What do you say to ?", sc, 3);
-                clientSender = "SEND? " + playerId + " " + message.substring(0, 200) + "***\n";
+                clientSender = "SEND? " + playerId + " " + Utils.messageToSend() + "***\n";
             } else if(choice.equals("quit")){
                 clientSender = "IQUIT***\n";
             }
@@ -85,15 +79,14 @@ public class InteractionInGamePhase extends InteractionPerPhase {
             int xpos = Integer.parseInt(list[2]);
             int ypos = Integer.parseInt(list[3]);
             int score = Integer.parseInt(list[4].substring(0, list[4].length()-3));
-            System.out.println("Player " + (i+1) + " : " + list[1] + ", her position on the maze : (" +
-                    xpos + "," + ypos + ") and his score : " + score);
+            System.out.println("[" + list[1] + "] : his actual position : (" +
+                    xpos + "," + ypos + ") with " + score + " points");
         }
     }
 
     public void getQuestionInGamePhase(BufferedReader br) throws IOException {
         String message = br.readLine();
         String[] list = message.split(" ");
-        System.out.println(list[0]);
         if(list[0].equals("MOVE!")) {
             client.setCurrentPos(Integer.parseInt(list[1]), Integer.parseInt(list[2].substring(0, list[2].length()-3)));
         }else if(list[0].equals("MOVEF")) {
@@ -103,7 +96,7 @@ public class InteractionInGamePhase extends InteractionPerPhase {
 
         }else if(list[0].equals("GLIS!")) {
             getListOfPlayersInGame(br, Integer.parseInt(list[1].substring(0, list[1].length() - 3)));
-        }else if(list[0].equals("MALL!***")){
+        }else if(list[0].equals("MALL!***") || list[0].equals("SEND!***")) {
             System.out.println("Your message has been sended");
         }else if(list[0].equals("GOBYE***")){
             System.out.println("Connection closing");
