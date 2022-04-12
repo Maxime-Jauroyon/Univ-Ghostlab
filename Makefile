@@ -4,15 +4,21 @@ CC = gcc
 CCFLAGS = -Wall -Wno-unused-label -Wno-unused-value -Wno-implicit-function-declaration -std=gnu99
 
 COMMON_SRC = \
-	src/main/c/array.c \
-    src/main/c/array.h \
-    src/main/c/message.c \
-    src/main/c/message.h \
-    src/main/c/string.c \
-    src/main/c/string.h \
-    src/main/c/types.h \
-    src/main/c/utils.c \
-    src/main/c/utils.h
+        src/main/c/array.c \
+        src/main/c/array.h \
+        src/main/c/memory.c \
+        src/main/c/memory.h \
+        src/main/c/message.c \
+        src/main/c/message.h \
+        src/main/c/network.c \
+        src/main/c/network.h \
+        src/main/c/print.c \
+        src/main/c/print.h \
+        src/main/c/string.c \
+        src/main/c/string.h \
+        src/main/c/types.h \
+        src/main/c/utils.c \
+        src/main/c/utils.h
 
 ifeq ($(shell uname), Linux)
 	COMMON_LIB = -pthread
