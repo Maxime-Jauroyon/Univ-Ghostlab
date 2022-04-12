@@ -3,6 +3,12 @@
 
 #include "types.h"
 
-int gl_printf(const char *format, ...);
+void gl_printf_no_indicator(const char *format, ...);
+
+void gl_printf(const char *format, ...);
+
+void gl_printf_warning(const char *format, ...);
+
+void gl_printf_error(const char *format, ...);
 
 #endif /* GHOSTLAB_PRINT_H */

@@ -8,6 +8,8 @@
 #include "string.h"
 #include "message.h"
 #include "network.h"
+#include "memory.h"
+#include "print.h"
 
 static const char g_help[] =
     "usage: " GHOSTLAB_EXECUTABLE_NAME " [options]\n"
@@ -47,57 +49,57 @@ int main(int argc, char **argv) {
         switch (opt) {
         case 'i':
             // TODO: Check if ip is valid, if invalid use default
-            server_ip = strdup(optarg);
+            server_ip = gl_strdup(optarg);
             break;
         case 'p':
             // TODO: Check if port is valid, if invalid use default
-            server_port = strdup(optarg);
+            server_port = gl_strdup(optarg);
             break;
         case 'n':
             // TODO: Check if name is valid, if invalid use default
-            player_name = strdup(optarg);
+            player_name = gl_strdup(optarg);
             break;
         case 'u':
             // TODO: Check if port is valid, if invalid use default
-            udp_port = strdup(optarg);
+            udp_port = gl_strdup(optarg);
             break;
         case 'h':
-            printf("%s", g_help);
+            gl_printf_no_indicator("%s", g_help);
             goto cleanup;
         case 'v':
-            printf("version: " GHOSTLAB_VERSION);
+            gl_printf_no_indicator("version: " GHOSTLAB_VERSION);
             goto cleanup;
         case '?':
             used_unknown_opt = 1;
             break;
         default:
-            fprintf(stderr, "option not yet implemented `%c`!\n", opt);
+            gl_printf_warning("option not yet implemented `%c`!\n", opt);
         }
     }
     
     if (used_unknown_opt) {
-        gl_error("use `-h` for more informations.\n");
+        gl_printf_warning("use `-h` for more informations.\n");
     }
     
     if (!server_ip) {
-        server_ip = strdup(GHOSTLAB_DEFAULT_SERVER_IP);
+        server_ip = gl_strdup(GHOSTLAB_DEFAULT_SERVER_IP);
     }
     if (!server_port) {
-        server_ip = strdup(GHOSTLAB_DEFAULT_SERVER_PORT);
+        server_port = gl_strdup(GHOSTLAB_DEFAULT_SERVER_PORT);
     }
     if (!udp_port) {
-        udp_port = strdup(GHOSTLAB_DEFAULT_UDP_PORT);
+        udp_port = gl_strdup(GHOSTLAB_DEFAULT_UDP_PORT);
     }
-    
+
     int client_fd = gl_socket_create(GHOSTLAB_DEFAULT_SERVER_IP, GHOSTLAB_DEFAULT_SERVER_PORT, GL_SOCKET_TYPE_CLIENT);
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_GAMES, 0 };
         gl_message_push_parameter(&msg, (gl_message_parameter_t) {.uint8_value = 8});
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_OGAMES, 0 };
         gl_message_push_parameter(&msg, (gl_message_parameter_t) {.uint8_value = 4});
@@ -105,7 +107,7 @@ int main(int argc, char **argv) {
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_NEWPL, 0 };
         gl_message_push_parameter(&msg,
@@ -114,7 +116,7 @@ int main(int argc, char **argv) {
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_REGIS, 0 };
         gl_message_push_parameter(&msg,
@@ -124,52 +126,52 @@ int main(int argc, char **argv) {
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_REGOK, 0 };
         gl_message_push_parameter(&msg, (gl_message_parameter_t) {.uint8_value =  5});
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_REGNO, 0 };
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_START, 0 };
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_UNREG, 0 };
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_UNROK, 0 };
         gl_message_push_parameter(&msg, (gl_message_parameter_t) {.uint8_value =  5});
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_DUNNO, 0 };
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_SIZE_REQ, 0 };
         gl_message_push_parameter(&msg, (gl_message_parameter_t) {.uint8_value =  5});
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_SIZE_RES, 0 };
         gl_message_push_parameter(&msg, (gl_message_parameter_t) {.uint8_value =  5});
@@ -178,14 +180,14 @@ int main(int argc, char **argv) {
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_LIST_REQ, 0 };
         gl_message_push_parameter(&msg, (gl_message_parameter_t) {.uint8_value =  5});
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_LIST_RES, 0 };
         gl_message_push_parameter(&msg, (gl_message_parameter_t) {.uint8_value =  5});
@@ -193,7 +195,7 @@ int main(int argc, char **argv) {
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_PLAYR, 0 };
         gl_message_push_parameter(&msg,
@@ -201,13 +203,13 @@ int main(int argc, char **argv) {
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_GAME_REQ, 0 };
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_WELCO, 0 };
         gl_message_push_parameter(&msg, (gl_message_parameter_t) {.uint8_value = 4,});
@@ -219,7 +221,7 @@ int main(int argc, char **argv) {
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_POSIT, 0 };
         gl_message_push_parameter(&msg,
@@ -229,35 +231,35 @@ int main(int argc, char **argv) {
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_UPMOV, 0 };
         gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number("23", 3)});
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_DOMOV, 0 };
         gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number("23", 3)});
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_LEMOV, 0 };
         gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number("23", 3)});
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_RIMOV, 0 };
         gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number("23", 3)});
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_MOVE_RES, 0 };
         gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number("23", 3)});
@@ -265,7 +267,7 @@ int main(int argc, char **argv) {
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_MOVEF, 0 };
         gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number("23", 3)});
@@ -274,32 +276,32 @@ int main(int argc, char **argv) {
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_IQUIT, 0 };
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_GOBYE, 0 };
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_GLIS_REQ, 0 };
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_GLIS_RES, 0 };
         gl_message_push_parameter(&msg, (gl_message_parameter_t) {.uint8_value = 4,});
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_GPLYR, 0 };
         gl_message_push_parameter(&msg,
@@ -310,7 +312,7 @@ int main(int argc, char **argv) {
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_MALL_REQ, 0 };
         gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring(
@@ -318,13 +320,13 @@ int main(int argc, char **argv) {
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_MALL_RES, 0 };
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_SEND_REQ, 0 };
         gl_message_push_parameter(&msg,
@@ -334,19 +336,19 @@ int main(int argc, char **argv) {
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_SEND_RES, 0 };
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_NSEND, 0 };
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_GHOST, 0 };
         gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number("23", 3)});
@@ -354,7 +356,7 @@ int main(int argc, char **argv) {
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_SCORE, 0 };
         gl_message_push_parameter(&msg,
@@ -365,7 +367,7 @@ int main(int argc, char **argv) {
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_MESSA, 0 };
         gl_message_push_parameter(&msg,
@@ -375,7 +377,7 @@ int main(int argc, char **argv) {
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_ENDGA, 0 };
         gl_message_push_parameter(&msg,
@@ -384,7 +386,7 @@ int main(int argc, char **argv) {
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_MESSP, 0 };
         gl_message_push_parameter(&msg,
@@ -394,7 +396,7 @@ int main(int argc, char **argv) {
         gl_message_write(client_fd, &msg);
         gl_message_free(&msg);
     }
-    
+
     for (uint8_t i = 0; i < 39; i++) {
         {
             gl_message_t msg = {0};
@@ -403,27 +405,21 @@ int main(int argc, char **argv) {
             gl_message_free(&msg);
         }
     }
-    
+
     gl_socket_close(client_fd);
-    
+
     goto cleanup;
     
     error:
     exit_code = gl_error_get(errno);
     
     cleanup:
-    if (server_ip) {
-        free(server_ip);
-    }
-    if (server_port) {
-        free(server_port);
-    }
-    if (player_name) {
-        free(player_name);
-    }
-    if (udp_port) {
-        free(udp_port);
-    }
+    gl_free(server_ip);
+    gl_free(server_port);
+    gl_free(player_name);
+    gl_free(udp_port);
+    
+    gl_memory_check_for_leaks();
     
     return exit_code;
 }

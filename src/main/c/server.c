@@ -7,6 +7,8 @@
 #include "utils.h"
 #include "message.h"
 #include "network.h"
+#include "memory.h"
+#include "print.h"
 
 static const char g_help[] =
     "usage: " GHOSTLAB_EXECUTABLE_NAME " [options]\n"
@@ -43,42 +45,42 @@ int main(int argc, char **argv) {
         switch (opt) {
         case 'p':
             // TODO: Check if port is valid, if invalid use default
-            server_port = strdup(optarg);
+            server_port = gl_strdup(optarg);
             break;
         case 'I':
             // TODO: Check if ip is valid, if invalid use default
-            multicast_ip = strdup(optarg);
+            multicast_ip = gl_strdup(optarg);
             break;
         case 'P':
             // TODO: Check if port is valid, if invalid use default
-            multicast_port = strdup(optarg);
+            multicast_port = gl_strdup(optarg);
             break;
         case 'h':
-            printf("%s", g_help);
+            gl_printf_no_indicator("%s", g_help);
             goto cleanup;
         case 'v':
-            printf("version: " GHOSTLAB_VERSION);
+            gl_printf_no_indicator("version: " GHOSTLAB_VERSION);
             goto cleanup;
         case '?':
             used_unknown_opt = 1;
             break;
         default:
-            fprintf(stderr, "option not yet implemented `%c`!\n", opt);
+            gl_printf_warning("option not yet implemented `%c`!\n", opt);
         }
     }
     
     if (used_unknown_opt) {
-        gl_error("use `-h` for more informations.\n");
+        gl_printf_warning("use `-h` for more informations.\n");
     }
     
     if (!server_port) {
-        server_port = strdup(GHOSTLAB_DEFAULT_SERVER_PORT);
+        server_port = gl_strdup(GHOSTLAB_DEFAULT_SERVER_PORT);
     }
     if (!multicast_ip) {
-        multicast_ip = strdup(GHOSTLAB_DEFAULT_MULTICAST_IP);
+        multicast_ip = gl_strdup(GHOSTLAB_DEFAULT_MULTICAST_IP);
     }
     if (!multicast_port) {
-        multicast_port = strdup(GHOSTLAB_DEFAULT_MULTICAST_PORT);
+        multicast_port = gl_strdup(GHOSTLAB_DEFAULT_MULTICAST_PORT);
     }
     
     int server_fd = gl_socket_create(GHOSTLAB_DEFAULT_SERVER_IP, GHOSTLAB_DEFAULT_SERVER_PORT, GL_SOCKET_TYPE_SERVER);
@@ -100,15 +102,11 @@ int main(int argc, char **argv) {
     exit_code = gl_error_get(errno);
     
     cleanup:
-    if (server_port) {
-        free(server_port);
-    }
-    if (multicast_ip) {
-        free(multicast_ip);
-    }
-    if (multicast_port) {
-        free(multicast_port);
-    }
+    gl_free(server_port);
+    gl_free(multicast_ip);
+    gl_free(multicast_port);
+    
+    gl_memory_check_for_leaks();
     
     return exit_code;
 }

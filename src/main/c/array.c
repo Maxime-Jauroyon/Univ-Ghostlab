@@ -9,7 +9,7 @@ void *internal_gl_array_set_capacity(void *array, uint64_t capacity, uint64_t it
     const uint64_t size = gl_array_get_size(array);
     const uint64_t memory = capacity ? item_size * capacity + header_size : 0;
     
-    header = (uint8_t *)realloc(header, memory);
+    header = (uint8_t *)gl_realloc(header, memory);
     
     if (!header) {
         return 0;
@@ -49,5 +49,5 @@ void internal_gl_array_free(void *array) {
         return;
     }
     
-    free(header);
+    gl_free(header);
 }

@@ -5,6 +5,7 @@
 #include "array.h"
 #include "utils.h"
 #include "string.h"
+#include "print.h"
 
 static uint8_t g_max_message_identifier_size = 0;
 
@@ -687,6 +688,10 @@ int gl_message_read(int fd, struct gl_message_t *dst) {
         }
         
         gl_array_push(dst->parameters_value, parameter);
+    
+        if (msg_param_def->value_type != GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING) {
+            gl_array_free(parameter_value_buf);
+        }
     }
     
     gl_assert(msg_def->num_parameters == gl_array_get_size(dst->parameters_value));
@@ -707,24 +712,24 @@ int gl_message_read(int fd, struct gl_message_t *dst) {
 int gl_message_printf(struct gl_message_t *msg) {
     const gl_message_definition_t *msg_def = gl_message_definitions()[msg->type];
     gl_assert(gl_array_get_size(msg->parameters_value) == msg_def->num_parameters);
-    printf("%s", msg_def->identifier);
+    gl_printf("%s", msg_def->identifier);
     
     for (uint8_t i = 0; i < msg_def->num_parameters; i++) {
         const gl_message_parameter_definition_t *msg_param_def = gl_message_parameter_definitions()[msg_def->parameters[i]];
-        
-        printf(" ");
+    
+        gl_printf(" ");
         
         if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT8) {
-            printf("%u", msg->parameters_value[i].uint8_value);
+            gl_printf("%u", msg->parameters_value[i].uint8_value);
         } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT16) {
-            printf("%hu", msg->parameters_value[i].uint16_value);
+            gl_printf("%hu", msg->parameters_value[i].uint16_value);
         } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT32) {
-            printf("%u", msg->parameters_value[i].uint32_value);
+            gl_printf("%u", msg->parameters_value[i].uint32_value);
         } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT64) {
 #ifdef __APPLE__
-            printf("%llu", msg->parameters_value[i].uint64_value);
+            gl_printf("%llu", msg->parameters_value[i].uint64_value);
 #else
-            printf("%lu", msg->parameters_value[i].uint64_value);
+            gl_printf("%lu", msg->parameters_value[i].uint64_value);
 #endif
         } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING) {
             gl_string_printf(&msg->parameters_value[i].string_value);
@@ -732,12 +737,12 @@ int gl_message_printf(struct gl_message_t *msg) {
     }
     
     if (msg_def->protocol == GL_MESSAGE_PROTOCOL_UDP) {
-        printf("%c%c%c", GHOSTLAB_UDP_TERMINATOR, GHOSTLAB_UDP_TERMINATOR, GHOSTLAB_UDP_TERMINATOR);
+        gl_printf("%c%c%c", GHOSTLAB_UDP_TERMINATOR, GHOSTLAB_UDP_TERMINATOR, GHOSTLAB_UDP_TERMINATOR);
     } else {
-        printf("%c%c%c", GHOSTLAB_TCP_TERMINATOR, GHOSTLAB_TCP_TERMINATOR, GHOSTLAB_TCP_TERMINATOR);
+        gl_printf("%c%c%c", GHOSTLAB_TCP_TERMINATOR, GHOSTLAB_TCP_TERMINATOR, GHOSTLAB_TCP_TERMINATOR);
     }
     
-    printf("\n");
+    gl_printf("\n");
     
     return 0;
 }

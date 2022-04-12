@@ -26,9 +26,6 @@
 #define GHOSTLAB_UDP_TERMINATOR '+'
 #define GHOSTLAB_SEPARATOR ' '
 
-// Prints an error message.
-#define gl_error(message) fprintf(stderr, GHOSTLAB_EXECUTABLE_NAME ": " message)
-
 // Asserts a condition that returns `-1` in case of error.
 #define gl_assert(condition) if (!(condition)) { return -1; } (void)0
 

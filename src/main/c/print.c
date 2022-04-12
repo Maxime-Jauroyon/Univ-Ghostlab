@@ -1,20 +1,85 @@
 #include "print.h"
 #include <stdio.h>
 #include <syslog.h>
+#include <string.h>
 
-int gl_printf(const char *format, ...) {
+static bool g_use_newline_indicator = true;
+
+void gl_printf_no_indicator(const char *format, ...) {
     va_list args;
     
-    int r = printf(GHOSTLAB_EXECUTABLE_NAME ": ");
+    va_start(args, format);
+    vprintf(format, args);
+    va_end(args);
     
-    if (r < 0) {
-        return r;
+//    va_start(args, format);
+//    vsyslog(LOG_NOTICE, format, args);
+//    va_end(args);
+    
+    if (strstr(format, "\n")) {
+        g_use_newline_indicator = true;
+    }
+}
+
+void gl_printf(const char *format, ...) {
+    va_list args;
+    
+    if (g_use_newline_indicator) {
+        printf(GHOSTLAB_EXECUTABLE_NAME ": ");
+        g_use_newline_indicator = false;
     }
     
     va_start(args, format);
-    r = printf(format, args);
-    syslog(LOG_NOTICE, format, args);
+    vprintf(format, args);
     va_end(args);
     
-    return r;
+//    va_start(args, format);
+//    vsyslog(LOG_NOTICE, format, args);
+//    va_end(args);
+    
+    if (strstr(format, "\n")) {
+        g_use_newline_indicator = true;
+    }
+}
+
+void gl_printf_warning(const char *format, ...) {
+    va_list args;
+    
+    if (g_use_newline_indicator) {
+        printf(GHOSTLAB_EXECUTABLE_NAME ": warning: ");
+        g_use_newline_indicator = false;
+    }
+    
+    va_start(args, format);
+    vprintf(format, args);
+    va_end(args);
+    
+//    va_start(args, format);
+//    vsyslog(LOG_WARNING, format, args);
+//    va_end(args);
+    
+    if (strstr(format, "\n")) {
+        g_use_newline_indicator = true;
+    }
+}
+
+void gl_printf_error(const char *format, ...) {
+    va_list args;
+    
+    if (g_use_newline_indicator) {
+        printf(GHOSTLAB_EXECUTABLE_NAME ": error: ");
+        g_use_newline_indicator = false;
+    }
+    
+    va_start(args, format);
+    vprintf(format, args);
+    va_end(args);
+    
+//    va_start(args, format);
+//    vsyslog(LOG_ERR, format, args);
+//    va_end(args);
+    
+    if (strstr(format, "\n")) {
+        g_use_newline_indicator = true;
+    }
 }
