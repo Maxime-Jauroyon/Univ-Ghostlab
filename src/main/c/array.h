@@ -3,6 +3,8 @@
 
 #include "types.h"
 
+void *gl_memmove(void *dst, const void *src, uint64_t size);
+
 // An array is a pointer of elements (like a C array) that is prefixed by its size and capacity in memory.
 //
 // Example:
@@ -55,13 +57,13 @@ typedef struct gl_array_header_t {
 #define gl_array_push(a, item) (gl_array_ensure(a, gl_array_get_size(a) + 1), (a)[gl_array_get_header(a)->size++] = (item), (a) + gl_array_get_header(a)->size - 1)
 
 // Inserts the item at the given index of the array (it will grow if needed).
-#define gl_array_insert(a, item, i) (gl_array_push(a, item), memmove((a) + (i) + 1, (a) + (i), (gl_array_get_size(a) - (i) - 1) * sizeof(*(a))), (a)[i] = (item), (a) + (i))
+#define gl_array_insert(a, item, i) (gl_array_push(a, item), gl_memmove((a) + (i) + 1, (a) + (i), (gl_array_get_size(a) - (i) - 1) * sizeof(*(a))), (a)[i] = (item), (a) + (i))
 
 // Pops the last item of the array.
 #define gl_array_pop(array) ((array)[--gl_array_get_header(array)->size])
 
 // Removes the item at the given index of the array.
-#define gl_array_remove(a, i) (((a) ? memmove((a) + (i), (a) + (i) + 1, (gl_array_get_size(a) - (i) - 1 * sizeof(*(a))) : 0), (a) ? --gl_array_get_header(a)->size : 0)
+#define gl_array_remove(a, i) (((a) ? gl_memmove((a) + (i), (a) + (i) + 1, (gl_array_get_size(a) - (i) - 1 * sizeof(*(a))) : 0), (a) ? --gl_array_get_header(a)->size : 0)
 
 // Frees the data of an array (must be called to deallocated memory).
 #define gl_array_free(a) (internal_gl_array_free((void *)(a)), (*(void **)&(a)) = 0)

@@ -1,6 +1,8 @@
 #ifndef GHOSTLAB_NETWORK_H
 #define GHOSTLAB_NETWORK_H
 
+#include "types.h"
+
 typedef enum gl_socket_type_t {
     GL_SOCKET_TYPE_SERVER,
     GL_SOCKET_TYPE_CLIENT,

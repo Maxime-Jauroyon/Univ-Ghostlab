@@ -1,6 +1,6 @@
 #include "array.h"
 #include <stdlib.h>
-#include <string.h>
+#include "memory.h"
 
 void *internal_gl_array_set_capacity(void *array, uint64_t capacity, uint64_t item_size) {
     uint8_t *header = array ? (uint8_t *)gl_array_get_header(array) : 0;
@@ -37,7 +37,7 @@ void *internal_gl_array_grow(void *array, uint64_t to_at_least, uint64_t item_si
 void *internal_gl_array_create_from_carray(const void *ptr, uint64_t size, uint64_t item_size) {
     void *array = internal_gl_array_set_capacity(0, size, item_size);
     gl_array_get_header(array)->size = size;
-    memcpy(array, ptr, size * item_size);
+    gl_memcpy(array, ptr, size * item_size);
     
     return array;
 }

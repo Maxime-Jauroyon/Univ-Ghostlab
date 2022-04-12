@@ -44,5 +44,5 @@ int gl_socket_server_accept_client(int server_fd) {
 }
 
 int gl_socket_close(int fd) {
-    close(fd);
+    return close(fd);
 }

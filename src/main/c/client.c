@@ -1,9 +1,5 @@
 #include "types.h"
 #include <stdlib.h>
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <printf.h>
-#include <unistd.h>
 #include <string.h>
 #include <errno.h>
 #include <getopt.h>
