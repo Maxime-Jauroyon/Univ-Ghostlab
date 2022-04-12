@@ -1,5 +1,7 @@
 package client;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
 import java.util.Scanner;
@@ -91,6 +93,26 @@ public class Utils {
             }
         }
         System.out.println();
+    }
+
+    private static boolean checkThreeNextChar(String read){
+        if(read.length() < 3)
+            return false;
+
+        for(int i = 3; i > 0; i--){
+            if(read.charAt(read.length()-i) != '*'){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static String read(BufferedReader br) throws IOException {
+        String read = "";
+        while(!checkThreeNextChar(read)){
+            read += (char) br.read();
+        }
+        return read;
     }
 
     private static boolean checkServerIp(String[] args){

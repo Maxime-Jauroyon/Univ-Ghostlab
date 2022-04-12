@@ -22,27 +22,28 @@ public class InteractionIntroductionPhase extends InteractionPerPhase {
             String clientSender = "";
 
             if(choice.equals("register")){
-                String username = Utils.getInput("Now choose your username : ", sc, 0);
+                if(client.getUsername() == null)
+                    client.setUsername(Utils.getInput("Now choose your username : ", sc, 0));
                 String gameId = Utils.getInput("Now choose your game id number : ", sc, 1);
-                clientSender = "REGIS " + username + " " + client.getUdpPort() + " " + gameId + "***\n";
+                clientSender = "REGIS " + client.getUsername() + " " + client.getUdpPort() + " " + gameId + "***";
             }else if(choice.equals("new")){
                 if(client.getUsername() == null)
                     client.setUsername(Utils.getInput("Now choose your username : ", sc, 0));
-                clientSender = "NEWPL " + client.getUsername() + " " + client.getUdpPort() + "***\n";
+                clientSender = "NEWPL " + client.getUsername() + " " + client.getUdpPort() + "***";
             }else if(choice.equals("unregister")){
-                clientSender = "UNREG***\n";
+                clientSender = "UNREG***";
             }else if(choice.equals("size")){
                 String gameId = Utils.getInput("Now choose your game id number : ", sc, 1);
-                clientSender = "SIZE? " + gameId + "***\n";
+                clientSender = "SIZE? " + gameId + "***";
             }else if(choice.equals("list")){
                 String gameId = Utils.getInput("Now choose your game id number : ", sc, 1);
-                clientSender = "LIST? " + gameId + "***\n";
+                clientSender = "LIST? " + gameId + "***";
             }else if(choice.equals("game")){
-                clientSender = "GAME?***\n";
+                clientSender = "GAME?***";
             }else if(choice.equals("start")){
-                clientSender = "START***\n";
+                clientSender = "START***";
             }else if(choice.equals("quit")){
-                clientSender = "IQUIT***\n";
+                clientSender = "IQUIT***";
             }
 
             pw.print(clientSender);
@@ -60,7 +61,7 @@ public class InteractionIntroductionPhase extends InteractionPerPhase {
     }
 
     public int getQuestionInIntroductionPhase(BufferedReader br, String clientChoice) throws IOException {
-        String message = br.readLine();
+        String message = Utils.read(br);
         String[] list = message.split(" ");
         if(list[0].equals("REGOK")) {
             client.setGameRegister(Integer.parseInt(list[1].substring(0, list[1].length()-3)));
@@ -82,13 +83,12 @@ public class InteractionIntroductionPhase extends InteractionPerPhase {
             if (startWithList) {
                 gameId = list[1];
             }
-
             String getCorrectNumberOf = (startWithList)? list[2].substring(0, list[2].length()-3):
                     list[1].substring(0, list[1].length()-3);
             int numberOf = Integer.parseInt(getCorrectNumberOf);
 
             for (int i = 0; i < numberOf; i++) {
-                message = br.readLine();
+                message = Utils.read(br);
                 list = message.split(" ");
                 if (startWithList) {
                     String playerId = list[1].substring(0, list[1].length()-3);

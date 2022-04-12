@@ -30,19 +30,19 @@ public class InteractionInGamePhase extends InteractionPerPhase {
         }
 
         if(choice.equals("left")){
-            return "LEMOV " + nbMove + "***\n";
+            return "LEMOV " + nbMove + "***";
         }else if(choice.equals("right")){
-            return "RIMOV " + nbMove + "***\n";
+            return "RIMOV " + nbMove + "***";
         }else if(choice.equals("up")){
-            return "UPMOV " + nbMove + "***\n";
+            return "UPMOV " + nbMove + "***";
         }else{
-            return "DOMOV " + nbMove + "***\n";
+            return "DOMOV " + nbMove + "***";
         }
     }
 
     public void putQuestionOnGamePhase(BufferedReader br, PrintWriter pw,
                                        String question, String[] correctAnswers,
-                                       Scanner sc) throws IOException, InterruptedException {
+                                       Scanner sc) throws IOException {
 
         while(true){
             String choice = Utils.gameStepChoice(question, correctAnswers, sc);
@@ -54,14 +54,14 @@ public class InteractionInGamePhase extends InteractionPerPhase {
                                  new String[]{"left","right","up","down"}, sc);
 
             }else if(choice.equals("list")) {
-                clientSender = "GLIS?***\n";
+                clientSender = "GLIS?***";
             }else if(choice.equals("messall")) {
-                clientSender = "MALL? " + Utils.messageToSend() + "***\n";
+                clientSender = "MALL? " + Utils.messageToSend() + "***";
             }else if(choice.equals("messto")){
                 String playerId = Utils.getInput("Who is the player ?", sc, 0);
-                clientSender = "SEND? " + playerId + " " + Utils.messageToSend() + "***\n";
+                clientSender = "SEND? " + playerId + " " + Utils.messageToSend() + "***";
             } else if(choice.equals("quit")){
-                clientSender = "IQUIT***\n";
+                clientSender = "IQUIT***";
             }
 
             pw.print(clientSender);
@@ -74,7 +74,7 @@ public class InteractionInGamePhase extends InteractionPerPhase {
 
     public void getListOfPlayersInGame(BufferedReader br, int numberOfPlayer) throws IOException {
         for(int i = 0; i < numberOfPlayer; i++){
-            String message = br.readLine();
+            String message = Utils.read(br);
             String[] list = message.split(" ");
             int xpos = Integer.parseInt(list[2]);
             int ypos = Integer.parseInt(list[3]);
@@ -85,7 +85,7 @@ public class InteractionInGamePhase extends InteractionPerPhase {
     }
 
     public void getQuestionInGamePhase(BufferedReader br) throws IOException {
-        String message = br.readLine();
+        String message = Utils.read(br);
         String[] list = message.split(" ");
         if(list[0].equals("MOVE!")) {
             client.setCurrentPos(Integer.parseInt(list[1]), Integer.parseInt(list[2].substring(0, list[2].length()-3)));

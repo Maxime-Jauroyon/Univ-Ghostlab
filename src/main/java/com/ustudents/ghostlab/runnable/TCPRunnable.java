@@ -31,7 +31,6 @@ public class TCPRunnable implements Runnable{
             String question = "What to you want to do ? (move/list/messall/messto/quit)";
             InteractionInGamePhase iigp = new InteractionInGamePhase(client);
             iigp.putQuestionOnGamePhase(br, pw, question, new String[]{"move","list","messall","messto","quit"}, sc);
-            System.out.println("Je m'appelle Léo100");
 
         }catch (Exception e){
             e.printStackTrace();
