@@ -49,6 +49,15 @@ typedef struct gl_array_header_t {
 // Returns the capacity of the array.
 #define gl_array_get_capacity(a) ((a) ? gl_array_get_header(a)->capacity : 0)
 
+// Returns the first element of the array.
+#define gl_array_get_first(a) ((a) ? (a)[0] : 0)
+
+// Returns the last element of the array.
+#define gl_array_get_last(a) ((a) ? (a)[gl_array_get_size(a) - 1] : 0)
+
+// Returns `true` if the array is empty.
+#define gl_array_is_empty(a) (!gl_array_get_size(a))
+
 // Ensures that the array is at least of capacity `n`.
 // If it isn't, the array grows geometrically to become able to host at least `n` items.
 #define gl_array_ensure(a, n) ((n) > gl_array_get_capacity(a) ? (*(void **)&(a)) = internal_gl_array_grow((void *)(a), n, sizeof(*(a))) : 0)

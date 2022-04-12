@@ -83,3 +83,10 @@ void gl_printf_error(const char *format, ...) {
         g_use_newline_indicator = true;
     }
 }
+
+void gl_gets(const char *format, char *dst) {
+    gl_printf(format);
+    fgets(dst, 512, stdin);
+    g_use_newline_indicator = true;
+    dst[strlen(dst) - 1] = 0;
+}

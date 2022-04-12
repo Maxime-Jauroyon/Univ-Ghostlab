@@ -23,7 +23,7 @@ uint8_t *gl_string_create_from_number(const char *src, uint8_t size) {
     
     // Every char of `src` is a number.
     for (uint8_t i = 0; i < (uint8_t)strlen(src); i++) {
-        if (!isnumber(src[i])) {
+        if (!isdigit(src[i])) {
             return 0;
         }
     }
@@ -51,7 +51,7 @@ uint8_t *gl_string_create_from_ip(const char *src) {
     int distance_from_last_point = 0;
     int total_num_points = 0;
     for (uint8_t i = 0; i < (uint8_t)strlen(src); i++) {
-        if (isnumber(src[i]) && distance_from_last_point < 3) {
+        if (isdigit(src[i]) && distance_from_last_point < 3) {
             distance_from_last_point++;
             continue;
         } else if (src[i] == '.' && distance_from_last_point > 0 && total_num_points < 3) {
