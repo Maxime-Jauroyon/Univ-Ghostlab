@@ -19,8 +19,8 @@ static const char g_help[] =
     "\t-p, --port <server port>                   defines the port to use (" GHOSTLAB_DEFAULT_SERVER_PORT " by default).\n"
     "\t-I, --multi-ip <server multicast ip>       defines the multicast ip to use (" GHOSTLAB_DEFAULT_MULTICAST_IP " by default).\n"
     "\t-P, --multi-port <server multicast port>   defines the multicast port to use (" GHOSTLAB_DEFAULT_MULTICAST_PORT " by default).\n"
-    "\t-h, --help                                 displays this help message and exits.\n"
-    "\t-v, --version                              displays the program's version and exits.\n";
+    "\t-h, --help                                 displays this help message and terminates.\n"
+    "\t-v, --version                              displays the program's version and terminates.\n";
 
 void *main_player_thread(void *arg) {
     int server_fd = gl_socket_create(GHOSTLAB_DEFAULT_SERVER_IP, GHOSTLAB_DEFAULT_SERVER_PORT, GL_SOCKET_TYPE_SERVER);
@@ -32,6 +32,17 @@ void *main_player_thread(void *arg) {
     }
     
     gl_socket_close(server_fd);
+}
+
+void command_help() {
+    gl_printf("commands:\n");
+    gl_printf("\tq, quit, exit   terminates the server.\n");
+    gl_printf("\th, help         displays this help message.\n");
+    gl_printf("\tv, version      display the program's version.\n");
+}
+
+void command_version() {
+    gl_printf("version: " GHOSTLAB_VERSION "\n");
 }
 
 void *main_tcp_thread(void *arg) {
@@ -116,13 +127,20 @@ int main(int argc, char **argv) {
     pthread_t tcp_thread;
     pthread_create(&tcp_thread, 0, main_tcp_thread, 0);
     
+    gl_printf("you can now enter commands.\n");
+    command_help();
+    
     bool quit = false;
     while (!quit) {
         char command[512] = { 0 };
-        gl_gets("enter a command: ", command);
+        gl_gets(0, command);
     
         if (strcmp(command, "quit") == 0 || strcmp(command, "exit") == 0 || strcmp(command, "q") == 0) {
             quit = true;
+        } else if (strcmp(command, "h") == 0 || strcmp(command, "help") == 0) {
+            command_help();
+        } else if (strcmp(command, "v") == 0 || strcmp(command, "version") == 0) {
+            command_version();
         }
     }
     
