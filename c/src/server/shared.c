@@ -14,5 +14,5 @@ const char g_help[] =
 bool g_quit = false;
 int32_t g_server_socket = 0;
 int32_t *g_client_sockets = 0;
-void *g_thread_client_acceptors = 0;
+void *g_thread_tcp = 0;
 void **g_threads_client_listener = 0;

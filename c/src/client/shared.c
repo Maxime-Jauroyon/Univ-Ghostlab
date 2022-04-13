@@ -12,3 +12,4 @@ const char g_help[] =
     "\t-u, --udp-port,  <client udp port>   defines the udp port to use to communicate with other players (" GHOSTLAB_DEFAULT_UDP_PORT " used by default).\n"
     "\t-h, --help                           displays this help message and exits.\n"
     "\t-v, --version                        displays the program's version and exits.\n";
+bool g_quit = false;

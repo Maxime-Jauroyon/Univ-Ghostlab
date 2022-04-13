@@ -2,10 +2,11 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <getopt.h>
-#include <string.h>
 #include <pthread.h>
+#include <cimgui/cimgui.h>
+#include <common/log.h>
+#include <common/gui.h>
 #include <common/utils.h>
-#include <common/print.h>
 #include <common/memory.h>
 #include <common/network.h>
 #include <common/command.h>
@@ -13,10 +14,13 @@
 #include <server/command.h>
 #include <server/thread_tcp.h>
 
+static void draw_main_gui();
+
 static int32_t g_exit_code = EXIT_SUCCESS;
 static char *g_server_port = 0;
 static char *g_multicast_ip = 0;
 static char *g_multicast_port = 0;
+static bool g_show_console = true;
 
 int main(int argc, char **argv) {
     errno = 0;
@@ -46,21 +50,24 @@ int main(int argc, char **argv) {
             g_multicast_port = gl_strdup(optarg);
             break;
         case 'h':
-            gl_printf_no_indicator("%s", g_help);
+            gl_log_push("%s", g_help);
             goto cleanup;
         case 'v':
-            gl_printf_no_indicator("version: " GHOSTLAB_VERSION);
+            gl_log_push("version: " GHOSTLAB_VERSION);
             goto cleanup;
         case '?':
             used_unknown_opt = 1;
+            gl_log_push_error("use `-h` for more informations.\n");
             break;
         default:
-            gl_printf_warning("option not yet implemented `%c`!\n", opt);
+            used_unknown_opt = 1;
+            gl_log_push_error("option not yet implemented `%c`!\n", opt);
+            gl_log_push_error("use `-h` for more informations.\n");
         }
     }
     
     if (used_unknown_opt) {
-        gl_printf_warning("use `-h` for more informations.\n");
+        goto error;
     }
     
     if (!g_server_port) {
@@ -73,38 +80,15 @@ int main(int argc, char **argv) {
         g_multicast_port = gl_strdup(GHOSTLAB_DEFAULT_MULTICAST_PORT);
     }
     
-    g_thread_client_acceptors = gl_malloc(sizeof(pthread_t));
-    pthread_create(g_thread_client_acceptors, 0, gl_thread_tcp_main, 0);
+    g_thread_tcp = gl_malloc(sizeof(pthread_t));
+    pthread_create(g_thread_tcp, 0, gl_thread_tcp_main, 0);
     
-    gl_printf("you can now enter commands.\n");
-    gl_command_definitions()[GL_COMMAND_TYPE_HELP]->function(0);
+    gl_gui_create();
     
     while (!g_quit) {
-        char command[gl_command_get_max_name_size(gl_command_definitions())];
-        gl_gets(0, command);
-    
-        uint32_t found_pos = GL_COMMAND_TYPE_COUNT;
-        
-        for (uint32_t i = 0; i < GL_COMMAND_TYPE_COUNT; i++) {
-            const gl_command_definition_t *cmd_def = gl_command_definitions()[i];
-    
-            for (uint32_t j = 0; j < gl_command_get_num_aliases(cmd_def); j++) {
-                if (strcmp(cmd_def->aliases[j], command) == 0) {
-                    found_pos = i;
-                }
-            }
-            
-            if (found_pos != GL_COMMAND_TYPE_COUNT) {
-                break;
-            }
-        }
-    
-        if (found_pos != GL_COMMAND_TYPE_COUNT) {
-            gl_command_definitions()[found_pos]->function(0);
-        } else {
-            gl_printf_warning("invalid option -- %s\n", command);
-            gl_printf_warning("use `h` for more informations.\n");
-        }
+        gl_gui_start_render();
+        draw_main_gui();
+        gl_gui_end_render();
     }
     
     goto cleanup;
@@ -115,16 +99,52 @@ int main(int argc, char **argv) {
     cleanup:
     gl_socket_close(g_server_socket);
     
-    if (g_thread_client_acceptors) {
-        pthread_join(g_thread_client_acceptors, 0);
-        gl_free(g_thread_client_acceptors);
+    if (g_thread_tcp) {
+        pthread_join(g_thread_tcp, 0);
+        gl_free(g_thread_tcp);
     }
     
     gl_free(g_server_port);
     gl_free(g_multicast_ip);
     gl_free(g_multicast_port);
     
+    gl_logs_free();
+    
     gl_memory_check_for_leaks();
     
+    gl_gui_free();
+    
     return g_exit_code;
+}
+
+static void draw_main_gui() {
+    {
+        gl_igBegin("Ghostlab Server", g_show_console ? 0.6f : 1.0f);
+        
+        if (igBeginMenuBar()) {
+            if (igBeginMenu("Options", true)) {
+                igMenuItemBoolPtr("Show Logs ", 0, &g_show_console, true);
+                igMenuItemBoolPtr("Quit", 0, &g_quit, true);
+                igEndMenu();
+            }
+            igEndMenuBar();
+        }
+        
+        if (igCollapsingHeaderTreeNodeFlags("Informations", 0)) {
+            igText("TCP socket connected:");
+            igText("- IP: 127.0.0.1");
+            igText("- Port: 4750");
+        }
+        
+        if (igCollapsingHeaderTreeNodeFlags("Statistics", 0)) {
+            igText("Number of clients connected: 0");
+            igText("Number of matches: 0");
+        }
+        
+        igEnd();
+    }
+    
+    if (g_show_console) {
+        gl_igConsole(gl_command_definitions(), GL_COMMAND_TYPE_COUNT);
+    }
 }

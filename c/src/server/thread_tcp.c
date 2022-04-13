@@ -1,6 +1,6 @@
 #include <server/thread_tcp.h>
 #include <pthread.h>
-#include <common/print.h>
+#include <common/log.h>
 #include <common/array.h>
 #include <common/memory.h>
 #include <common/network.h>
@@ -9,7 +9,7 @@
 #include <server/thread_connection.h>
 
 void *gl_thread_tcp_main(void *arg) {
-    gl_printf("clients acceptor thread started.\n");
+    gl_log_push("tcp thread started.\n");
     
     g_server_socket = gl_socket_create(GHOSTLAB_DEFAULT_SERVER_IP, GHOSTLAB_DEFAULT_SERVER_PORT, GL_SOCKET_TYPE_SERVER);
     
@@ -35,7 +35,7 @@ void *gl_thread_tcp_main(void *arg) {
     gl_array_free(g_threads_client_listener);
     gl_socket_close(g_server_socket);
     
-    gl_printf("clients acceptor thread stopped.\n");
+    gl_log_push("tcp thread stopped.\n");
     
     return 0;
 }

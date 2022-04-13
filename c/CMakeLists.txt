@@ -35,30 +35,23 @@ set(COMMON_SRC
         src/common/array.h
         src/common/command.c
         src/common/command.h
+        src/common/gui.c
+        src/common/gui.h
+        src/common/log.c
+        src/common/log.h
         src/common/memory.c
         src/common/memory.h
         src/common/message.c
         src/common/message.h
         src/common/network.c
         src/common/network.h
-        src/common/print.c
-        src/common/print.h
         src/common/string.c
         src/common/string.h
         src/common/types.h
         src/common/utils.c
         src/common/utils.h)
 
-set(LIBS ncurses)
-set(INCLUDE_DIRS ${CURSES_INCLUDE_DIRS} deps src)
-
-if (UNIX AND NOT APPLE)
-    set(THREADS_PREFER_PTHREAD_FLAG ON)
-    find_package(Threads REQUIRED)
-    set(COMMON_LIB ${COMMON_LIB} Threads::Threads)
-endif()
-
-add_executable(server
+set(SERVER_SRC
         src/server/main.c
         src/server/command.c
         src/server/command.h
@@ -71,15 +64,12 @@ add_executable(server
         src/server/thread_multicast.c
         src/server/thread_multicast.h
         src/server/thread_tcp.c
-        src/server/thread_tcp.h
-        ${COMMON_SRC}
-        ${DEPS_SRC})
-target_link_libraries(server PRIVATE ${LIBS})
-target_include_directories(server PRIVATE ${INCLUDE_DIRS})
-target_compile_definitions(server PRIVATE GHOSTLAB_SERVER)
+        src/server/thread_tcp.h)
 
-add_executable(client
+set(CLIENT_SRC
         src/client/main.c
+        src/client/command.c
+        src/client/command.h
         src/client/message.c
         src/client/message.h
         src/client/shared.c
@@ -87,7 +77,27 @@ add_executable(client
         src/client/thread_multicast.c
         src/client/thread_multicast.h
         src/client/thread_udp.c
-        src/client/thread_udp.h
+        src/client/thread_udp.h)
+
+set(LIBS ncurses)
+set(INCLUDE_DIRS ${CURSES_INCLUDE_DIRS} deps src)
+
+if (UNIX AND NOT APPLE)
+    set(THREADS_PREFER_PTHREAD_FLAG ON)
+    find_package(Threads REQUIRED)
+    set(LIBS ${LIBS} Threads::Threads)
+endif()
+
+add_executable(server
+        ${SERVER_SRC}
+        ${COMMON_SRC}
+        ${DEPS_SRC})
+target_link_libraries(server PRIVATE ${LIBS})
+target_include_directories(server PRIVATE ${INCLUDE_DIRS})
+target_compile_definitions(server PRIVATE GHOSTLAB_SERVER)
+
+add_executable(client
+        ${CLIENT_SRC}
         ${COMMON_SRC}
         ${DEPS_SRC})
 target_link_libraries(client PRIVATE ${LIBS})

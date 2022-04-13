@@ -4,6 +4,7 @@
 #include <string.h>
 #include <common/array.h>
 #include <common/utils.h>
+#include "log.h"
 
 uint8_t *gl_string_create_from_cstring(const char *src) {
     uint8_t *dst = 0;
@@ -94,6 +95,6 @@ int32_t gl_write_cstring(uint8_t **buf, const char **n) {
 
 void gl_string_printf(uint8_t **str) {
     for (uint32_t i = 0; i < gl_array_get_size(*str); i++) {
-        printf("%c", (*str)[i]);
+        gl_log_push("%c", (*str)[i]);
     }
 }

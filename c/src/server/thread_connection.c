@@ -1,5 +1,5 @@
 #include <server/thread_connection.h>
-#include <common/print.h>
+#include <common/log.h>
 #include <common/message.h>
 #include <common/network.h>
 #include <server/shared.h>
@@ -7,7 +7,7 @@
 void *gl_thread_connection_main(void *arg) {
     uint32_t id = *(uint32_t *)arg;
     
-    gl_printf("client listener %d thread started.\n", id);
+    gl_log_push("connection %d thread started.\n", id);
     
     while (1) {
         gl_message_t msg = {0};
@@ -23,7 +23,7 @@ void *gl_thread_connection_main(void *arg) {
     
     gl_socket_close(g_client_sockets[id]);
     
-    gl_printf("client listener %d thread stopped.\n", id);
+    gl_log_push("connection %d thread stopped.\n", id);
     
     return 0;
 }

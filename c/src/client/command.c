@@ -1,7 +1,7 @@
-#include <server/command.h>
+#include <client/command.h>
 #include <common/log.h>
 #include <common/command.h>
-#include <server/shared.h>
+#include <client/shared.h>
 
 static void command_help(void *arg) {
     gl_log_push("commands:\n");

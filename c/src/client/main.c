@@ -1,116 +1,156 @@
 #include <common/types.h>
+#include <errno.h>
+#include <stdlib.h>
+#include <getopt.h>
 #include <cimgui/cimgui.h>
-#include <cimtui/cimtui.h>
+#include <common/log.h>
+#include <common/gui.h>
+#include <common/utils.h>
+#include <common/memory.h>
+#include <common/network.h>
+#include <common/command.h>
+#include <client/shared.h>
+#include <client/command.h>
+#include "common/message.h"
+#include "common/string.h"
 
-static bool g_quit = false;
-static bool g_show_logs_window = true;
-static bool g_show_logs_info = true;
-static bool g_show_logs_warning = true;
-static bool g_show_logs_error = true;
+static void draw_main_gui();
 
-const char *g_test[] = {
-    "[server] [error] Hello, World 1!",
-    "[server] [error] Hello, World 2!",
-    "[server] [error] Hello, World 3!",
-    "[server] [error] Hello, World 4!",
-    "[server] [error] Hello, World 5!",
-    "[server] [error] Hello, World 6!",
-    "[server] [error] Hello, World 7!",
-    "[server] [error] Hello, World 8!",
-    "[server] [error] Hello, World 9!",
-    "[server] [error] Hello, World 10!",
-    "[server] [error] Hello, World 11!",
-    "[server] [error] Hello, World 12!",
-    "[server] [error] Hello, World 13!",
-    "[server] [error] Hello, World 14!",
-    "[server] [error] Hello, World 15!",
-    "[server] [error] Hello, World 16!",
-    "[server] [error] Hello, World 17!",
-    "[server] [error] Hello, World! 18",
-    "[server] [error] Hello, World! 19",
-    "[server] [error] Hello, World! 20",
-    "[server] [error] Hello, World! 21",
-    "[server] [error] Hello, World! 22",
-    "[server] [error] Hello, World! 23",
-    "[server] [error] Hello, World! 24",
-    "[server] [error] Hello, World! 25",
-    "[server] [error] Hello, World! 26",
-    "[server] [error] Hello, World! 27",
-    "[server] [error] Hello, World! 28",
-    "[server] [error] Hello, World! 29",
-    "[server] [error] Hello, World! 30",
-    "[server] [error] Hello, World! 31",
-    "[server] [error] Hello, World! 32",
-    "[server] [error] Hello, World! 33",
-};
+static int exit_code = EXIT_SUCCESS;
+static char *server_ip = 0;
+static char *server_port = 0;
+static char *player_name = 0;
+static char *udp_port = 0;
+static bool g_show_console = true;
 
-void draw() {
-    ImGuiIO *io = igGetIO();
+int main(int argc, char **argv) {
+    errno = 0;
     
-    {
-        igSetNextWindowPos((ImVec2) {0, 0}, ImGuiCond_Always, (ImVec2) {0});
-        if (g_show_logs_window) {
-            igSetNextWindowSize((ImVec2) {io->DisplaySize.x, io->DisplaySize.y * 0.6f}, ImGuiCond_Always);
-        } else {
-            igSetNextWindowSize((ImVec2) {io->DisplaySize.x, io->DisplaySize.y}, ImGuiCond_Always);
+    static struct option opts[] = {
+        { "ip", required_argument, 0, 'i' },
+        { "port", required_argument, 0, 'p' },
+        { "name", required_argument, 0, 'n' },
+        { "udp-port", required_argument, 0, 'u' },
+        { "help", no_argument, 0, 'h' },
+        { "version", no_argument, 0, 'v' },
+        {0, 0, 0, 0}
+    };
+    int32_t used_unknown_opt = 0;
+    int32_t opt;
+    while ((opt = getopt_long(argc, argv, "i:p:n:u:hv", opts, 0)) != -1) {
+        switch (opt) {
+        case 'i':
+            // TODO: Check if ip is valid, if invalid use default
+            server_ip = gl_strdup(optarg);
+            break;
+        case 'p':
+            // TODO: Check if port is valid, if invalid use default
+            server_port = gl_strdup(optarg);
+            break;
+        case 'n':
+            // TODO: Check if name is valid, if invalid use default
+            player_name = gl_strdup(optarg);
+            break;
+        case 'u':
+            // TODO: Check if port is valid, if invalid use default
+            udp_port = gl_strdup(optarg);
+            break;
+        case 'h':
+            gl_log_push("%s", g_help);
+            goto cleanup;
+        case 'v':
+            gl_log_push("version: " GHOSTLAB_VERSION);
+            goto cleanup;
+        case '?':
+            used_unknown_opt = 1;
+            gl_log_push_error("use `-h` for more informations.\n");
+            break;
+        default:
+            used_unknown_opt = 1;
+            gl_log_push_error("option not yet implemented `%c`!\n", opt);
+            gl_log_push_error("use `-h` for more informations.\n");
         }
-        igBegin("Ghostlab Server", 0, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_MenuBar);
+    }
+    
+    if (used_unknown_opt) {
+        goto error;
+    }
+    
+    if (!server_ip) {
+        server_ip = gl_strdup(GHOSTLAB_DEFAULT_SERVER_IP);
+    }
+    if (!server_port) {
+        server_port = gl_strdup(GHOSTLAB_DEFAULT_SERVER_PORT);
+    }
+    if (!udp_port) {
+        udp_port = gl_strdup(GHOSTLAB_DEFAULT_UDP_PORT);
+    }
+    
+    int client_fd = gl_socket_create(GHOSTLAB_DEFAULT_SERVER_IP, GHOSTLAB_DEFAULT_SERVER_PORT, GL_SOCKET_TYPE_CLIENT);
+    
+    if (client_fd == -1) {
+        gl_log_push("server not connected!\n");
+        goto error;
+    }
+    
+    gl_gui_create();
+    
+    while (!g_quit) {
+        gl_gui_start_render();
+        draw_main_gui();
+        gl_gui_end_render();
+    }
+    
+    goto cleanup;
+    
+    error:
+    exit_code = gl_error_get(errno);
+    
+    cleanup:
+    gl_socket_close(client_fd);
+    
+    gl_free(server_ip);
+    gl_free(server_port);
+    gl_free(player_name);
+    gl_free(udp_port);
+    
+    gl_logs_free();
+    
+    gl_memory_check_for_leaks();
+    
+    gl_gui_free();
+    
+    return exit_code;
+}
+
+static void draw_main_gui() {
+    {
+        gl_igBegin("Ghostlab Client", g_show_console ? 0.6f : 1.0f);
         
         if (igBeginMenuBar()) {
             if (igBeginMenu("Options", true)) {
-                igMenuItemBoolPtr("Show Logs ", 0, &g_show_logs_window, true);
+                igMenuItemBoolPtr("Show Logs ", 0, &g_show_console, true);
                 igMenuItemBoolPtr("Quit", 0, &g_quit, true);
                 igEndMenu();
             }
             igEndMenuBar();
         }
         
+        if (igCollapsingHeaderTreeNodeFlags("Informations", 0)) {
+            igText("TCP socket connected:");
+            igText("- IP: 127.0.0.1");
+            igText("- Port: 4750");
+        }
+        
+        if (igCollapsingHeaderTreeNodeFlags("Statistics", 0)) {
+            igText("Number of clients connected: 0");
+            igText("Number of matches: 0");
+        }
+        
         igEnd();
     }
     
-    if (g_show_logs_window) {
-        igSetNextWindowPos((ImVec2) { 0, io->DisplaySize.y - io->DisplaySize.y * 0.4f }, ImGuiCond_Always, (ImVec2) { 0 });
-        igSetNextWindowSize((ImVec2) { io->DisplaySize.x, io->DisplaySize.y * 0.4f + ((int)io->DisplaySize.y % 5 != 0 ? 1.0f : 0.0f) }, ImGuiCond_Always);
-        igBegin("Logs", 0, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_MenuBar);
-    
-        if (igBeginMenuBar()) {
-            if (igBeginMenu("Options", true)) {
-                if (igMenuItemBool("Clear", 0, false, true)) {
-                
-                }
-                igMenuItemBoolPtr("Show Info ", 0, &g_show_logs_info, true);
-                igMenuItemBoolPtr("Show Warnings ", 0, &g_show_logs_warning, true);
-                igMenuItemBoolPtr("Show Errors ", 0, &g_show_logs_error, true);
-                igEndMenu();
-            }
-            igEndMenuBar();
-        }
-        
-        igBeginChildStr("logs_output", (ImVec2) { 0, 0 }, false, ImGuiWindowFlags_HorizontalScrollbar);
-        ImGuiListClipper clipper = { 0 };
-        ImGuiListClipper_Begin(&clipper, 33, -1);
-        while (ImGuiListClipper_Step(&clipper)) {
-            for (uint32_t i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
-                const char* test = g_test[i];
-                igTextUnformatted(test, 0);
-            }
-        }
-        //igSetScrollHereX(1.0f);
-        //igSetScrollHereY(1.0f);
-        igEndChild();
-        
-        
-        igEnd();
+    if (g_show_console) {
+        gl_igConsole(gl_command_definitions(), GL_COMMAND_TYPE_COUNT);
     }
-}
-
-int main(void) {
-    igTuiInit();
-    while (!g_quit) {
-        igTuiNewFrame();
-        draw();
-        igTuiRender();
-    }
-    igTuiShutdown();
-    return 0;
 }

@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <common/array.h>
 #include <common/utils.h>
-#include <common/print.h>
+#include <common/log.h>
 #include <common/string.h>
 
 static uint8_t g_max_identifier_size = 0;
@@ -732,22 +732,22 @@ int32_t gl_message_printf(struct gl_message_t *msg) {
     const gl_message_definition_t *msg_def = gl_message_definitions()[msg->type];
     gl_assert(gl_message_get_num_parameters(msg_def) == gl_array_get_size(msg->parameters_value));
     
-    gl_printf("%s", msg_def->identifier);
+    gl_log_push("%s", msg_def->identifier);
     
     for (uint32_t i = 0; i < gl_message_get_num_parameters(msg_def); i++) {
         const gl_message_parameter_definition_t *msg_param_def = gl_message_parameter_definitions()[msg_def->parameters[i]];
     
-        gl_printf(" ");
+        gl_log_push(" ");
         
         if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT8) {
-            gl_printf("%u", msg->parameters_value[i].uint8_value);
+            gl_log_push("%u", msg->parameters_value[i].uint8_value);
         } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT16) {
-            gl_printf("%hu", msg->parameters_value[i].uint16_value);
+            gl_log_push("%hu", msg->parameters_value[i].uint16_value);
         } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT32) {
-            gl_printf("%u", msg->parameters_value[i].uint32_value);
+            gl_log_push("%u", msg->parameters_value[i].uint32_value);
         } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT64) {
 #ifdef __APPLE__
-            gl_printf("%llu", msg->parameters_value[i].uint64_value);
+            gl_log_push("%llu", msg->parameters_value[i].uint64_value);
 #else
             gl_printf("%lu", msg->parameters_value[i].uint64_value);
 #endif
@@ -757,7 +757,7 @@ int32_t gl_message_printf(struct gl_message_t *msg) {
     }
     
     uint8_t terminator = msg_def->protocol == GL_MESSAGE_PROTOCOL_TCP ? GHOSTLAB_TCP_TERMINATOR : GHOSTLAB_UDP_TERMINATOR;
-    gl_printf("%c%c%c\n", terminator, terminator, terminator);
+    gl_log_push("%c%c%c\n", terminator, terminator, terminator);
     
     return 0;
 }

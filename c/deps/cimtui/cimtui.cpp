@@ -17,9 +17,11 @@ void igTuiInit() {
 }
 
 void igTuiShutdown() {
-    ImTui_ImplText_Shutdown();
-    ImTui_ImplNcurses_Shutdown();
-    ImGui::DestroyContext();
+    if (ImGui::GetCurrentContext()) {
+        ImTui_ImplText_Shutdown();
+        ImTui_ImplNcurses_Shutdown();
+        ImGui::DestroyContext();
+    }
 }
 
 bool igTuiNewFrame() {
