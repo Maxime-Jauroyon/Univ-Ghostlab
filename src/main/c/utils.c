@@ -25,7 +25,7 @@
 #endif
 
 // Checks `errno` to call `perror` if needed and returns `0`.
-int gl_error_get(int err) {
+int32_t gl_error_get(int32_t err) {
     if (err != 0) {
         perror(GHOSTLAB_EXECUTABLE_NAME);
     }
@@ -89,13 +89,13 @@ uint64_t gl_uint8_to_uint64(const uint8_t *n, gl_conversion_type_t conversion_ty
     return r;
 }
 
-int gl_uint8_write(uint8_t **buf, const uint8_t *n) {
+int32_t gl_uint8_write(uint8_t **buf, const uint8_t *n) {
     gl_array_push(*buf, *n);
     
     return 1;
 }
 
-int gl_uint16_write(uint8_t **buf, const uint16_t *n, gl_conversion_type_t conversion_type) {
+int32_t gl_uint16_write(uint8_t **buf, const uint16_t *n, gl_conversion_type_t conversion_type) {
     uint16_t v;
     
     if (conversion_type == GL_CONVERSION_TYPE_LITTLE_ENDIAN) {
@@ -113,7 +113,7 @@ int gl_uint16_write(uint8_t **buf, const uint16_t *n, gl_conversion_type_t conve
     return 2;
 }
 
-int gl_uint32_write(uint8_t **buf, const uint32_t *n, gl_conversion_type_t conversion_type) {
+int32_t gl_uint32_write(uint8_t **buf, const uint32_t *n, gl_conversion_type_t conversion_type) {
     uint32_t v;
     
     if (conversion_type == GL_CONVERSION_TYPE_LITTLE_ENDIAN) {
@@ -133,7 +133,7 @@ int gl_uint32_write(uint8_t **buf, const uint32_t *n, gl_conversion_type_t conve
     return 4;
 }
 
-int gl_uint64_write(uint8_t **buf, const uint64_t *n, gl_conversion_type_t conversion_type) {
+int32_t gl_uint64_write(uint8_t **buf, const uint64_t *n, gl_conversion_type_t conversion_type) {
     uint64_t v;
     
     if (conversion_type == GL_CONVERSION_TYPE_LITTLE_ENDIAN) {
@@ -157,11 +157,11 @@ int gl_uint64_write(uint8_t **buf, const uint64_t *n, gl_conversion_type_t conve
     return 8;
 }
 
-int gl_uint8_read(int fd, uint8_t *n) {
-    return (int)read(fd, n, sizeof(uint8_t));
+int32_t gl_uint8_read(int32_t fd, uint8_t *n) {
+    return (int32_t)read(fd, n, sizeof(uint8_t));
 }
 
-int gl_uint8_read_until_separator(int fd, uint8_t **dst, uint8_t *last_c, uint16_t max_size, bool precise_size, bool allow_spaces) {
+int32_t gl_uint8_read_until_separator(int32_t fd, uint8_t **dst, uint8_t *last_c, uint16_t max_size, bool precise_size, bool allow_spaces) {
     uint8_t c = 0;
     
     while (allow_spaces ? !gl_is_terminator(c) : !gl_is_separator_or_terminator(c)) {

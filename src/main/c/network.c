@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-int gl_socket_create(const char *ip, const char *port, gl_socket_type_t type) {
+int32_t gl_socket_create(const char *ip, const char *port, gl_socket_type_t type) {
     struct sockaddr_in address;
     
     address.sin_family = AF_INET;
@@ -15,8 +15,8 @@ int gl_socket_create(const char *ip, const char *port, gl_socket_type_t type) {
         inet_aton(ip, &address.sin_addr);
     }
     
-    int fd = socket(PF_INET, SOCK_STREAM, 0);
-    int r = 0;
+    int32_t fd = socket(PF_INET, SOCK_STREAM, 0);
+    int32_t r = 0;
     
     if (type == GL_SOCKET_TYPE_SERVER) {
         r = bind(fd, (struct sockaddr *)&address, sizeof(struct sockaddr_in));
@@ -37,12 +37,12 @@ int gl_socket_create(const char *ip, const char *port, gl_socket_type_t type) {
     return fd;
 }
 
-int gl_socket_server_accept_client(int server_fd) {
+int32_t gl_socket_server_accept_client(int32_t server_fd) {
     struct sockaddr_in address;
     socklen_t size_client = sizeof(address);
     return accept(server_fd, (struct sockaddr *)&address, &size_client);
 }
 
-int gl_socket_close(int fd) {
+int32_t gl_socket_close(int32_t fd) {
     return close(fd);
 }

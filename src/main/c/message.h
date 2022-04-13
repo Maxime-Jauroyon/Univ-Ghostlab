@@ -94,7 +94,6 @@ typedef enum gl_message_protocol_t {
 typedef struct gl_message_definition_t {
     const char *identifier;
     const gl_message_protocol_t protocol;
-    const uint8_t num_parameters;
     const gl_message_parameter_type_t parameters[];
 } gl_message_definition_t;
 
@@ -113,15 +112,19 @@ typedef struct gl_message_t {
     gl_message_parameter_t *parameters_value;
 } gl_message_t;
 
-int gl_message_write(int fd, struct gl_message_t *dst);
+uint8_t gl_message_get_max_identifier_size(const gl_message_definition_t **msg_defs);
 
-int gl_message_read(int fd, struct gl_message_t *dst);
+uint32_t gl_message_get_num_parameters(const gl_message_definition_t *msg_def);
 
-int gl_message_printf(struct gl_message_t *msg);
+int32_t gl_message_write(int32_t fd, struct gl_message_t *dst);
 
-int gl_message_push_parameter(struct gl_message_t *msg, struct gl_message_parameter_t msg_param);
+int32_t gl_message_read(int32_t fd, struct gl_message_t *dst);
 
-int gl_message_free(struct gl_message_t *msg);
+int32_t gl_message_printf(struct gl_message_t *msg);
+
+int32_t gl_message_push_parameter(struct gl_message_t *msg, struct gl_message_parameter_t msg_param);
+
+void gl_message_free(struct gl_message_t *msg);
 
 const gl_message_parameter_definition_t **gl_message_parameter_definitions();
 

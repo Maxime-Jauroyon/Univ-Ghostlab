@@ -5,96 +5,45 @@
 #include <pthread.h>
 #include <string.h>
 #include "utils.h"
-#include "message.h"
 #include "network.h"
 #include "memory.h"
 #include "print.h"
+#include "server_common.h"
+#include "server_command.h"
+#include "command.h"
+#include "server_thread_clients_acceptor.h"
 
-static const char g_help[] =
-    "usage: " GHOSTLAB_EXECUTABLE_NAME " [options]\n"
-    "\n"
-    "ghostlab is an online matchmaking based game where you take upon yourself to become the best ghost hunter!\n"
-    "\n"
-    "options:\n"
-    "\t-p, --port <server port>                   defines the port to use (" GHOSTLAB_DEFAULT_SERVER_PORT " by default).\n"
-    "\t-I, --multi-ip <server multicast ip>       defines the multicast ip to use (" GHOSTLAB_DEFAULT_MULTICAST_IP " by default).\n"
-    "\t-P, --multi-port <server multicast port>   defines the multicast port to use (" GHOSTLAB_DEFAULT_MULTICAST_PORT " by default).\n"
-    "\t-h, --help                                 displays this help message and terminates.\n"
-    "\t-v, --version                              displays the program's version and terminates.\n";
-
-void *main_player_thread(void *arg) {
-    int server_fd = gl_socket_create(GHOSTLAB_DEFAULT_SERVER_IP, GHOSTLAB_DEFAULT_SERVER_PORT, GL_SOCKET_TYPE_SERVER);
-    
-    int client_fd = gl_socket_server_accept_client(server_fd);
-    
-    if (client_fd >= 0) {
-    
-    }
-    
-    gl_socket_close(server_fd);
-}
-
-void command_help() {
-    gl_printf("commands:\n");
-    gl_printf("\tq, quit, exit   terminates the server.\n");
-    gl_printf("\th, help         displays this help message.\n");
-    gl_printf("\tv, version      display the program's version.\n");
-}
-
-void command_version() {
-    gl_printf("version: " GHOSTLAB_VERSION "\n");
-}
-
-void *main_tcp_thread(void *arg) {
-    int server_fd = gl_socket_create(GHOSTLAB_DEFAULT_SERVER_IP, GHOSTLAB_DEFAULT_SERVER_PORT, GL_SOCKET_TYPE_SERVER);
-    
-    int client_fd = gl_socket_server_accept_client(server_fd);
-    
-    if (client_fd >= 0) {
-        for (uint8_t i = 0; i < 39; i++) {
-            gl_message_t msg = {0};
-            gl_message_read(client_fd, &msg);
-            gl_message_printf(&msg);
-            gl_message_write(client_fd, &msg);
-            gl_message_free(&msg);
-        }
-    }
-    
-    gl_socket_close(server_fd);
-}
+static int32_t g_exit_code = EXIT_SUCCESS;
+static char *g_server_port = 0;
+static char *g_multicast_ip = 0;
+static char *g_multicast_port = 0;
 
 int main(int argc, char **argv) {
     errno = 0;
-    int exit_code = EXIT_SUCCESS;
     
-    char *server_port = 0;
-    char *multicast_ip = 0;
-    char *multicast_port = 0;
-    
-    static struct option opts[] =
-        {
-            { "port", required_argument, 0, 'p' },
-            { "multi-ip", required_argument, 0, 'I' },
-            { "multi-port", required_argument, 0, 'P' },
-            { "help", no_argument, 0, 'h' },
-            { "version", no_argument, 0, 'v' },
-            {0, 0, 0, 0}
-        };
-    int used_unknown_opt = 0;
-    int opt;
+    static struct option opts[] = {
+        { "port", required_argument, 0, 'p' },
+        { "multi-ip", required_argument, 0, 'I' },
+        { "multi-port", required_argument, 0, 'P' },
+        { "help", no_argument, 0, 'h' },
+        { "version", no_argument, 0, 'v' },
+        {0, 0, 0, 0}
+    };
+    int32_t used_unknown_opt = 0;
+    int32_t opt;
     while ((opt = getopt_long(argc, argv, "p:I:P:hv", opts, 0)) != -1) {
         switch (opt) {
         case 'p':
             // TODO: Check if port is valid, if invalid use default
-            server_port = gl_strdup(optarg);
+            g_server_port = gl_strdup(optarg);
             break;
         case 'I':
             // TODO: Check if ip is valid, if invalid use default
-            multicast_ip = gl_strdup(optarg);
+            g_multicast_ip = gl_strdup(optarg);
             break;
         case 'P':
             // TODO: Check if port is valid, if invalid use default
-            multicast_port = gl_strdup(optarg);
+            g_multicast_port = gl_strdup(optarg);
             break;
         case 'h':
             gl_printf_no_indicator("%s", g_help);
@@ -114,49 +63,68 @@ int main(int argc, char **argv) {
         gl_printf_warning("use `-h` for more informations.\n");
     }
     
-    if (!server_port) {
-        server_port = gl_strdup(GHOSTLAB_DEFAULT_SERVER_PORT);
+    if (!g_server_port) {
+        g_server_port = gl_strdup(GHOSTLAB_DEFAULT_SERVER_PORT);
     }
-    if (!multicast_ip) {
-        multicast_ip = gl_strdup(GHOSTLAB_DEFAULT_MULTICAST_IP);
+    if (!g_multicast_ip) {
+        g_multicast_ip = gl_strdup(GHOSTLAB_DEFAULT_MULTICAST_IP);
     }
-    if (!multicast_port) {
-        multicast_port = gl_strdup(GHOSTLAB_DEFAULT_MULTICAST_PORT);
+    if (!g_multicast_port) {
+        g_multicast_port = gl_strdup(GHOSTLAB_DEFAULT_MULTICAST_PORT);
     }
     
-    pthread_t tcp_thread;
-    pthread_create(&tcp_thread, 0, main_tcp_thread, 0);
+    g_thread_client_acceptors = gl_malloc(sizeof(pthread_t));
+    pthread_create(g_thread_client_acceptors, 0, gl_thread_clients_acceptor_main, 0);
     
     gl_printf("you can now enter commands.\n");
-    command_help();
+    gl_command_definitions()[GL_COMMAND_TYPE_HELP]->function(0);
     
-    bool quit = false;
-    while (!quit) {
-        char command[512] = { 0 };
+    while (!g_quit) {
+        char command[gl_command_get_max_name_size(gl_command_definitions())];
         gl_gets(0, command);
     
-        if (strcmp(command, "quit") == 0 || strcmp(command, "exit") == 0 || strcmp(command, "q") == 0) {
-            quit = true;
-        } else if (strcmp(command, "h") == 0 || strcmp(command, "help") == 0) {
-            command_help();
-        } else if (strcmp(command, "v") == 0 || strcmp(command, "version") == 0) {
-            command_version();
+        uint32_t found_pos = GL_COMMAND_TYPE_COUNT;
+        
+        for (uint32_t i = 0; i < GL_COMMAND_TYPE_COUNT; i++) {
+            const gl_command_definition_t *cmd_def = gl_command_definitions()[i];
+    
+            for (uint32_t j = 0; j < gl_command_get_num_aliases(cmd_def); j++) {
+                if (strcmp(cmd_def->aliases[j], command) == 0) {
+                    found_pos = i;
+                }
+            }
+            
+            if (found_pos != GL_COMMAND_TYPE_COUNT) {
+                break;
+            }
+        }
+    
+        if (found_pos != GL_COMMAND_TYPE_COUNT) {
+            gl_command_definitions()[found_pos]->function(0);
+        } else {
+            gl_printf_warning("invalid option -- %s\n", command);
+            gl_printf_warning("use `h` for more informations.\n");
         }
     }
     
     goto cleanup;
     
     error:
-    exit_code = gl_error_get(errno);
+    g_exit_code = gl_error_get(errno);
     
     cleanup:
-    pthread_join(tcp_thread, 0);
+    gl_socket_close(g_server_socket);
     
-    gl_free(server_port);
-    gl_free(multicast_ip);
-    gl_free(multicast_port);
+    if (g_thread_client_acceptors) {
+        pthread_join(g_thread_client_acceptors, 0);
+        gl_free(g_thread_client_acceptors);
+    }
+    
+    gl_free(g_server_port);
+    gl_free(g_multicast_ip);
+    gl_free(g_multicast_port);
     
     gl_memory_check_for_leaks();
     
-    return exit_code;
+    return g_exit_code;
 }

@@ -2,10 +2,14 @@
 #include <stdio.h>
 #include <syslog.h>
 #include <string.h>
+#include <pthread.h>
 
 static bool g_use_newline_indicator = true;
+static pthread_mutex_t g_print_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void gl_printf_no_indicator(const char *format, ...) {
+    pthread_mutex_lock(&g_print_mutex);
+    
     va_list args;
     
     va_start(args, format);
@@ -19,9 +23,13 @@ void gl_printf_no_indicator(const char *format, ...) {
     if (strstr(format, "\n")) {
         g_use_newline_indicator = true;
     }
+    
+    pthread_mutex_unlock(&g_print_mutex);
 }
 
 void gl_printf(const char *format, ...) {
+    pthread_mutex_lock(&g_print_mutex);
+    
     va_list args;
     
     if (g_use_newline_indicator) {
@@ -40,9 +48,13 @@ void gl_printf(const char *format, ...) {
     if (strstr(format, "\n")) {
         g_use_newline_indicator = true;
     }
+    
+    pthread_mutex_unlock(&g_print_mutex);
 }
 
 void gl_printf_warning(const char *format, ...) {
+    pthread_mutex_lock(&g_print_mutex);
+    
     va_list args;
     
     if (g_use_newline_indicator) {
@@ -61,9 +73,13 @@ void gl_printf_warning(const char *format, ...) {
     if (strstr(format, "\n")) {
         g_use_newline_indicator = true;
     }
+    
+    pthread_mutex_unlock(&g_print_mutex);
 }
 
 void gl_printf_error(const char *format, ...) {
+    pthread_mutex_lock(&g_print_mutex);
+    
     va_list args;
     
     if (g_use_newline_indicator) {
@@ -82,6 +98,8 @@ void gl_printf_error(const char *format, ...) {
     if (strstr(format, "\n")) {
         g_use_newline_indicator = true;
     }
+    
+    pthread_mutex_unlock(&g_print_mutex);
 }
 
 void gl_gets(const char *format, char *dst) {
