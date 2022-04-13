@@ -13,6 +13,7 @@
 #include <server/shared.h>
 #include <server/command.h>
 #include <server/thread_tcp.h>
+#include "message.h"
 
 static void draw_main_gui();
 
@@ -80,13 +81,15 @@ int main(int argc, char **argv) {
         g_multicast_port = gl_strdup(GHOSTLAB_DEFAULT_MULTICAST_PORT);
     }
     
+    gl_message_add_functions();
+    
     g_thread_tcp = gl_malloc(sizeof(pthread_t));
     pthread_create(g_thread_tcp, 0, gl_thread_tcp_main, 0);
     
-    gl_gui_create();
+    gl_gui_create("Ghostlab Server");
     
     while (!g_quit) {
-        gl_gui_start_render();
+        gl_gui_start_render(&g_quit);
         draw_main_gui();
         gl_gui_end_render();
     }

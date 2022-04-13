@@ -8,7 +8,7 @@
 #include <server/shared.h>
 #include <server/thread_connection.h>
 
-void *gl_thread_tcp_main(void *arg) {
+void *gl_thread_tcp_main(void *user_data) {
     gl_log_push("tcp thread started.\n");
     
     g_server_socket = gl_socket_create(GHOSTLAB_DEFAULT_SERVER_IP, GHOSTLAB_DEFAULT_SERVER_PORT, GL_SOCKET_TYPE_SERVER);

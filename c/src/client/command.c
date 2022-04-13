@@ -3,7 +3,7 @@
 #include <common/command.h>
 #include <client/shared.h>
 
-static void command_help(void *arg) {
+static void command_help(void *user_data) {
     gl_log_push("commands:\n");
     gl_log_push("\tq, e, quit, exit   terminates the program.\n");
     gl_log_push("\th, help            displays this help message.\n");
@@ -19,7 +19,7 @@ static const gl_command_definition_t g_command_help = {
     }
 };
 
-static void command_version(void *arg) {
+static void command_version(void *user_data) {
     gl_log_push("version: " GHOSTLAB_VERSION "\n");
 }
 
@@ -32,7 +32,7 @@ static const gl_command_definition_t g_command_version = {
     }
 };
 
-static void command_quit(void *arg) {
+static void command_quit(void *user_data) {
     g_quit = true;
 }
 

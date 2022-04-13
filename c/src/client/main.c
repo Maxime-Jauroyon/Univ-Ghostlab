@@ -13,6 +13,7 @@
 #include <client/command.h>
 #include "common/message.h"
 #include "common/string.h"
+#include "message.h"
 
 static void draw_main_gui();
 
@@ -25,6 +26,8 @@ static bool g_show_console = true;
 
 int main(int argc, char **argv) {
     errno = 0;
+    
+    int32_t server_fd = -1;
     
     static struct option opts[] = {
         { "ip", required_argument, 0, 'i' },
@@ -86,17 +89,21 @@ int main(int argc, char **argv) {
         udp_port = gl_strdup(GHOSTLAB_DEFAULT_UDP_PORT);
     }
     
-    int client_fd = gl_socket_create(GHOSTLAB_DEFAULT_SERVER_IP, GHOSTLAB_DEFAULT_SERVER_PORT, GL_SOCKET_TYPE_CLIENT);
+    gl_message_add_functions();
     
-    if (client_fd == -1) {
+    server_fd = gl_socket_create(GHOSTLAB_DEFAULT_SERVER_IP, GHOSTLAB_DEFAULT_SERVER_PORT, GL_SOCKET_TYPE_CLIENT);
+    
+    if (server_fd == -1) {
         gl_log_push("server not connected!\n");
         goto error;
     }
     
-    gl_gui_create();
+    gl_message_wait_and_execute(server_fd);
+    
+    gl_gui_create("Ghostlab Client");
     
     while (!g_quit) {
-        gl_gui_start_render();
+        gl_gui_start_render(&g_quit);
         draw_main_gui();
         gl_gui_end_render();
     }
@@ -107,7 +114,9 @@ int main(int argc, char **argv) {
     exit_code = gl_error_get(errno);
     
     cleanup:
-    gl_socket_close(client_fd);
+    if (server_fd != -1) {
+        gl_socket_close(server_fd);
+    }
     
     gl_free(server_ip);
     gl_free(server_port);

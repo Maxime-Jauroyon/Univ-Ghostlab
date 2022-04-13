@@ -3,6 +3,8 @@
 
 #include <common/types.h>
 
+struct gl_message_t;
+
 typedef enum gl_message_parameter_type_t {
     GL_MESSAGE_PARAMETER_TYPE_N,
     GL_MESSAGE_PARAMETER_TYPE_M,
@@ -94,6 +96,7 @@ typedef enum gl_message_protocol_t {
 typedef struct gl_message_definition_t {
     const char *identifier;
     const gl_message_protocol_t protocol;
+    void (*function)(struct gl_message_t *, int32_t, void *);
     const gl_message_parameter_type_t parameters[];
 } gl_message_definition_t;
 
@@ -112,9 +115,9 @@ typedef struct gl_message_t {
     gl_message_parameter_t *parameters_value;
 } gl_message_t;
 
-uint8_t gl_message_get_max_identifier_size(const gl_message_definition_t **msg_defs);
+uint8_t gl_message_get_max_identifier_size(gl_message_definition_t **msg_defs);
 
-uint32_t gl_message_get_num_parameters(const gl_message_definition_t *msg_def);
+uint32_t gl_message_get_num_parameters(gl_message_definition_t *msg_def);
 
 int32_t gl_message_write(int32_t fd, struct gl_message_t *dst);
 
@@ -126,8 +129,12 @@ int32_t gl_message_push_parameter(struct gl_message_t *msg, struct gl_message_pa
 
 void gl_message_free(struct gl_message_t *msg);
 
-const gl_message_parameter_definition_t **gl_message_parameter_definitions();
+void gl_message_execute(struct gl_message_t *msg, int32_t socket_id, void *user_data);
 
-const gl_message_definition_t **gl_message_definitions();
+int32_t gl_message_wait_and_execute(int32_t socket_id);
+
+gl_message_parameter_definition_t **gl_message_parameter_definitions();
+
+gl_message_definition_t **gl_message_definitions();
 
 #endif /* GHOSTLAB_MESSAGE_H */

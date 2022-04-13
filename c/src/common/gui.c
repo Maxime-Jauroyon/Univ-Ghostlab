@@ -1,10 +1,19 @@
 #include <common/gui.h>
 #include <string.h>
-#include "cimtui/cimtui.h"
-#include "cimgui/cimgui.h"
+#include <cimgui/cimgui.h>
 #include "command.h"
 #include "log.h"
 #include "array.h"
+#include "glad/gl.h"
+
+#if GHOSTLAB_TUI
+#include "cimtui/cimtui.h"
+#elif GHOSTLAB_GUI
+#include <SDL.h>
+#include "imgui/gui/imgui_impl_sdl.h"
+#include "imgui/gui/imgui_impl_opengl3.h"
+#include "imgui/gui/sourcesanspro.h"
+#endif
 
 static float g_current_pos_y = 0.0f;
 static char g_console_buf[512] = { 0 };
@@ -12,30 +21,142 @@ static bool g_console_show_info = true;
 static bool g_console_show_warning = true;
 static bool g_console_show_error = true;
 static bool g_first_time = true;
+#if GHOSTLAB_GUI
+static SDL_Window *g_window;
+static SDL_GLContext gl_context;
+ImFontConfig *g_fontConfig;
+#endif
 
-void gl_gui_create() {
+int32_t gl_gui_create(const char *gui_title) {
+    gl_assert(igDebugCheckVersionAndDataLayout(igGetVersion(), sizeof(ImGuiIO), sizeof(ImGuiStyle), sizeof(ImVec2), sizeof(ImVec4), sizeof(ImDrawVert), sizeof(ImDrawIdx)));
+    igCreateContext(0);
+    
+    ImGuiIO *io = igGetIO();
+    io->IniFilename = 0;
+    
+    igStyleColorsDark(0);
+    
+#if GHOSTLAB_TUI
     igTuiInit();
+#elif GHOSTLAB_GUI
+    gl_assert(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) == 0);
+
+#ifdef __APPLE__
+    // GL 3.2 Core + GLSL 150
+    const char* glsl_version = "#version 150";
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG); // Always required on Mac
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+#else
+    // GL 3.0 + GLSL 130
+    const char* glsl_version = "#version 130";
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+#endif
+    
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+    SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+    g_window = SDL_CreateWindow(gui_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
+    gl_context = SDL_GL_CreateContext(g_window);
+    SDL_GL_MakeCurrent(g_window, gl_context);
+    SDL_GL_SetSwapInterval(1);
+    
+    gl_assert(gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress) != 0);
+    
+    ImGui_ImplSDL2_InitForOpenGL(g_window, gl_context);
+    ImGui_ImplOpenGL3_Init(glsl_version);
+    
+    g_fontConfig = ImFontConfig_ImFontConfig();
+    g_fontConfig->RasterizerMultiply = 1.5f;
+    g_fontConfig->OversampleH = 4;
+    g_fontConfig->OversampleV = 4;
+    ImFontAtlas_AddFontFromMemoryCompressedTTF(io->Fonts, SourceSansProRegular_compressed_data, (int)SourceSansProRegular_compressed_size, 15.0f, g_fontConfig, 0);
+    io->FontDefault = io->Fonts->Fonts.Data[io->Fonts->Fonts.Size - 1];
+#endif
+    
+    return 0;
 }
 
-void gl_gui_start_render() {
+void gl_gui_start_render(bool *quit) {
     g_current_pos_y = 0.0f;
-    
+
+#if GHOSTLAB_TUI
     igTuiNewFrame();
+#elif GHOSTLAB_GUI
+    SDL_Event event;
+    while (SDL_PollEvent(&event))
+    {
+        ImGui_ImplSDL2_ProcessEvent(&event);
+        
+        if (event.type == SDL_QUIT) {
+            *quit = true;
+        }
+        
+        if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(g_window)) {
+            *quit = true;
+        }
+    }
+    
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplSDL2_NewFrame(g_window);
+#endif
+    
+    igNewFrame();
 }
 
 void gl_gui_end_render() {
+    igRender();
+    
+#if GHOSTLAB_TUI
     igTuiRender();
+#elif GHOSTLAB_GUI
+    ImGuiIO *io = igGetIO();
+    glViewport(0, 0, (int)io->DisplaySize.x, (int)io->DisplaySize.y);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    if (igGetDrawData() != 0) {
+        ImGui_ImplOpenGL3_RenderDrawData(igGetDrawData());
+    }
+    SDL_GL_SwapWindow(g_window);
+#endif
 }
 
 void gl_gui_free() {
+#if GHOSTLAB_TUI
     igTuiShutdown();
+#elif GHOSTLAB_GUI
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+#endif
+    
+    if (igGetCurrentContext()) {
+        igDestroyContext(igGetCurrentContext());
+#if GHOSTLAB_GUI
+        ImFontConfig_destroy(g_fontConfig);
+#endif
+    }
+
+#if GHOSTLAB_GUI
+    SDL_GL_DeleteContext(gl_context);
+    SDL_DestroyWindow(g_window);
+    SDL_Quit();
+#endif
 }
 
 void gl_igBegin(const char *title, float height) {
     ImGuiIO *io = igGetIO();
     
     igSetNextWindowPos((ImVec2) { 0, io->DisplaySize.y * g_current_pos_y }, ImGuiCond_Always, (ImVec2) { 0 });
+#if GHOSTLAB_TUI
     igSetNextWindowSize((ImVec2) { io->DisplaySize.x, io->DisplaySize.y * height + ((int)io->DisplaySize.y % 5 != 0 ? 1.0f : 0.0f) }, ImGuiCond_Always);
+#elif GHOSTLAB_GUI
+    igSetNextWindowSize((ImVec2) { io->DisplaySize.x, io->DisplaySize.y * height + 1 }, ImGuiCond_Always);
+#endif
     igBegin(title, 0, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_MenuBar);
     g_current_pos_y += height;
 }
@@ -79,7 +200,7 @@ void gl_igConsole(const struct gl_command_definition_t **cmd_defs, uint32_t cmd_
         gl_execute_command(g_console_buf, 512, cmd_defs, cmd_defs_count, true);
     }
     
-    igBeginChildStr("#logs_output", (ImVec2) { 0, 0 }, false, ImGuiWindowFlags_HorizontalScrollbar);
+    igBeginChildStr("#logs_output", (ImVec2) { 0, 0 }, true, ImGuiWindowFlags_HorizontalScrollbar);
     
     ImGuiListClipper clipper = { 0 };
     ImGuiListClipper_Begin(&clipper, gl_array_get_size(gl_logs()), -1);

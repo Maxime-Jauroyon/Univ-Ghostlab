@@ -163,17 +163,19 @@ int32_t gl_uint8_read(int32_t fd, uint8_t *n) {
 
 int32_t gl_uint8_read_until_separator(int32_t fd, uint8_t **dst, uint8_t *last_c, uint16_t max_size, bool precise_size, bool allow_spaces) {
     uint8_t c = 0;
+    bool first = true;
     
     while (allow_spaces ? !gl_is_terminator(c) : !gl_is_separator_or_terminator(c)) {
-        if (c != 0) {
+        if (!first) {
             gl_array_push(*dst, c);
-            gl_assert(gl_array_get_header(*dst)->size <= max_size);
+            gl_assert(gl_array_get_size(*dst) <= max_size);
         }
         
         gl_assert(gl_uint8_read(fd, &c) != 0);
+        first = false;
     }
     
-    gl_assert(!precise_size || gl_array_get_header(*dst)->size == max_size);
+    gl_assert(!precise_size || gl_array_get_size(*dst) == max_size);
     
     *last_c = c;
     

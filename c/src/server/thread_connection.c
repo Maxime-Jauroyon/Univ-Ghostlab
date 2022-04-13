@@ -4,24 +4,26 @@
 #include <common/network.h>
 #include <server/shared.h>
 
-void *gl_thread_connection_main(void *arg) {
-    uint32_t id = *(uint32_t *)arg;
+void *gl_thread_connection_main(void *user_data) {
+    uint32_t id = *(uint32_t *)user_data;
+    int32_t socket_id = g_client_sockets[id];
     
     gl_log_push("connection %d thread started.\n", id);
     
+    {
+        gl_message_t msg = {.type = GL_MESSAGE_TYPE_GAMES, 0};
+        gl_message_push_parameter(&msg, (gl_message_parameter_t) {.uint8_value = 0});
+        gl_message_write(socket_id, &msg);
+        gl_message_free(&msg);
+    }
+    
     while (1) {
-        gl_message_t msg = {0};
-        int32_t r = gl_message_read(g_client_sockets[id], &msg);
-        
-        if (r > 0) {
-            gl_message_printf(&msg);
-            gl_message_free(&msg);
-        } else {
+        if (gl_message_wait_and_execute(socket_id) < 0) {
             break;
         }
     }
     
-    gl_socket_close(g_client_sockets[id]);
+    gl_socket_close(socket_id);
     
     gl_log_push("connection %d thread stopped.\n", id);
     

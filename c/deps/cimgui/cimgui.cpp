@@ -4,9 +4,14 @@
 
 #include <stdio.h>
 #include <stdint.h>
-#include <imgui/imgui.h>
-#include <imgui/imgui_internal.h>
 
+#if GHOSTLAB_TUI
+#include <imgui/tui/imgui.h>
+#include <imgui/tui/imgui_internal.h>
+#elif GHOSTLAB_GUI
+#include <imgui/gui/imgui.h>
+#include <imgui/gui/imgui_internal.h>
+#endif
 #if defined _WIN32 || defined __CYGWIN__
 #ifdef CIMGUI_NO_EXPORT
         #define API

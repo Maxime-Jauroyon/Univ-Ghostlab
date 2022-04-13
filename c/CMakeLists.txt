@@ -7,17 +7,20 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(DEPS_SRC
-        deps/imgui/imconfig.h
-        deps/imgui/imgui.cpp
-        deps/imgui/imgui.h
-        deps/imgui/imgui_demo.cpp
-        deps/imgui/imgui_draw.cpp
-        deps/imgui/imgui_internal.h
-        deps/imgui/imgui_tables.cpp
-        deps/imgui/imgui_widgets.cpp
-        deps/imgui/imstb_rectpack.h
-        deps/imgui/imstb_textedit.h
-        deps/imgui/imstb_truetype.h
+        deps/cimgui/cimgui.cpp
+        deps/cimgui/cimgui.h)
+set(DEPS_TUI_SRC
+        deps/imgui/tui/imconfig.h
+        deps/imgui/tui/imgui.cpp
+        deps/imgui/tui/imgui.h
+        deps/imgui/tui/imgui_demo.cpp
+        deps/imgui/tui/imgui_draw.cpp
+        deps/imgui/tui/imgui_internal.h
+        deps/imgui/tui/imgui_tables.cpp
+        deps/imgui/tui/imgui_widgets.cpp
+        deps/imgui/tui/imstb_rectpack.h
+        deps/imgui/tui/imstb_textedit.h
+        deps/imgui/tui/imstb_truetype.h
         deps/imtui/imtui.h
         deps/imtui/imtui-demo.cpp
         deps/imtui/imtui-demo.h
@@ -25,11 +28,29 @@ set(DEPS_SRC
         deps/imtui/imtui-impl-ncurses.h
         deps/imtui/imtui-impl-text.cpp
         deps/imtui/imtui-impl-text.h
-        deps/cimgui/cimgui.cpp
-        deps/cimgui/cimgui.h
         deps/cimtui/cimtui.cpp
         deps/cimtui/cimtui.h)
-
+set(DEPS_GUI_SRC
+        deps/glad/gl.c
+        deps/glad/gl.h
+        deps/glad/khrplatform.h
+        deps/imgui/gui/imconfig.h
+        deps/imgui/gui/imgui.cpp
+        deps/imgui/gui/imgui.h
+        deps/imgui/gui/imgui_demo.cpp
+        deps/imgui/gui/imgui_draw.cpp
+        deps/imgui/gui/imgui_impl_opengl3.cpp
+        deps/imgui/gui/imgui_impl_opengl3.h
+        deps/imgui/gui/imgui_impl_sdl.cpp
+        deps/imgui/gui/imgui_impl_sdl.h
+        deps/imgui/gui/imgui_internal.h
+        deps/imgui/gui/imgui_tables.cpp
+        deps/imgui/gui/imgui_widgets.cpp
+        deps/imgui/gui/imstb_rectpack.h
+        deps/imgui/gui/imstb_textedit.h
+        deps/imgui/gui/imstb_truetype.h
+        deps/imgui/gui/sourcesanspro.h
+        deps/imgui/gui/sourcesanspro.c)
 set(COMMON_SRC
         src/common/array.c
         src/common/array.h
@@ -50,11 +71,12 @@ set(COMMON_SRC
         src/common/types.h
         src/common/utils.c
         src/common/utils.h)
-
 set(SERVER_SRC
-        src/server/main.c
         src/server/command.c
         src/server/command.h
+        src/server/main.c
+        src/server/message.c
+        src/server/message.h
         src/server/shared.c
         src/server/shared.h
         src/server/thread_connection.c
@@ -65,11 +87,10 @@ set(SERVER_SRC
         src/server/thread_multicast.h
         src/server/thread_tcp.c
         src/server/thread_tcp.h)
-
 set(CLIENT_SRC
-        src/client/main.c
         src/client/command.c
         src/client/command.h
+        src/client/main.c
         src/client/message.c
         src/client/message.h
         src/client/shared.c
@@ -79,27 +100,40 @@ set(CLIENT_SRC
         src/client/thread_udp.c
         src/client/thread_udp.h)
 
-set(LIBS ncurses)
-set(INCLUDE_DIRS ${CURSES_INCLUDE_DIRS} deps src)
-
 if (UNIX AND NOT APPLE)
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     find_package(Threads REQUIRED)
-    set(LIBS ${LIBS} Threads::Threads)
+    set(DEPS_LIBS Threads::Threads)
 endif()
+find_package(Curses REQUIRED)
+set(DEPS_TUI_LIBS ncurses)
+find_package(SDL2 REQUIRED)
+set(DEPS_GUI_LIBS ${SDL2_LIBRARIES})
 
-add_executable(server
-        ${SERVER_SRC}
-        ${COMMON_SRC}
-        ${DEPS_SRC})
-target_link_libraries(server PRIVATE ${LIBS})
-target_include_directories(server PRIVATE ${INCLUDE_DIRS})
-target_compile_definitions(server PRIVATE GHOSTLAB_SERVER)
+set(INCLUDE_DIRS ${CURSES_INCLUDE_DIRS} deps src)
+set(DEPS_GUI_INCLUDE_DIRS ${SDL2_INCLUDE_DIRS})
 
-add_executable(client
-        ${CLIENT_SRC}
-        ${COMMON_SRC}
-        ${DEPS_SRC})
-target_link_libraries(client PRIVATE ${LIBS})
-target_include_directories(client PRIVATE ${INCLUDE_DIRS})
-target_compile_definitions(client PRIVATE GHOSTLAB_CLIENT)
+set(DEPS_TUI_DEFINITIONS GHOSTLAB_TUI=1)
+set(DEPS_GUI_DEFINITIONS GHOSTLAB_GUI=1)
+set(SERVER_DEFINITIONS GHOSTLAB_SERVER=1)
+set(CLIENT_DEFINITIONS GHOSTLAB_CLIENT=1)
+
+add_executable(server_tui ${SERVER_SRC} ${COMMON_SRC} ${DEPS_SRC} ${DEPS_TUI_SRC})
+target_link_libraries(server_tui PRIVATE ${DEPS_LIBS} ${DEPS_TUI_LIBS})
+target_include_directories(server_tui PRIVATE ${INCLUDE_DIRS})
+target_compile_definitions(server_tui PRIVATE ${SERVER_DEFINITIONS} ${DEPS_TUI_DEFINITIONS})
+
+add_executable(client_tui ${CLIENT_SRC} ${COMMON_SRC} ${DEPS_SRC} ${DEPS_TUI_SRC})
+target_link_libraries(client_tui PRIVATE ${DEPS_LIBS} ${DEPS_TUI_LIBS})
+target_include_directories(client_tui PRIVATE ${INCLUDE_DIRS})
+target_compile_definitions(client_tui PRIVATE ${CLIENT_DEFINITIONS} ${DEPS_TUI_DEFINITIONS})
+
+add_executable(server_gui ${SERVER_SRC} ${COMMON_SRC} ${DEPS_SRC} ${DEPS_GUI_SRC})
+target_link_libraries(server_gui PRIVATE ${DEPS_LIBS} ${DEPS_GUI_LIBS})
+target_include_directories(server_gui PRIVATE ${INCLUDE_DIRS} ${DEPS_GUI_INCLUDE_DIRS})
+target_compile_definitions(server_gui PRIVATE ${SERVER_DEFINITIONS} ${DEPS_GUI_DEFINITIONS})
+
+add_executable(client_gui ${CLIENT_SRC} ${COMMON_SRC} ${DEPS_SRC} ${DEPS_GUI_SRC})
+target_link_libraries(client_gui PRIVATE ${DEPS_LIBS} ${DEPS_GUI_LIBS})
+target_include_directories(client_gui PRIVATE ${INCLUDE_DIRS} ${DEPS_GUI_INCLUDE_DIRS})
+target_compile_definitions(client_gui PRIVATE ${CLIENT_DEFINITIONS} ${DEPS_GUI_DEFINITIONS})

@@ -5,9 +5,9 @@
 
 struct gl_command_definition_t;
 
-void gl_gui_create();
+int32_t gl_gui_create(const char *gui_title);
 
-void gl_gui_start_render();
+void gl_gui_start_render(bool *quit);
 
 void gl_gui_end_render();
 

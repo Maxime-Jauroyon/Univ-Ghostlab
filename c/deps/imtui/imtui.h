@@ -7,7 +7,7 @@
 #pragma once
 
 // simply expose the existing Dear ImGui API
-#include <imgui/imgui.h>
+#include <imgui/tui/imgui.h>
 
 #include "imtui-impl-text.h"
 
