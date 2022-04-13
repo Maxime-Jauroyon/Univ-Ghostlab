@@ -1,6 +1,0 @@
-#ifndef GHOSTLAB_CLIENT_MESSAGE_H
-#define GHOSTLAB_CLIENT_MESSAGE_H
-
-#include "types.h"
-
-#endif /* GHOSTLAB_CLIENT_MESSAGE_H */
