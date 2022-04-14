@@ -49,8 +49,10 @@ set(DEPS_GUI_SRC
         deps/imgui/gui/imstb_rectpack.h
         deps/imgui/gui/imstb_textedit.h
         deps/imgui/gui/imstb_truetype.h
-        deps/imgui/gui/sourcesanspro.h
-        deps/imgui/gui/sourcesanspro.c)
+        deps/imgui/gui/fonts/firacode.c
+        deps/imgui/gui/fonts/firacode.h
+        deps/imgui/gui/fonts/sourcesanspro.c
+        deps/imgui/gui/fonts/sourcesanspro.h)
 set(COMMON_SRC
         src/common/array.c
         src/common/array.h

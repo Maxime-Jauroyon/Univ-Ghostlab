@@ -12,7 +12,8 @@
 #include <SDL.h>
 #include "imgui/gui/imgui_impl_sdl.h"
 #include "imgui/gui/imgui_impl_opengl3.h"
-#include "imgui/gui/sourcesanspro.h"
+#include "imgui/gui/fonts/sourcesanspro.h"
+#include "imgui/gui/fonts/firacode.h"
 #endif
 
 static float g_current_pos_y = 0.0f;
@@ -60,7 +61,7 @@ int32_t gl_gui_create(const char *gui_title) {
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-    SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+    SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI );
     g_window = SDL_CreateWindow(gui_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
     gl_context = SDL_GL_CreateContext(g_window);
     SDL_GL_MakeCurrent(g_window, gl_context);
@@ -70,13 +71,13 @@ int32_t gl_gui_create(const char *gui_title) {
     
     ImGui_ImplSDL2_InitForOpenGL(g_window, gl_context);
     ImGui_ImplOpenGL3_Init(glsl_version);
-    
     g_fontConfig = ImFontConfig_ImFontConfig();
     g_fontConfig->RasterizerMultiply = 1.5f;
     g_fontConfig->OversampleH = 4;
     g_fontConfig->OversampleV = 4;
-    ImFontAtlas_AddFontFromMemoryCompressedTTF(io->Fonts, SourceSansProRegular_compressed_data, (int)SourceSansProRegular_compressed_size, 15.0f, g_fontConfig, 0);
+    ImFontAtlas_AddFontFromMemoryCompressedTTF(io->Fonts, SourceSansProRegular_compressed_data, (int)SourceSansProRegular_compressed_size, 16.0f, g_fontConfig, 0);
     io->FontDefault = io->Fonts->Fonts.Data[io->Fonts->Fonts.Size - 1];
+    ImFontAtlas_AddFontFromMemoryCompressedTTF(io->Fonts, FiraCodeRegular_compressed_data, (int)FiraCodeRegular_compressed_size, 16.0f, g_fontConfig, 0);
 #endif
     
     return 0;
@@ -162,6 +163,8 @@ void gl_igBegin(const char *title, float height) {
 }
 
 void gl_igConsole(const struct gl_command_definition_t **cmd_defs, uint32_t cmd_defs_count) {
+    ImGuiIO *io = igGetIO();
+    
     if (g_first_time) {
         gl_log_push("you can now enter commands.\n");
         cmd_defs[0]->function(0);
@@ -201,6 +204,7 @@ void gl_igConsole(const struct gl_command_definition_t **cmd_defs, uint32_t cmd_
     }
     
     igBeginChildStr("#logs_output", (ImVec2) { 0, 0 }, true, ImGuiWindowFlags_HorizontalScrollbar);
+    igPushFont(io->Fonts->Fonts.Data[io->Fonts->Fonts.Size - 1]);
     
     ImGuiListClipper clipper = { 0 };
     ImGuiListClipper_Begin(&clipper, gl_array_get_size(gl_logs()), -1);
@@ -235,6 +239,7 @@ void gl_igConsole(const struct gl_command_definition_t **cmd_defs, uint32_t cmd_
         igSetScrollHereY(1.0f);
     }
     
+    igPopFont();
     igEndChild();
     
     igEnd();

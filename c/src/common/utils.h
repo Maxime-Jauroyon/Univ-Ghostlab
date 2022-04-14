@@ -26,8 +26,8 @@ int32_t gl_uint32_write(uint8_t **buf, const uint32_t *n, gl_conversion_type_t c
 
 int32_t gl_uint64_write(uint8_t **buf, const uint64_t *n, gl_conversion_type_t conversion_type);
 
-int32_t gl_uint8_read(int32_t fd, uint8_t *n);
+int32_t gl_uint8_recv(int32_t fd, uint8_t *n);
 
-int32_t gl_uint8_read_until_separator(int32_t fd, uint8_t **dst, uint8_t *last_c, uint16_t max_size, bool precise_size, bool allow_spaces);
+int32_t gl_uint8_array_recv_until_separator(int32_t fd, uint8_t **dst, uint8_t *last_c, uint16_t max_size, bool precise_size, bool allow_spaces, const uint8_t *buf, uint32_t *i);
 
 #endif /* GHOSTLAB_UTILS_H */

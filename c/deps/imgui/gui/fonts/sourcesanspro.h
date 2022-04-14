@@ -4,4 +4,4 @@
 extern const unsigned int SourceSansProRegular_compressed_size;
 extern const unsigned int SourceSansProRegular_compressed_data[];
 
-#endif //GHOSTLAB_SOURCESANSPRO_H
+#endif /* GHOSTLAB_SOURCESANSPRO_H */

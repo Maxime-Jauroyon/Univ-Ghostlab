@@ -6,6 +6,9 @@
 #include <common/log.h>
 #include <common/string.h>
 #include <pthread.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include "memory.h"
 
 static uint8_t g_max_identifier_size = 0;
 static pthread_mutex_t g_thread_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -578,6 +581,15 @@ static gl_message_definition_t g_message_messp = {
     }
 };
 
+static gl_message_definition_t g_message_shutd = {
+    .identifier = "SHUTD",
+    .protocol = GL_MESSAGE_PROTOCOL_UDP,
+    .function = 0,
+    .parameters = {
+        GL_MESSAGE_PARAMETER_TYPE_COUNT
+    }
+};
+
 static gl_message_definition_t *g_message_definitions_array[] = {
     [GL_MESSAGE_TYPE_GAMES] = &g_message_game,
     [GL_MESSAGE_TYPE_OGAMES] = &g_message_ogame,
@@ -619,6 +631,7 @@ static gl_message_definition_t *g_message_definitions_array[] = {
     [GL_MESSAGE_TYPE_MESSA] = &g_message_messa,
     [GL_MESSAGE_TYPE_ENDGA] = &g_message_endga,
     [GL_MESSAGE_TYPE_MESSP] = &g_message_messp,
+    [GL_MESSAGE_TYPE_SHUTD] = &g_message_shutd,
     
     [GL_MESSAGE_TYPE_COUNT] = 0
 };
@@ -649,60 +662,89 @@ uint32_t gl_message_get_num_parameters(gl_message_definition_t *msg_def) {
     return i;
 }
 
-int32_t gl_message_write(int32_t fd, struct gl_message_t *dst) {
-    gl_assert(dst);
-    
+int32_t gl_message_write_to_buf(uint8_t **buf, int32_t fd, struct gl_message_t *dst) {
     gl_message_definition_t *msg_def = gl_message_definitions()[dst->type];
     
     gl_assert(gl_message_get_num_parameters(msg_def) == gl_array_get_size(dst->parameters_value));
     
-    uint8_t *buf = 0;
+    *buf = 0;
     
-    gl_write_cstring(&buf, (const char **)&msg_def->identifier);
+    gl_write_cstring(buf, (const char **)&msg_def->identifier);
     
     for (uint32_t i = 0; i < gl_message_get_num_parameters(msg_def); i++) {
         uint8_t separator = GHOSTLAB_SEPARATOR;
-        gl_uint8_write(&buf, (uint8_t *) &separator);
+        gl_uint8_write(buf, (uint8_t *) &separator);
         
         const gl_message_parameter_definition_t *msg_param_def = gl_message_parameter_definitions()[msg_def->parameters[i]];
         
         if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT8) {
-            gl_uint8_write(&buf, &dst->parameters_value[i].uint8_value);
+            gl_uint8_write(buf, &dst->parameters_value[i].uint8_value);
         } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT16) {
-            gl_uint16_write(&buf, &dst->parameters_value[i].uint16_value, msg_param_def->conversion_type);
+            gl_uint16_write(buf, &dst->parameters_value[i].uint16_value, msg_param_def->conversion_type);
         } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT32) {
-            gl_uint32_write(&buf, &dst->parameters_value[i].uint32_value, msg_param_def->conversion_type);
+            gl_uint32_write(buf, &dst->parameters_value[i].uint32_value, msg_param_def->conversion_type);
         } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT64) {
-            gl_uint64_write(&buf, &dst->parameters_value[i].uint64_value, msg_param_def->conversion_type);
+            gl_uint64_write(buf, &dst->parameters_value[i].uint64_value, msg_param_def->conversion_type);
         } else {
             gl_assert(!msg_param_def->force_exact_length || msg_param_def->value_length == gl_array_get_size(dst->parameters_value[i].string_value));
-            gl_write_string(&buf, (const uint8_t **)&dst->parameters_value[i].string_value);
+            gl_write_string(buf, (const uint8_t **)&dst->parameters_value[i].string_value);
         }
     }
     
     uint8_t terminator = msg_def->protocol == GL_MESSAGE_PROTOCOL_TCP ? GHOSTLAB_TCP_TERMINATOR : GHOSTLAB_UDP_TERMINATOR;
     for (uint32_t i = 0; i < 3; i++) {
-        gl_uint8_write(&buf, &terminator);
+        gl_uint8_write(buf, &terminator);
     }
     
+    return gl_array_get_size(*buf);
+}
+
+int32_t gl_message_send(int32_t fd, struct gl_message_t *dst) {
+    uint8_t *buf;
+    gl_message_write_to_buf(&buf, fd, dst);
     int32_t size = gl_array_get_size(buf);
-    write(fd, buf, size);
-    
+    int32_t r = (int32_t)send(fd, buf, size, 0);
     gl_array_free(buf);
-    
-    gl_log_push("sent: ");
+    if (r < 0) {
+        return r;
+    }
+    gl_log_push("sent to %d: ", fd);
     gl_message_printf(dst);
-    
+    gl_message_free(dst);
     return size;
 }
 
-int32_t gl_message_read(int32_t fd, struct gl_message_t *dst) {
+int32_t gl_message_sendto(int32_t fd, struct gl_message_t *dst, struct sockaddr *sockaddr) {
+    uint8_t *buf;
+    gl_message_write_to_buf(&buf, fd, dst);
+    int32_t size = gl_array_get_size(buf);
+    int32_t r = (int32_t)sendto(fd, buf, size, 0, sockaddr, (socklen_t)sizeof(struct sockaddr_in));
+    gl_array_free(buf);
+    if (r < 0) {
+        return r;
+    }
+    gl_log_push("sent to all: ");
+    gl_message_printf(dst);
+    gl_message_free(dst);
+    return size;
+}
+
+int32_t gl_message_recv(int32_t fd, struct gl_message_t *dst, gl_message_protocol_t protocol) {
+    uint8_t buf[1024] = { 0 };
+    uint32_t buf_pos = 0;
+    
+    if (protocol == GL_MESSAGE_PROTOCOL_UDP) {
+        gl_assert(recv(fd, buf, 1024, 0) > 0);
+    }
+    
     uint16_t total_size = 0;
     uint8_t last_c = 0;
     uint8_t *identifier_buf = 0;
     
     // Reads the message type name.
-    gl_assert(gl_uint8_read_until_separator(fd, &identifier_buf, &last_c, gl_message_get_max_identifier_size(gl_message_definitions()), false, false) != 0);
+    gl_assert(gl_uint8_array_recv_until_separator(fd, &identifier_buf, &last_c,
+                                                  gl_message_get_max_identifier_size(gl_message_definitions()), false,
+                                                  false, protocol == GL_MESSAGE_PROTOCOL_UDP ? buf : 0, &buf_pos) != 0);
     gl_array_push(identifier_buf, 0);
     total_size += gl_array_get_header(identifier_buf)->size;
     
@@ -727,7 +769,9 @@ int32_t gl_message_read(int32_t fd, struct gl_message_t *dst) {
         uint8_t *parameter_value_buf = 0;
         
         // Reads the parameter value.
-        gl_assert(gl_uint8_read_until_separator(fd, &parameter_value_buf, &last_c, msg_param_def->value_length, msg_param_def->force_exact_length, msg_param_def->can_contain_spaces) != 0);
+        gl_assert(gl_uint8_array_recv_until_separator(fd, &parameter_value_buf, &last_c, msg_param_def->value_length,
+                                                      msg_param_def->force_exact_length,
+                                                      msg_param_def->can_contain_spaces, protocol == GL_MESSAGE_PROTOCOL_UDP ? buf : 0, &buf_pos) != 0);
         gl_assert(parameter_value_buf != 0);
         total_size += gl_array_get_header(parameter_value_buf)->size + 1;
         
@@ -751,7 +795,7 @@ int32_t gl_message_read(int32_t fd, struct gl_message_t *dst) {
         }
         
         gl_array_push(dst->parameters_value, parameter);
-    
+        
         if (msg_param_def->value_type != GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING) {
             gl_array_free(parameter_value_buf);
         }
@@ -764,9 +808,11 @@ int32_t gl_message_read(int32_t fd, struct gl_message_t *dst) {
     gl_assert(msg_def->protocol != GL_MESSAGE_PROTOCOL_UDP || gl_is_udp_terminator(last_c));
     
     // Reads ending characters.
-    uint8_t c;
-    gl_assert(gl_uint8_read(fd, &c) != 0);
-    gl_assert(gl_uint8_read(fd, &c) != 0);
+    if (protocol == GL_MESSAGE_PROTOCOL_TCP) {
+        uint8_t c;
+        gl_assert(gl_uint8_recv(fd, &c) != 0);
+        gl_assert(gl_uint8_recv(fd, &c) != 0);
+    }
     total_size += 2;
     
     gl_log_push("received: ");
@@ -843,9 +889,9 @@ void gl_message_execute(struct gl_message_t *msg, int32_t socket_id, void *user_
     }
 }
 
-int32_t gl_message_wait_and_execute(int32_t socket_id) {
+int32_t gl_message_wait_and_execute(int32_t socket_id, gl_message_protocol_t protocol) {
     gl_message_t msg = { 0 };
-    int32_t r = gl_message_read(socket_id, &msg);
+    int32_t r = gl_message_recv(socket_id, &msg, protocol);
     
     if (r >= 0) {
         gl_message_execute(&msg, socket_id, 0);

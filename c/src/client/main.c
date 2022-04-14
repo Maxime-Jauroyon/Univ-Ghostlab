@@ -11,24 +11,25 @@
 #include <common/command.h>
 #include <client/shared.h>
 #include <client/command.h>
+#include <pthread.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include "common/message.h"
-#include "common/string.h"
 #include "message.h"
+#include "thread_multicast.h"
 
 static void draw_main_gui();
+static void draw_server_down_popup();
 
-static int exit_code = EXIT_SUCCESS;
-static char *server_ip = 0;
-static char *server_port = 0;
-static char *player_name = 0;
-static char *udp_port = 0;
+static int32_t g_exit_code = EXIT_SUCCESS;
 static bool g_show_console = true;
 
 int main(int argc, char **argv) {
     errno = 0;
-    
+
     int32_t server_fd = -1;
-    
+
     static struct option opts[] = {
         { "ip", required_argument, 0, 'i' },
         { "port", required_argument, 0, 'p' },
@@ -74,11 +75,11 @@ int main(int argc, char **argv) {
             gl_log_push_error("use `-h` for more informations.\n");
         }
     }
-    
+
     if (used_unknown_opt) {
         goto error;
     }
-    
+
     if (!server_ip) {
         server_ip = gl_strdup(GHOSTLAB_DEFAULT_SERVER_IP);
     }
@@ -88,54 +89,68 @@ int main(int argc, char **argv) {
     if (!udp_port) {
         udp_port = gl_strdup(GHOSTLAB_DEFAULT_UDP_PORT);
     }
-    
+
     gl_message_add_functions();
     
+    gl_gui_create("Ghostlab Client");
+
     server_fd = gl_socket_create(GHOSTLAB_DEFAULT_SERVER_IP, GHOSTLAB_DEFAULT_SERVER_PORT, GL_SOCKET_TYPE_CLIENT);
     
     if (server_fd == -1) {
-        gl_log_push("server not connected!\n");
+        draw_server_down_popup();
         goto error;
     }
     
-    gl_message_wait_and_execute(server_fd);
+    g_thread_multicast = gl_malloc(sizeof(pthread_t));
+    pthread_create(g_thread_multicast, 0, gl_thread_multicast_main, 0);
     
-    gl_gui_create("Ghostlab Client");
-    
+    gl_message_wait_and_execute(server_fd, GL_MESSAGE_PROTOCOL_TCP);
+
     while (!g_quit) {
         gl_gui_start_render(&g_quit);
         draw_main_gui();
         gl_gui_end_render();
     }
-    
+
     goto cleanup;
-    
+
     error:
-    exit_code = gl_error_get(errno);
-    
+    g_exit_code = 1;
+
     cleanup:
-    if (server_fd != -1) {
-        gl_socket_close(server_fd);
+    gl_socket_close(&g_multicast_socket);
+
+    if (g_thread_multicast) {
+        pthread_join(*(pthread_t *)g_thread_multicast, 0);
+        gl_free(g_thread_multicast);
     }
-    
+
+    if (server_fd != -1) {
+        gl_socket_close(&server_fd);
+    }
+
     gl_free(server_ip);
     gl_free(server_port);
     gl_free(player_name);
     gl_free(udp_port);
-    
+
     gl_logs_free();
+
+    if (g_server_down) {
+        draw_server_down_popup();
+    }
     
     gl_memory_check_for_leaks();
-    
+
     gl_gui_free();
-    
-    return exit_code;
+
+    return g_exit_code;
 }
 
 static void draw_main_gui() {
     {
         gl_igBegin("Ghostlab Client", g_show_console ? 0.6f : 1.0f);
-        
+
         if (igBeginMenuBar()) {
             if (igBeginMenu("Options", true)) {
                 igMenuItemBoolPtr("Show Logs ", 0, &g_show_console, true);
@@ -144,22 +159,54 @@ static void draw_main_gui() {
             }
             igEndMenuBar();
         }
-        
+
         if (igCollapsingHeaderTreeNodeFlags("Informations", 0)) {
             igText("TCP socket connected:");
             igText("- IP: 127.0.0.1");
             igText("- Port: 4750");
         }
-        
+
         if (igCollapsingHeaderTreeNodeFlags("Statistics", 0)) {
             igText("Number of clients connected: 0");
             igText("Number of matches: 0");
         }
-        
+
         igEnd();
     }
-    
+
     if (g_show_console) {
         gl_igConsole(gl_command_definitions(), GL_COMMAND_TYPE_COUNT);
+    }
+}
+
+static void draw_server_down_popup() {
+    bool quit = false;
+    
+    while (!quit) {
+        gl_gui_start_render(&quit);
+        
+        igOpenPopup("###Down", 0);
+        
+        if (igBeginPopupModal("Server Down###Down", 0, ImGuiWindowFlags_AlwaysAutoResize)) {
+            igText(" ");
+            igText("The server is down!");
+            igText("The client cannot continue!");
+            igText("To know more, contact the server's owners.");
+            igText(" ");
+            igText("Press any key to continue.");
+            igText(" ");
+            
+            for (int i = 0; i < 512; ++i) {
+                if (igIsKeyReleased(i) || igIsMouseDown(0)) {
+                    igCloseCurrentPopup();
+                    quit = true;
+                    break;
+                }
+            }
+            
+            igEndPopup();
+        }
+        
+        gl_gui_end_render();
     }
 }

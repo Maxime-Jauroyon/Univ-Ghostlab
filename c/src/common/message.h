@@ -3,7 +3,9 @@
 
 #include <common/types.h>
 
+struct sockaddr;
 struct gl_message_t;
+struct socklen_t;
 
 typedef enum gl_message_parameter_type_t {
     GL_MESSAGE_PARAMETER_TYPE_N,
@@ -84,6 +86,7 @@ typedef enum gl_message_type_t {
     GL_MESSAGE_TYPE_MESSA,
     GL_MESSAGE_TYPE_ENDGA,
     GL_MESSAGE_TYPE_MESSP,
+    GL_MESSAGE_TYPE_SHUTD,
     
     GL_MESSAGE_TYPE_COUNT
 } gl_message_type_t;
@@ -119,9 +122,13 @@ uint8_t gl_message_get_max_identifier_size(gl_message_definition_t **msg_defs);
 
 uint32_t gl_message_get_num_parameters(gl_message_definition_t *msg_def);
 
-int32_t gl_message_write(int32_t fd, struct gl_message_t *dst);
+int32_t gl_message_write_to_buf(uint8_t **buf, int32_t fd, struct gl_message_t *dst);
 
-int32_t gl_message_read(int32_t fd, struct gl_message_t *dst);
+int32_t gl_message_send(int32_t fd, struct gl_message_t *dst);
+
+int32_t gl_message_sendto(int32_t fd, struct gl_message_t *dst, struct sockaddr *sockaddr);
+
+int32_t gl_message_recv(int32_t fd, struct gl_message_t *dst, gl_message_protocol_t protocol);
 
 int32_t gl_message_printf(struct gl_message_t *msg);
 
@@ -131,7 +138,7 @@ void gl_message_free(struct gl_message_t *msg);
 
 void gl_message_execute(struct gl_message_t *msg, int32_t socket_id, void *user_data);
 
-int32_t gl_message_wait_and_execute(int32_t socket_id);
+int32_t gl_message_wait_and_execute(int32_t socket_id, gl_message_protocol_t protocol);
 
 gl_message_parameter_definition_t **gl_message_parameter_definitions();
 

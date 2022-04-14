@@ -13,7 +13,7 @@ void *gl_thread_tcp_main(void *user_data) {
     
     g_server_socket = gl_socket_create(GHOSTLAB_DEFAULT_SERVER_IP, GHOSTLAB_DEFAULT_SERVER_PORT, GL_SOCKET_TYPE_SERVER);
     
-    while (1) {
+    while (!g_quit) {
         int32_t client_fd = gl_socket_server_accept_client(g_server_socket);
         
         if (client_fd >= 0) {
@@ -27,13 +27,13 @@ void *gl_thread_tcp_main(void *user_data) {
     }
     
     for (uint32_t i = 0; i < gl_array_get_size(g_threads_client_listener); i++) {
-        gl_socket_close(g_client_sockets[i]);
+        gl_socket_close(&g_client_sockets[i]);
         pthread_join(*(pthread_t *)g_threads_client_listener[i], 0);
         gl_free(g_threads_client_listener[i]);
     }
     gl_array_free(g_client_sockets);
     gl_array_free(g_threads_client_listener);
-    gl_socket_close(g_server_socket);
+    gl_socket_close(&g_server_socket);
     
     gl_log_push("tcp thread stopped.\n");
     

@@ -12,7 +12,12 @@ const char g_help[] =
     "\t-h, --help                                 displays this help message and terminates.\n"
     "\t-v, --version                              displays the program's version and terminates.\n";
 bool g_quit = false;
-int32_t g_server_socket = 0;
+int32_t g_server_socket = -1;
 int32_t *g_client_sockets = 0;
+int32_t g_multicast_socket = -1;
 void *g_thread_tcp = 0;
+void *g_thread_multicast = 0;
 void **g_threads_client_listener = 0;
+char *g_server_port = 0;
+char *g_multicast_ip = 0;
+char *g_multicast_port = 0;

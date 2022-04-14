@@ -23,6 +23,9 @@
 #define ntohll(x) be64toh(x)
 #endif
 #include <common/array.h>
+#include <sys/socket.h>
+#include "log.h"
+#include "memory.h"
 
 // Checks `errno` to call `perror` if needed and returns `0`.
 int32_t gl_error_get(int32_t err) {
@@ -157,11 +160,11 @@ int32_t gl_uint64_write(uint8_t **buf, const uint64_t *n, gl_conversion_type_t c
     return 8;
 }
 
-int32_t gl_uint8_read(int32_t fd, uint8_t *n) {
-    return (int32_t)read(fd, n, sizeof(uint8_t));
+int32_t gl_uint8_recv(int32_t fd, uint8_t *n) {
+    return (int32_t)recv(fd, n, 1, 0);
 }
 
-int32_t gl_uint8_read_until_separator(int32_t fd, uint8_t **dst, uint8_t *last_c, uint16_t max_size, bool precise_size, bool allow_spaces) {
+int32_t gl_uint8_array_recv_until_separator(int32_t fd, uint8_t **dst, uint8_t *last_c, uint16_t max_size, bool precise_size, bool allow_spaces, const uint8_t *buf, uint32_t *i) {
     uint8_t c = 0;
     bool first = true;
     
@@ -171,7 +174,11 @@ int32_t gl_uint8_read_until_separator(int32_t fd, uint8_t **dst, uint8_t *last_c
             gl_assert(gl_array_get_size(*dst) <= max_size);
         }
         
-        gl_assert(gl_uint8_read(fd, &c) != 0);
+        if (buf) {
+            c = buf[(*i)++];
+        } else {
+            gl_assert(gl_uint8_recv(fd, &c) != 0);
+        }
         first = false;
     }
     

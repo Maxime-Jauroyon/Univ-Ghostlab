@@ -13,3 +13,10 @@ const char g_help[] =
     "\t-h, --help                           displays this help message and exits.\n"
     "\t-v, --version                        displays the program's version and exits.\n";
 bool g_quit = false;
+bool g_server_down = false;
+char *server_ip = 0;
+char *server_port = 0;
+char *player_name = 0;
+char *udp_port = 0;
+int32_t g_multicast_socket = -1;
+void *g_thread_multicast = 0;

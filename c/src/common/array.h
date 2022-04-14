@@ -72,7 +72,7 @@ typedef struct gl_array_header_t {
 #define gl_array_pop(array) ((array)[--gl_array_get_header(array)->size])
 
 // Removes the item at the given index of the array.
-#define gl_array_remove(a, i) (((a) ? gl_memmove((a) + (i), (a) + (i) + 1, (gl_array_get_size(a) - (i) - 1 * sizeof(*(a))) : 0), (a) ? --gl_array_get_header(a)->size : 0)
+#define gl_array_remove(a, i) (gl_array_get_size(a) > (i) ? (gl_array_get_size(a) - 1 == (i) ? gl_array_pop(a) : gl_memmove((a) + (i), (a) + (i) + 1, ((gl_array_get_size(a) - (i) - 1) * sizeof(*(a)))), --gl_array_get_header(a)->size) : 0)
 
 // Frees the data of an array (must be called to deallocated memory).
 #define gl_array_free(a) (internal_gl_array_free((void *)(a)), (*(void **)&(a)) = 0)
