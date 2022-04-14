@@ -16,9 +16,9 @@ typedef struct gl_log_t {
     char data[512];
 } gl_log_t;
 
-void gl_log_push(const char *format, ...);
+void gl_log_vpush(const char *format, gl_log_type_t type, va_list args);
 
-void gl_log_vpush(const char *format, va_list args);
+void gl_log_push(const char *format, ...);
 
 void gl_log_push_info(const char *format, ...);
 

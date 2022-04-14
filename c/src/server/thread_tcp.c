@@ -28,7 +28,7 @@ void *gl_thread_tcp_main(void *user_data) {
     
     for (uint32_t i = 0; i < gl_array_get_size(g_threads_client_listener); i++) {
         gl_socket_close(g_client_sockets[i]);
-        pthread_join(g_threads_client_listener[i], 0);
+        pthread_join(*(pthread_t *)g_threads_client_listener[i], 0);
         gl_free(g_threads_client_listener[i]);
     }
     gl_array_free(g_client_sockets);

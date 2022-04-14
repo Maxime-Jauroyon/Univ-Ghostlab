@@ -103,7 +103,7 @@ set(CLIENT_SRC
 if (UNIX AND NOT APPLE)
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     find_package(Threads REQUIRED)
-    set(DEPS_LIBS Threads::Threads)
+    set(DEPS_LIBS Threads::Threads ${CMAKE_DL_LIBS})
 endif()
 find_package(Curses REQUIRED)
 set(DEPS_TUI_LIBS ncurses)

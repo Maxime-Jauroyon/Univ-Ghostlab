@@ -796,7 +796,7 @@ int32_t gl_message_printf(struct gl_message_t *msg) {
 #ifdef __APPLE__
             gl_log_push("%llu", msg->parameters_value[i].uint64_value);
 #else
-            gl_printf("%lu", msg->parameters_value[i].uint64_value);
+            gl_log_push("%lu", msg->parameters_value[i].uint64_value);
 #endif
         } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING) {
             gl_string_printf(&msg->parameters_value[i].string_value);

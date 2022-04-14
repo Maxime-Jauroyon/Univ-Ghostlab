@@ -103,7 +103,7 @@ int main(int argc, char **argv) {
     gl_socket_close(g_server_socket);
     
     if (g_thread_tcp) {
-        pthread_join(g_thread_tcp, 0);
+        pthread_join(*(pthread_t *)g_thread_tcp, 0);
         gl_free(g_thread_tcp);
     }
     

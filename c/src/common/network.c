@@ -44,5 +44,6 @@ int32_t gl_socket_server_accept_client(int32_t server_fd) {
 }
 
 int32_t gl_socket_close(int32_t fd) {
+    shutdown(fd, SHUT_RD);
     return close(fd);
 }

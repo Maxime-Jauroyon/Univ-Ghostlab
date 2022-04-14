@@ -207,30 +207,24 @@ void gl_igConsole(const struct gl_command_definition_t **cmd_defs, uint32_t cmd_
     while (ImGuiListClipper_Step(&clipper)) {
         for (uint32_t i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
             gl_log_t* log = gl_logs()[i];
-            char final_buf[512];
             
             if (log->type == GL_LOG_TYPE_DEFAULT) {
-                sprintf(final_buf, "[" GHOSTLAB_EXECUTABLE_NAME "] %s", log->data);
-                igText(final_buf, 0);
+                igTextUnformatted(log->data, 0);
             } else if (log->type == GL_LOG_TYPE_INFO && g_console_show_info) {
-                sprintf(final_buf, "[" GHOSTLAB_EXECUTABLE_NAME "] [info] %s", log->data);
                 igPushStyleColorVec4(ImGuiCol_Text, (ImVec4) { 0.00f, 1.00f, 1.00f, 1.00f });
-                igText(final_buf, 0);
+                igTextUnformatted(log->data, 0);
                 igPopStyleColor(1);
             } else if (log->type == GL_LOG_TYPE_WARNING && g_console_show_warning) {
-                sprintf(final_buf, "[" GHOSTLAB_EXECUTABLE_NAME "] [warning] %s", log->data);
                 igPushStyleColorVec4(ImGuiCol_Text, (ImVec4) { 1.00f, 1.00f, 0.00f, 1.00f });
-                igText(final_buf, 0);
+                igTextUnformatted(log->data, 0);
                 igPopStyleColor(1);
             } else if (log->type == GL_LOG_TYPE_ERROR && g_console_show_error) {
-                sprintf(final_buf, "[" GHOSTLAB_EXECUTABLE_NAME "] [error] %s", log->data);
                 igPushStyleColorVec4(ImGuiCol_Text, (ImVec4) { 1.00f, 0.00f, 0.00f, 1.00f });
-                igText(final_buf, 0);
+                igTextUnformatted(log->data, 0);
                 igPopStyleColor(1);
             } else if (log->type == GL_LOG_TYPE_USER) {
-                sprintf(final_buf, "$ %s", log->data);
                 igPushStyleColorVec4(ImGuiCol_Text, (ImVec4) { 0.00f, 1.00f, 0.00f, 1.00f });
-                igText(final_buf, 0);
+                igTextUnformatted(log->data, 0);
                 igPopStyleColor(1);
             }
         }
