@@ -9,9 +9,10 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include "memory.h"
+#include "network.h"
 
 static uint8_t g_max_identifier_size = 0;
-static pthread_mutex_t g_thread_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t g_message_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 static gl_message_parameter_definition_t g_message_parameter_n = {
     .identifier = "n",
@@ -515,11 +516,22 @@ static gl_message_definition_t g_message_send_res = {
     }
 };
 
-static gl_message_definition_t g_message_glis_nsend = {
+static gl_message_definition_t g_message_nsend = {
     .identifier = "NSEND",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
     .parameters = {
+        GL_MESSAGE_PARAMETER_TYPE_COUNT
+    }
+};
+
+static gl_message_definition_t g_message_multi = {
+    .identifier = "MULTI",
+    .protocol = GL_MESSAGE_PROTOCOL_TCP,
+    .function = 0,
+    .parameters = {
+        GL_MESSAGE_PARAMETER_TYPE_IP,
+        GL_MESSAGE_PARAMETER_TYPE_PORT,
         GL_MESSAGE_PARAMETER_TYPE_COUNT
     }
 };
@@ -624,7 +636,8 @@ static gl_message_definition_t *g_message_definitions_array[] = {
     [GL_MESSAGE_TYPE_MALL_RES] = &g_message_mall_res,
     [GL_MESSAGE_TYPE_SEND_REQ] = &g_message_send_req,
     [GL_MESSAGE_TYPE_SEND_RES] = &g_message_send_res,
-    [GL_MESSAGE_TYPE_NSEND] = &g_message_glis_nsend,
+    [GL_MESSAGE_TYPE_NSEND] = &g_message_nsend,
+    [GL_MESSAGE_TYPE_MULTI] = &g_message_multi,
     
     [GL_MESSAGE_TYPE_GHOST] = &g_message_ghost,
     [GL_MESSAGE_TYPE_SCORE] = &g_message_score,
@@ -662,7 +675,7 @@ uint32_t gl_message_get_num_parameters(gl_message_definition_t *msg_def) {
     return i;
 }
 
-int32_t gl_message_write_to_buf(uint8_t **buf, int32_t fd, struct gl_message_t *dst) {
+int32_t gl_message_write_to_buf(uint8_t **buf, struct gl_message_t *dst) {
     gl_message_definition_t *msg_def = gl_message_definitions()[dst->type];
     
     gl_assert(gl_message_get_num_parameters(msg_def) == gl_array_get_size(dst->parameters_value));
@@ -699,34 +712,66 @@ int32_t gl_message_write_to_buf(uint8_t **buf, int32_t fd, struct gl_message_t *
     return gl_array_get_size(*buf);
 }
 
-int32_t gl_message_send(int32_t fd, struct gl_message_t *dst) {
+int32_t gl_message_send_tcp(int32_t fd, struct gl_message_t *dst) {
     uint8_t *buf;
-    gl_message_write_to_buf(&buf, fd, dst);
+    gl_message_write_to_buf(&buf, dst);
     int32_t size = gl_array_get_size(buf);
-    int32_t r = (int32_t)send(fd, buf, size, 0);
+    int32_t r;
+    r = (int32_t)send(fd, buf, size, 0);
     gl_array_free(buf);
     if (r < 0) {
         return r;
     }
-    gl_log_push("sent to %d: ", fd);
+    gl_log_push("tcp: sent to %d: ", fd);
     gl_message_printf(dst);
     gl_message_free(dst);
     return size;
 }
 
-int32_t gl_message_sendto(int32_t fd, struct gl_message_t *dst, struct sockaddr *sockaddr) {
-    uint8_t *buf;
-    gl_message_write_to_buf(&buf, fd, dst);
-    int32_t size = gl_array_get_size(buf);
-    int32_t r = (int32_t)sendto(fd, buf, size, 0, sockaddr, (socklen_t)sizeof(struct sockaddr_in));
-    gl_array_free(buf);
-    if (r < 0) {
-        return r;
+static int32_t gl_message_send_to_address(const char *ip, const char *port, struct gl_message_t *dst, bool is_multicast) {
+    int32_t exit_code = 0;
+    
+    struct sockaddr *saddr = 0;
+    int32_t fd = gl_socket_create(ip, port, is_multicast ? GL_SOCKET_TYPE_MULTICAST_SENDER : GL_SOCKET_TYPE_UDP_SENDER, &saddr);
+    
+    if (fd == -1) {
+        goto error;
     }
-    gl_log_push("sent to all: ");
+    
+    uint8_t *buf;
+    gl_message_write_to_buf(&buf, dst);
+    int32_t size = gl_array_get_size(buf);
+    
+    if ((int32_t)sendto(fd, buf, size, 0, saddr, (socklen_t)sizeof(struct sockaddr_in)) == -1) {
+        goto error;
+    }
+    
+    gl_array_free(buf);
+    if (is_multicast) {
+        gl_log_push("multicast: sent: ");
+    } else {
+        gl_log_push("udp: sent %s-%s: ", ip, port);
+    }
     gl_message_printf(dst);
     gl_message_free(dst);
-    return size;
+    exit_code = size;
+    
+    goto cleanup;
+    
+    error:
+    exit_code = -1;
+    
+    cleanup:
+    gl_socket_close(&fd);
+    return exit_code;
+}
+
+int32_t gl_message_send_udp(const char *ip, const char *port, struct gl_message_t *dst) {
+    return gl_message_send_to_address(ip, port, dst, false);
+}
+
+int32_t gl_message_send_multicast(const char *ip, const char *port, struct gl_message_t *dst) {
+    return gl_message_send_to_address(ip, port, dst, true);
 }
 
 int32_t gl_message_recv(int32_t fd, struct gl_message_t *dst, gl_message_protocol_t protocol) {
@@ -866,26 +911,28 @@ int32_t gl_message_push_parameter(struct gl_message_t *msg, struct gl_message_pa
 }
 
 void gl_message_free(struct gl_message_t *msg) {
-    gl_message_definition_t *msg_def = gl_message_definitions()[msg->type];
+    if (msg) {
+        gl_message_definition_t *msg_def = gl_message_definitions()[msg->type];
     
-    for (uint32_t i = 0; i < gl_message_get_num_parameters(msg_def); i++) {
-        gl_message_parameter_definition_t *msg_param_def = gl_message_parameter_definitions()[msg_def->parameters[i]];
+        for (uint32_t i = 0; i < gl_message_get_num_parameters(msg_def); i++) {
+            gl_message_parameter_definition_t *msg_param_def = gl_message_parameter_definitions()[msg_def->parameters[i]];
         
-        if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING) {
-            gl_array_free(msg->parameters_value[i].string_value);
+            if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING) {
+                gl_array_free(msg->parameters_value[i].string_value);
+            }
         }
-    }
     
-    if (gl_message_get_num_parameters(msg_def) > 0) {
-        gl_array_free(msg->parameters_value);
+        if (gl_message_get_num_parameters(msg_def) > 0) {
+            gl_array_free(msg->parameters_value);
+        }
     }
 }
 
 void gl_message_execute(struct gl_message_t *msg, int32_t socket_id, void *user_data) {
     if (gl_message_definitions()[msg->type]->function) {
-        pthread_mutex_lock(&g_thread_mutex);
+        pthread_mutex_lock(&g_message_mutex);
         gl_message_definitions()[msg->type]->function(msg, socket_id, user_data);
-        pthread_mutex_unlock(&g_thread_mutex);
+        pthread_mutex_unlock(&g_message_mutex);
     }
 }
 

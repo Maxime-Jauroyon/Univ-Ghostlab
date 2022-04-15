@@ -6,6 +6,7 @@ const char g_help[] =
     "ghostlab is an online matchmaking based game where you take upon yourself to become the best ghost hunter!\n"
     "\n"
     "options:\n"
+    "\t-i, --ip <server ip>                       defines the ip to use (" GHOSTLAB_DEFAULT_SERVER_IP " by default).\n"
     "\t-p, --port <server port>                   defines the port to use (" GHOSTLAB_DEFAULT_SERVER_PORT " by default).\n"
     "\t-I, --multi-ip <server multicast ip>       defines the multicast ip to use (" GHOSTLAB_DEFAULT_MULTICAST_IP " by default).\n"
     "\t-P, --multi-port <server multicast port>   defines the multicast port to use (" GHOSTLAB_DEFAULT_MULTICAST_PORT " by default).\n"
@@ -14,10 +15,9 @@ const char g_help[] =
 bool g_quit = false;
 int32_t g_server_socket = -1;
 int32_t *g_client_sockets = 0;
-int32_t g_multicast_socket = -1;
 void *g_thread_tcp = 0;
-void *g_thread_multicast = 0;
 void **g_threads_client_listener = 0;
+char *g_server_ip = 0;
 char *g_server_port = 0;
 char *g_multicast_ip = 0;
 char *g_multicast_port = 0;

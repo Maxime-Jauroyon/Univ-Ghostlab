@@ -5,6 +5,7 @@
 #include <common/array.h>
 #include <common/utils.h>
 #include "log.h"
+#include "memory.h"
 
 uint8_t *gl_string_create_from_cstring(const char *src) {
     uint8_t *dst = 0;
@@ -75,6 +76,42 @@ uint8_t *gl_string_create_from_ip(const char *src) {
     }
     
     return dst;
+}
+
+char *gl_cstring_create_from_string(const uint8_t *src) {
+    if (!src) {
+        return 0;
+    }
+    
+    char *str = gl_malloc(gl_array_get_size(src));
+    
+    for (uint32_t i = 0; i < gl_array_get_size(src); i++) {
+        str[i] = (char)src[i];
+    }
+    
+    return str;
+}
+
+char *gl_cstring_create_from_ip(const uint8_t *src) {
+    if (!src) {
+        return 0;
+    }
+    
+    uint32_t end_idx;
+    for (end_idx = 0; end_idx < gl_array_get_size(src); end_idx++) {
+        if (src[end_idx] == '#') {
+            break;
+        }
+    }
+    
+    char *str = gl_malloc(end_idx + 1);
+    str[end_idx] = 0;
+    
+    for (uint32_t i = 0; i < end_idx; i++) {
+        str[i] = (char)src[i];
+    }
+    
+    return str;
 }
 
 int32_t gl_write_string(uint8_t **buf, const uint8_t **n) {

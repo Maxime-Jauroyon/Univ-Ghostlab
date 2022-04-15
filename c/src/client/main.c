@@ -5,19 +5,16 @@
 #include <cimgui/cimgui.h>
 #include <common/log.h>
 #include <common/gui.h>
-#include <common/utils.h>
 #include <common/memory.h>
 #include <common/network.h>
 #include <common/command.h>
 #include <client/shared.h>
 #include <client/command.h>
 #include <pthread.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 #include "common/message.h"
 #include "message.h"
-#include "thread_multicast.h"
+#include "thread_multicast_server.h"
+#include "thread_udp.h"
 
 static void draw_main_gui();
 static void draw_server_down_popup();
@@ -27,8 +24,6 @@ static bool g_show_console = true;
 
 int main(int argc, char **argv) {
     errno = 0;
-
-    int32_t server_fd = -1;
 
     static struct option opts[] = {
         { "ip", required_argument, 0, 'i' },
@@ -45,19 +40,19 @@ int main(int argc, char **argv) {
         switch (opt) {
         case 'i':
             // TODO: Check if ip is valid, if invalid use default
-            server_ip = gl_strdup(optarg);
+            g_server_ip = gl_strdup(optarg);
             break;
         case 'p':
             // TODO: Check if port is valid, if invalid use default
-            server_port = gl_strdup(optarg);
+            g_server_port = gl_strdup(optarg);
             break;
         case 'n':
             // TODO: Check if name is valid, if invalid use default
-            player_name = gl_strdup(optarg);
+            g_player_id = gl_strdup(optarg);
             break;
         case 'u':
             // TODO: Check if port is valid, if invalid use default
-            udp_port = gl_strdup(optarg);
+            g_udp_port = gl_strdup(optarg);
             break;
         case 'h':
             gl_log_push("%s", g_help);
@@ -80,32 +75,39 @@ int main(int argc, char **argv) {
         goto error;
     }
 
-    if (!server_ip) {
-        server_ip = gl_strdup(GHOSTLAB_DEFAULT_SERVER_IP);
+    if (!g_server_ip) {
+        g_server_ip = gl_strdup(GHOSTLAB_DEFAULT_SERVER_IP);
     }
-    if (!server_port) {
-        server_port = gl_strdup(GHOSTLAB_DEFAULT_SERVER_PORT);
+    if (!g_server_port) {
+        g_server_port = gl_strdup(GHOSTLAB_DEFAULT_SERVER_PORT);
     }
-    if (!udp_port) {
-        udp_port = gl_strdup(GHOSTLAB_DEFAULT_UDP_PORT);
+    if (!g_udp_port) {
+        g_udp_port = gl_strdup(GHOSTLAB_DEFAULT_UDP_PORT);
     }
 
     gl_message_add_functions();
     
     gl_gui_create("Ghostlab Client");
-
-    server_fd = gl_socket_create(GHOSTLAB_DEFAULT_SERVER_IP, GHOSTLAB_DEFAULT_SERVER_PORT, GL_SOCKET_TYPE_CLIENT);
     
-    if (server_fd == -1) {
+    g_server_tcp_socket = gl_socket_create(g_server_ip, g_server_port, GL_SOCKET_TYPE_TCP_CLIENT, 0);
+    
+    if (g_server_tcp_socket == -1) {
         draw_server_down_popup();
         goto error;
     }
     
-    g_thread_multicast = gl_malloc(sizeof(pthread_t));
-    pthread_create(g_thread_multicast, 0, gl_thread_multicast_main, 0);
+    // MULTI
+    gl_message_wait_and_execute(g_server_tcp_socket, GL_MESSAGE_PROTOCOL_TCP);
     
-    gl_message_wait_and_execute(server_fd, GL_MESSAGE_PROTOCOL_TCP);
-
+    // GAMES
+    gl_message_wait_and_execute(g_server_tcp_socket, GL_MESSAGE_PROTOCOL_TCP);
+    
+    g_multicast_server_thread = gl_malloc(sizeof(pthread_t));
+    pthread_create(g_multicast_server_thread, 0, gl_thread_multicast_server_main, 0);
+    
+    g_udp_thread = gl_malloc(sizeof(pthread_t));
+    pthread_create(g_udp_thread, 0, gl_thread_udp_main, 0);
+    
     while (!g_quit) {
         gl_gui_start_render(&g_quit);
         draw_main_gui();
@@ -116,23 +118,27 @@ int main(int argc, char **argv) {
 
     error:
     g_exit_code = 1;
-
+    
     cleanup:
-    gl_socket_close(&g_multicast_socket);
-
-    if (g_thread_multicast) {
-        pthread_join(*(pthread_t *)g_thread_multicast, 0);
-        gl_free(g_thread_multicast);
+    if (g_udp_thread) {
+        gl_socket_close(&g_udp_socket);
+        pthread_join(*(pthread_t *)g_udp_thread, 0);
+        gl_free(g_udp_thread);
+    }
+    if (g_multicast_server_thread) {
+        gl_socket_close(&g_multicast_server_socket);
+        pthread_join(*(pthread_t *)g_multicast_server_thread, 0);
+        gl_free(g_multicast_server_thread);
     }
 
-    if (server_fd != -1) {
-        gl_socket_close(&server_fd);
+    if (g_server_tcp_socket != -1) {
+        gl_socket_close(&g_server_tcp_socket);
     }
 
-    gl_free(server_ip);
-    gl_free(server_port);
-    gl_free(player_name);
-    gl_free(udp_port);
+    gl_free(g_server_ip);
+    gl_free(g_server_port);
+    gl_free(g_player_id);
+    gl_free(g_udp_port);
 
     gl_logs_free();
 

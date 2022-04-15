@@ -1,7 +1,6 @@
 #include <common/utils.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
+#include <sys/socket.h>
 #ifdef __APPLE__
 #include <libkern/OSByteOrder.h>
 #define htobe16(x) OSSwapHostToBigInt16(x)
@@ -17,24 +16,11 @@
 #define le32toh(x) OSSwapLittleToHostInt32(x)
 #define le64toh(x) OSSwapLittleToHostInt64(x)
 #else
-#include <netinet/in.h>
 #include <endian.h>
 #define htonll(x) htobe64(x)
 #define ntohll(x) be64toh(x)
 #endif
 #include <common/array.h>
-#include <sys/socket.h>
-#include "log.h"
-#include "memory.h"
-
-// Checks `errno` to call `perror` if needed and returns `0`.
-int32_t gl_error_get(int32_t err) {
-    if (err != 0) {
-        perror(GHOSTLAB_EXECUTABLE_NAME);
-    }
-    
-    return 0;
-}
 
 uint16_t gl_uint8_to_uint16(const uint8_t *n, gl_conversion_type_t conversion_type) {
     uint16_t r =

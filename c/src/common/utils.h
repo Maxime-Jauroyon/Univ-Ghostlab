@@ -9,9 +9,6 @@
 #define gl_is_terminator(c) (gl_is_tcp_terminator(c) || gl_is_udp_terminator(c))
 #define gl_is_separator_or_terminator(c) (gl_is_separator(c) || gl_is_terminator(c))
 
-// Checks `errno` to call `perror` if needed and returns `0`.
-int32_t gl_error_get(int32_t err);
-
 uint16_t gl_uint8_to_uint16(const uint8_t *n, gl_conversion_type_t conversion_type);
 
 uint32_t gl_uint8_to_uint32(const uint8_t *n, gl_conversion_type_t conversion_type);

@@ -80,13 +80,14 @@ typedef enum gl_message_type_t {
     GL_MESSAGE_TYPE_SEND_REQ,
     GL_MESSAGE_TYPE_SEND_RES,
     GL_MESSAGE_TYPE_NSEND,
+    GL_MESSAGE_TYPE_MULTI, // CUSTOM
     
     GL_MESSAGE_TYPE_GHOST,
     GL_MESSAGE_TYPE_SCORE,
     GL_MESSAGE_TYPE_MESSA,
     GL_MESSAGE_TYPE_ENDGA,
     GL_MESSAGE_TYPE_MESSP,
-    GL_MESSAGE_TYPE_SHUTD,
+    GL_MESSAGE_TYPE_SHUTD, // CUSTOM
     
     GL_MESSAGE_TYPE_COUNT
 } gl_message_type_t;
@@ -122,11 +123,13 @@ uint8_t gl_message_get_max_identifier_size(gl_message_definition_t **msg_defs);
 
 uint32_t gl_message_get_num_parameters(gl_message_definition_t *msg_def);
 
-int32_t gl_message_write_to_buf(uint8_t **buf, int32_t fd, struct gl_message_t *dst);
+int32_t gl_message_write_to_buf(uint8_t **buf, struct gl_message_t *dst);
 
-int32_t gl_message_send(int32_t fd, struct gl_message_t *dst);
+int32_t gl_message_send_tcp(int32_t fd, struct gl_message_t *msg);
 
-int32_t gl_message_sendto(int32_t fd, struct gl_message_t *dst, struct sockaddr *sockaddr);
+int32_t gl_message_send_udp(const char *ip, const char *port, struct gl_message_t *msg);
+
+int32_t gl_message_send_multicast(const char *ip, const char *port, struct gl_message_t *msg);
 
 int32_t gl_message_recv(int32_t fd, struct gl_message_t *dst, gl_message_protocol_t protocol);
 

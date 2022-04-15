@@ -18,7 +18,6 @@
 #include <netdb.h>
 #include <string.h>
 #include "message.h"
-#include "thread_multicast.h"
 
 static void draw_main_gui();
 
@@ -29,6 +28,7 @@ int main(int argc, char **argv) {
     errno = 0;
 
     static struct option opts[] = {
+        { "ip", required_argument, 0, 'i' },
         { "port", required_argument, 0, 'p' },
         { "multi-ip", required_argument, 0, 'I' },
         { "multi-port", required_argument, 0, 'P' },
@@ -38,8 +38,12 @@ int main(int argc, char **argv) {
     };
     int32_t used_unknown_opt = 0;
     int32_t opt;
-    while ((opt = getopt_long(argc, argv, "p:I:P:hv", opts, 0)) != -1) {
+    while ((opt = getopt_long(argc, argv, "i:p:I:P:hv", opts, 0)) != -1) {
         switch (opt) {
+        case 'i':
+            // TODO: Check if ip is valid, if invalid use default
+            g_server_ip = gl_strdup(optarg);
+            break;
         case 'p':
             // TODO: Check if port is valid, if invalid use default
             g_server_port = gl_strdup(optarg);
@@ -72,7 +76,10 @@ int main(int argc, char **argv) {
     if (used_unknown_opt) {
         goto error;
     }
-
+    
+    if (!g_server_ip) {
+        g_server_ip = gl_strdup(GHOSTLAB_DEFAULT_SERVER_IP);
+    }
     if (!g_server_port) {
         g_server_port = gl_strdup(GHOSTLAB_DEFAULT_SERVER_PORT);
     }
@@ -87,10 +94,7 @@ int main(int argc, char **argv) {
 
     g_thread_tcp = gl_malloc(sizeof(pthread_t));
     pthread_create(g_thread_tcp, 0, gl_thread_tcp_main, 0);
-
-    g_thread_multicast = gl_malloc(sizeof(pthread_t));
-    pthread_create(g_thread_multicast, 0, gl_thread_multicast_main, 0);
-
+    
     gl_gui_create("Ghostlab Server");
 
     while (!g_quit) {
@@ -102,20 +106,13 @@ int main(int argc, char **argv) {
     goto cleanup;
 
     error:
-    g_exit_code = gl_error_get(errno);
+    g_exit_code = -1;
 
     cleanup:
     gl_log_push("shutting down...\n");
 
     gl_message_t msg = {.type = GL_MESSAGE_TYPE_SHUTD, 0};
-    gl_thread_multicast_send(&msg);
-
-    if (g_thread_multicast) {
-        gl_thread_multicast_wake_up();
-        pthread_join(*(pthread_t *)g_thread_multicast, 0);
-        gl_socket_close(&g_multicast_socket);
-        gl_free(g_thread_multicast);
-    }
+    gl_message_send_multicast(g_multicast_ip, g_multicast_port, &msg);
 
     gl_socket_close(&g_server_socket);
 
@@ -123,7 +120,8 @@ int main(int argc, char **argv) {
         pthread_join(*(pthread_t *)g_thread_tcp, 0);
         gl_free(g_thread_tcp);
     }
-
+    
+    gl_free(g_server_ip);
     gl_free(g_server_port);
     gl_free(g_multicast_ip);
     gl_free(g_multicast_port);

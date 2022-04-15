@@ -9,6 +9,10 @@ uint8_t *gl_string_create_from_number(const char *src, uint8_t size);
 
 uint8_t *gl_string_create_from_ip(const char *src);
 
+char *gl_cstring_create_from_string(const uint8_t *src);
+
+char *gl_cstring_create_from_ip(const uint8_t *src);
+
 int32_t gl_write_string(uint8_t **buf, const uint8_t **n);
 
 int32_t gl_write_cstring(uint8_t **buf, const char **n);

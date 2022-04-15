@@ -62,6 +62,8 @@ set(COMMON_SRC
         src/common/gui.h
         src/common/log.c
         src/common/log.h
+        src/common/maze.c
+        src/common/maze.h
         src/common/memory.c
         src/common/memory.h
         src/common/message.c
@@ -81,14 +83,12 @@ set(SERVER_SRC
         src/server/message.h
         src/server/shared.c
         src/server/shared.h
-        src/server/thread_connection.c
-        src/server/thread_connection.h
-        src/server/thread_matches.c
-        src/server/thread_matches.h
-        src/server/thread_multicast.c
-        src/server/thread_multicast.h
+        src/server/thread_games_handler.c
+        src/server/thread_games_handler.h
         src/server/thread_tcp.c
-        src/server/thread_tcp.h)
+        src/server/thread_tcp.h
+        src/server/thread_tcp_connection.c
+        src/server/thread_tcp_connection.h)
 set(CLIENT_SRC
         src/client/command.c
         src/client/command.h
@@ -97,8 +97,8 @@ set(CLIENT_SRC
         src/client/message.h
         src/client/shared.c
         src/client/shared.h
-        src/client/thread_multicast.c
-        src/client/thread_multicast.h
+        src/client/thread_multicast_server.c
+        src/client/thread_multicast_server.h
         src/client/thread_udp.c
         src/client/thread_udp.h)
 
@@ -139,3 +139,5 @@ add_executable(client_gui ${CLIENT_SRC} ${COMMON_SRC} ${DEPS_SRC} ${DEPS_GUI_SRC
 target_link_libraries(client_gui PRIVATE ${DEPS_LIBS} ${DEPS_GUI_LIBS})
 target_include_directories(client_gui PRIVATE ${INCLUDE_DIRS} ${DEPS_GUI_INCLUDE_DIRS})
 target_compile_definitions(client_gui PRIVATE ${CLIENT_DEFINITIONS} ${DEPS_GUI_DEFINITIONS})
+
+add_executable(maze src/maze.c)
