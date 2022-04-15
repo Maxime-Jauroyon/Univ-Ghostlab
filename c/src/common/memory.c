@@ -91,8 +91,8 @@ void *gl_strdup(void *ptr) {
     return new_ptr;
 }
 
-#if GHOSTLAB_TUI || GHOSTLAB_GUI
 void gl_memory_check_for_leaks() {
+#if GHOSTLAB_TUI || GHOSTLAB_GUI
     bool quit = g_allocated_ptrs == 0;
     
     while (!quit) {
@@ -124,5 +124,7 @@ void gl_memory_check_for_leaks() {
         
         gl_gui_end_render();
     }
-}
+#else
+    printf("At least %lu memory leaks detected!    ", g_allocated_ptrs);
 #endif
+}

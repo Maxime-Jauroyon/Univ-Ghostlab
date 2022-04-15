@@ -1,4 +1,7 @@
 #include <common/gui.h>
+
+#if GHOSTLAB_TUI || GHOSTLAB_GUI
+
 #include <string.h>
 #include <cimgui/cimgui.h>
 #include "command.h"
@@ -244,3 +247,5 @@ void gl_igConsole(const struct gl_command_definition_t **cmd_defs, uint32_t cmd_
     
     igEnd();
 }
+
+#endif

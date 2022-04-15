@@ -10,8 +10,6 @@ void *gl_memmove(void *dst, const void *src, uint64_t size);
 void *gl_memcpy(void *dst, const void *src, size_t size);
 void *gl_realloc(void *ptr, size_t size);
 void *gl_strdup(void *ptr);
-#if GHOSTLAB_TUI || GHOSTLAB_GUI
 void gl_memory_check_for_leaks();
-#endif
 
 #endif /* GHOSTLAB_MEMORY_H */
