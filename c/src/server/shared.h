@@ -7,6 +7,7 @@ struct gl_message_t;
 
 extern const char g_help[];
 extern bool g_quit;
+extern bool g_legacy_protocol;
 extern int32_t g_server_socket;
 extern int32_t *g_client_sockets;
 extern void *g_thread_tcp;

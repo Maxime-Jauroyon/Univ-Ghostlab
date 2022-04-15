@@ -2,9 +2,11 @@
 #include <string.h>
 #include <stdlib.h>
 #include <common/log.h>
+#if GHOSTLAB_TUI || GHOSTLAB_GUI
 #include "cimtui/cimtui.h"
 #include "cimgui/cimgui.h"
 #include "gui.h"
+#endif
 
 static uint64_t g_allocated_ptrs = 0;
 
@@ -89,6 +91,7 @@ void *gl_strdup(void *ptr) {
     return new_ptr;
 }
 
+#if GHOSTLAB_TUI || GHOSTLAB_GUI
 void gl_memory_check_for_leaks() {
     bool quit = g_allocated_ptrs == 0;
     
@@ -122,3 +125,4 @@ void gl_memory_check_for_leaks() {
         gl_gui_end_render();
     }
 }
+#endif

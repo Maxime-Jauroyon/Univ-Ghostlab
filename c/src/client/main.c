@@ -30,13 +30,14 @@ int main(int argc, char **argv) {
         { "port", required_argument, 0, 'p' },
         { "name", required_argument, 0, 'n' },
         { "udp-port", required_argument, 0, 'u' },
+        { "legacy-protocol", required_argument, 0, 'l' },
         { "help", no_argument, 0, 'h' },
         { "version", no_argument, 0, 'v' },
         {0, 0, 0, 0}
     };
     int32_t used_unknown_opt = 0;
     int32_t opt;
-    while ((opt = getopt_long(argc, argv, "i:p:n:u:hv", opts, 0)) != -1) {
+    while ((opt = getopt_long(argc, argv, "i:p:n:u:lhv", opts, 0)) != -1) {
         switch (opt) {
         case 'i':
             // TODO: Check if ip is valid, if invalid use default
@@ -53,6 +54,9 @@ int main(int argc, char **argv) {
         case 'u':
             // TODO: Check if port is valid, if invalid use default
             g_udp_port = gl_strdup(optarg);
+            break;
+        case 'l':
+            g_legacy_protocol = true;
             break;
         case 'h':
             gl_log_push("%s", g_help);
@@ -96,14 +100,15 @@ int main(int argc, char **argv) {
         goto error;
     }
     
-    // MULTI
-    gl_message_wait_and_execute(g_server_tcp_socket, GL_MESSAGE_PROTOCOL_TCP);
+    if (!g_legacy_protocol) {
+        // MULTI
+        gl_message_wait_and_execute(g_server_tcp_socket, GL_MESSAGE_PROTOCOL_TCP);
+        g_multicast_server_thread = gl_malloc(sizeof(pthread_t));
+        pthread_create(g_multicast_server_thread, 0, gl_thread_multicast_server_main, 0);
+    }
     
     // GAMES
     gl_message_wait_and_execute(g_server_tcp_socket, GL_MESSAGE_PROTOCOL_TCP);
-    
-    g_multicast_server_thread = gl_malloc(sizeof(pthread_t));
-    pthread_create(g_multicast_server_thread, 0, gl_thread_multicast_server_main, 0);
     
     g_udp_thread = gl_malloc(sizeof(pthread_t));
     pthread_create(g_udp_thread, 0, gl_thread_udp_main, 0);
@@ -125,7 +130,8 @@ int main(int argc, char **argv) {
         pthread_join(*(pthread_t *)g_udp_thread, 0);
         gl_free(g_udp_thread);
     }
-    if (g_multicast_server_thread) {
+    
+    if (!g_legacy_protocol && g_multicast_server_thread) {
         gl_socket_close(&g_multicast_server_socket);
         pthread_join(*(pthread_t *)g_multicast_server_thread, 0);
         gl_free(g_multicast_server_thread);
@@ -134,17 +140,20 @@ int main(int argc, char **argv) {
     if (g_server_tcp_socket != -1) {
         gl_socket_close(&g_server_tcp_socket);
     }
-
+    
+    if (g_server_down) {
+        draw_server_down_popup();
+    }
+    
     gl_free(g_server_ip);
     gl_free(g_server_port);
     gl_free(g_player_id);
     gl_free(g_udp_port);
-
+    gl_free(g_multicast_ip);
+    gl_free(g_multicast_port);
+    
+    
     gl_logs_free();
-
-    if (g_server_down) {
-        draw_server_down_popup();
-    }
     
     gl_memory_check_for_leaks();
 

@@ -10,10 +10,12 @@ const char g_help[] =
     "\t-p, --port <server port>         defines the port to connect to (" GHOSTLAB_DEFAULT_SERVER_PORT " by default).\n"
     "\t-n, --name <player name>         defines the name to use when connected to a match (will be asked later if not provided).\n"
     "\t-u, --udp-port,  <client port>   defines the udp port to use to communicate with other players (" GHOSTLAB_DEFAULT_UDP_PORT " used by default).\n"
+    "\t-l, --legacy-protocol            sets the protocol version to legacy (the program will not run any extensions).\n"
     "\t-h, --help                       displays this help message and exits.\n"
     "\t-v, --version                    displays the program's version and exits.\n";
 bool g_quit = false;
 bool g_server_down = false;
+bool g_legacy_protocol = false;
 char *g_server_ip = 0;
 char *g_server_port = 0;
 char *g_player_id = 0;

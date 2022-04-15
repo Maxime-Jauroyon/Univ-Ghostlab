@@ -34,8 +34,11 @@ typedef struct gl_array_header_t {
     uint64_t size;
 } gl_array_header_t;
 
+// Initialies an array with a specific size.
+#define gl_array_create(t, n) internal_gl_array_create(0, n, sizeof(t))
+
 // Initialies an array from a C array pointer.
-#define gl_array_create_from_carray(ptr, n) internal_gl_array_create_from_carray(ptr, n, sizeof(*(ptr)))
+#define gl_array_create_from_carray(ptr, n) internal_gl_array_create(ptr, n, sizeof(*(ptr)))
 
 // Returns the header of the array.
 #define gl_array_get_header(a) ((gl_array_header_t *)((uint8_t *)(a) - sizeof(gl_array_header_t)))
@@ -72,7 +75,7 @@ typedef struct gl_array_header_t {
 #define gl_array_pop(array) ((array)[--gl_array_get_header(array)->size])
 
 // Removes the item at the given index of the array.
-#define gl_array_remove(a, i) (gl_array_get_size(a) > (i) ? (gl_array_get_size(a) - 1 == (i) ? gl_array_pop(a) : gl_memmove((a) + (i), (a) + (i) + 1, ((gl_array_get_size(a) - (i) - 1) * sizeof(*(a)))), --gl_array_get_header(a)->size) : 0)
+#define gl_array_remove(a, i) (gl_memmove((a) + (i), (a) + (i) + 1, (gl_array_get_size(a) - (i) - 1) * sizeof(*(a))), (--gl_array_get_header(a)->size), (void *)0)
 
 // Frees the data of an array (must be called to deallocated memory).
 #define gl_array_free(a) (internal_gl_array_free((void *)(a)), (*(void **)&(a)) = 0)
@@ -87,7 +90,7 @@ void *internal_gl_array_grow(void *array, uint64_t to_at_least, uint64_t item_si
 
 // Internal function.
 // Initializes an array from a C array pointer.
-void *internal_gl_array_create_from_carray(const void *ptr, uint64_t size, uint64_t item_size);
+void *internal_gl_array_create(const void *ptr, uint64_t size, uint64_t item_size);
 
 // Internal function.
 // Frees data of the array.

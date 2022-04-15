@@ -860,7 +860,13 @@ int32_t gl_message_recv(int32_t fd, struct gl_message_t *dst, gl_message_protoco
     }
     total_size += 2;
     
-    gl_log_push("received: ");
+    if (protocol == GL_MESSAGE_PROTOCOL_UDP) {
+        gl_log_push("udp: received: ");
+    } else {
+        gl_log_push("tcp: received: ");
+    }
+    // TODO: Add multicast?
+    
     gl_message_printf(dst);
     
     return total_size;

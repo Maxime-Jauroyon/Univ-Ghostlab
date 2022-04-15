@@ -6,6 +6,7 @@
 extern const char g_help[];
 extern bool g_quit;
 extern bool g_server_down;
+extern bool g_legacy_protocol;
 extern char *g_server_ip;
 extern char *g_server_port;
 extern char *g_player_id;

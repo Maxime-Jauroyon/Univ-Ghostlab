@@ -32,13 +32,14 @@ int main(int argc, char **argv) {
         { "port", required_argument, 0, 'p' },
         { "multi-ip", required_argument, 0, 'I' },
         { "multi-port", required_argument, 0, 'P' },
+        { "legacy-protocol", required_argument, 0, 'l' },
         { "help", no_argument, 0, 'h' },
         { "version", no_argument, 0, 'v' },
         {0, 0, 0, 0}
     };
     int32_t used_unknown_opt = 0;
     int32_t opt;
-    while ((opt = getopt_long(argc, argv, "i:p:I:P:hv", opts, 0)) != -1) {
+    while ((opt = getopt_long(argc, argv, "i:p:I:P:lhv", opts, 0)) != -1) {
         switch (opt) {
         case 'i':
             // TODO: Check if ip is valid, if invalid use default
@@ -55,6 +56,9 @@ int main(int argc, char **argv) {
         case 'P':
             // TODO: Check if port is valid, if invalid use default
             g_multicast_port = gl_strdup(optarg);
+            break;
+        case 'l':
+            g_legacy_protocol = true;
             break;
         case 'h':
             gl_log_push("%s", g_help);
@@ -109,10 +113,10 @@ int main(int argc, char **argv) {
     g_exit_code = -1;
 
     cleanup:
-    gl_log_push("shutting down...\n");
-
-    gl_message_t msg = {.type = GL_MESSAGE_TYPE_SHUTD, 0};
-    gl_message_send_multicast(g_multicast_ip, g_multicast_port, &msg);
+    if (!g_legacy_protocol) {
+        gl_message_t msg = {.type = GL_MESSAGE_TYPE_SHUTD, 0};
+        gl_message_send_multicast(g_multicast_ip, g_multicast_port, &msg);
+    }
 
     gl_socket_close(&g_server_socket);
 
