@@ -96,7 +96,14 @@ uint8_t **gl_grid_create(uint8_t width, uint8_t height, uint8_t num_colors_per_l
     return grid;
 }
 
-void gl_maze_generate_from_grid(uint8_t **grid) {
+void gl_maze_generate_from_grid_with_seed(uint8_t **grid, uint64_t seed) {
+#ifdef __APPLE__
+    printf("seed: %llu\n\n", seed);
+#else
+    printf("seed: %lu\n\n", seed);
+#endif
+    srand(seed);
+    
     if (!grid) {
         return;
     }
@@ -233,6 +240,10 @@ void gl_maze_generate_from_grid(uint8_t **grid) {
     }
 }
 
+void gl_maze_generate_from_grid(uint8_t **grid) {
+    gl_maze_generate_from_grid_with_seed(grid, time(0));
+}
+
 void gl_maze_free(uint8_t **grid) {
     for (uint32_t y = 0; y < gl_array_get_size(grid); y++) {
         gl_array_free(grid[y]);
@@ -241,8 +252,6 @@ void gl_maze_free(uint8_t **grid) {
 }
 
 int main() {
-    srand(time(0));
-    
     printf("1. create grid:\n\n");
     uint8_t **grid = gl_grid_create(3, 3, 2, 2, 0,
                                     (gl_maze_element_t[]) {GL_MAZE_ELEMENT_PILLAR, GL_MAZE_ELEMENT_WALL_CLOSED,

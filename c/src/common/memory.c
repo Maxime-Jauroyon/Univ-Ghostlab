@@ -104,7 +104,11 @@ void gl_memory_check_for_leaks() {
         
         if (igBeginPopupModal("Memory Leaks Detected###Leaks", 0, ImGuiWindowFlags_AlwaysAutoResize)) {
             igText(" ");
+#ifdef __APPLE__
+            igText("At least %llu memory leaks detected!    ", g_allocated_ptrs);
+#else
             igText("At least %lu memory leaks detected!    ", g_allocated_ptrs);
+#endif
             igText(" ");
             igText("You should inspect your code:");
             igText("- Through a debugger.");
@@ -128,7 +132,11 @@ void gl_memory_check_for_leaks() {
     }
 #else
     if (g_allocated_ptrs > 0) {
+#ifdef __APPLE__
+        printf("At least %llu memory leaks detected!    ", g_allocated_ptrs);
+#else
         printf("At least %lu memory leaks detected!    ", g_allocated_ptrs);
+#endif
     }
 #endif
 }
