@@ -21,8 +21,8 @@ typedef struct gl_pos_t {
 } gl_pos_t;
 
 uint8_t **gl_grid_create(uint8_t width, uint8_t height, uint8_t num_colors_per_line, uint8_t num_distinc_lines, uint8_t num_shift_per_line, const gl_maze_element_t* elements_per_color) {
-    printf("grid width = 2 * %d + 1 = %d\n", width, 2 * width + 1);
-    printf("grid height = 2 * %d + 1 = %d\n", height, 2 * height + 1);
+    printf("grid width = 2 * width + 1 = 2 * %d + 1 = %d\n", width, 2 * width + 1);
+    printf("grid height = 2 * height + 1 = 2 * %d + 1 = %d\n", height, 2 * height + 1);
     printf("num colors per line: %d\n", num_colors_per_line);
     printf("num distinct lines: %d\n", num_distinc_lines);
     printf("num shifting after end of line: %d\n", num_shift_per_line);
