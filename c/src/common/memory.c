@@ -127,6 +127,8 @@ void gl_memory_check_for_leaks() {
         gl_gui_end_render();
     }
 #else
-    printf("At least %lu memory leaks detected!    ", g_allocated_ptrs);
+    if (g_allocated_ptrs > 0) {
+        printf("At least %lu memory leaks detected!    ", g_allocated_ptrs);
+    }
 #endif
 }
