@@ -51,11 +51,9 @@ uint8_t **gl_grid_create(uint8_t width, uint8_t height, uint8_t num_colors_per_l
     }
     
     uint8_t **grid = gl_array_create(uint8_t*, height);
-    
-    for (uint32_t y = 0; y < width; y++) {
+    for (uint32_t y = 0; y < height; y++) {
         grid[y] = gl_array_create(uint8_t, width);
-        
-        for (uint32_t x = 0; x < height; x++) {
+        for (uint32_t x = 0; x < width; x++) {
             grid[y][x] = ((x + y * (num_shift_per_line)) % num_colors_per_line) + num_colors_per_line * (y % num_distinc_lines);
         }
     }
@@ -117,8 +115,8 @@ void gl_maze_generate_from_grid_with_seed(uint8_t **grid, uint64_t seed) {
     
     gl_pos_t initial_pos;
     do {
-        initial_pos.x = rand() % height;
-        initial_pos.y = rand() % width;
+        initial_pos.x = rand() % width;
+        initial_pos.y = rand() % height;
     } while (grid[initial_pos.y][initial_pos.x] != GL_MAZE_ELEMENT_ROOM);
     
     gl_pos_t *path = 0;
@@ -253,7 +251,7 @@ void gl_maze_free(uint8_t **grid) {
 
 int main() {
     printf("1. create grid:\n\n");
-    uint8_t **grid = gl_grid_create(3, 3, 2, 2, 0,
+    uint8_t **grid = gl_grid_create(6, 3, 2, 2, 0,
                                     (gl_maze_element_t[]) {GL_MAZE_ELEMENT_PILLAR, GL_MAZE_ELEMENT_WALL_CLOSED,
                                                            GL_MAZE_ELEMENT_WALL_CLOSED, GL_MAZE_ELEMENT_ROOM});
     printf("2. generate:\n\n");
