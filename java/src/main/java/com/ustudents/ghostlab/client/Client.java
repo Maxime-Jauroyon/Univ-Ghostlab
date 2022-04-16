@@ -154,6 +154,7 @@ public class Client extends Application {
     @Override
     protected void renderImGui() {
         ImGui.text("Hello, World!");
+        ImGui.showDemoWindow();
     }
 
     @Override
