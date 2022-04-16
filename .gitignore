@@ -3,3 +3,5 @@ cmake-*/
 .idea/
 out
 school-uni-pr6.iml
+.gradle/
+build/
