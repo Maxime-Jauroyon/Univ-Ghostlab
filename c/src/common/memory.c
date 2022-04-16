@@ -2,6 +2,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <common/log.h>
+#include <printf.h>
+
 #if GHOSTLAB_TUI || GHOSTLAB_GUI
 #include "cimtui/cimtui.h"
 #include "cimgui/cimgui.h"

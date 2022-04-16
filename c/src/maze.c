@@ -19,7 +19,7 @@ typedef struct gl_pos_t {
 } gl_pos_t;
 
 uint8_t **grid_create(uint8_t width, uint8_t height, uint8_t num_colors_per_line, uint8_t num_distinc_lines, uint8_t num_shift_per_line, uint8_t *num_colors) {
-    if (width == 0 || height == 0 || num_colors_per_line == 0 || num_distinc_lines == 0) {
+    if (width < 5 || height < 5 || num_colors_per_line == 0 || num_distinc_lines == 0) {
         return 0;
     }
     
@@ -194,8 +194,10 @@ uint8_t **create_maze(uint8_t **grid, gl_maze_element_t* elements_per_color, uin
 int main() {
     srand(time(0));
     
-    uint8_t width = 10;
-    uint8_t height = 10;
+    uint8_t width = 5;
+    uint8_t height = 5;
+    width = 2 * width + 1;
+    height = 2 * height + 1;
     gl_maze_element_t elements[4] = { GL_MAZE_ELEMENT_PILLAR, GL_MAZE_ELEMENT_WALL_CLOSED, GL_MAZE_ELEMENT_WALL_CLOSED, GL_MAZE_ELEMENT_ROOM };
     uint8_t num_colors;
     uint8_t **grid = grid_create(width, height, 2, 2, 0, &num_colors);
@@ -203,8 +205,12 @@ int main() {
     
     for (uint32_t y = 0; y < width; y++) {
         for (uint32_t x = 0; x < height; x++) {
-            if (grid[y][x] == GL_MAZE_ELEMENT_WALL_CLOSED || grid[y][x] == GL_MAZE_ELEMENT_PILLAR) {
+            if (grid[y][x] == GL_MAZE_ELEMENT_PILLAR) {
                 printf("#");
+            } else if (grid[y][x] == GL_MAZE_ELEMENT_WALL_CLOSED) {
+                printf("C");
+            } else if (grid[y][x] == GL_MAZE_ELEMENT_WALL_OPENED) {
+                printf("O");
             } else {
                 printf(".");
             }
