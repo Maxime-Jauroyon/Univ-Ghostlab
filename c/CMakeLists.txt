@@ -140,5 +140,6 @@ target_link_libraries(client_gui PRIVATE ${DEPS_LIBS} ${DEPS_GUI_LIBS})
 target_include_directories(client_gui PRIVATE ${INCLUDE_DIRS} ${DEPS_GUI_INCLUDE_DIRS})
 target_compile_definitions(client_gui PRIVATE ${CLIENT_DEFINITIONS} ${DEPS_GUI_DEFINITIONS})
 
-add_executable(maze src/maze.c src/common/array.c src/common/array.h src/common/log.c src/common/log.h src/common/memory.c src/common/memory.h)
+add_executable(maze src/test/maze.c ${COMMON_SRC})
 target_include_directories(maze PRIVATE ${INCLUDE_DIRS})
+target_compile_definitions(maze PRIVATE GHOSTLAB_EXECUTABLE_NAME="maze")

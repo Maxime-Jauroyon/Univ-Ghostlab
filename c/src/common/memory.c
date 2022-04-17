@@ -42,7 +42,6 @@ void gl_free(void *ptr) {
         g_allocated_ptrs--;
         free(ptr);
     }
-    
 }
 
 void *gl_memmove(void *dst, const void *src, uint64_t size) {
@@ -59,7 +58,9 @@ void *gl_memcpy(void *dst, const void *src, size_t size) {
     void *ptr = memcpy(dst, src, size);
     
     if (ptr) {
-        g_allocated_ptrs++;
+        if (!dst) {
+            g_allocated_ptrs++;
+        }
     } else {
         gl_log_push_error("couldn't copy memory!\n");
     }

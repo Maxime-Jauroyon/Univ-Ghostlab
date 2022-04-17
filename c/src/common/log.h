@@ -28,7 +28,7 @@ void gl_log_push_error(const char *format, ...);
 
 void gl_log_push_user(const char *format, ...);
 
-void gl_logs_free();
+void gl_log_free();
 
 bool gl_log_should_scroll();
 

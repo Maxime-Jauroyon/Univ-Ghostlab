@@ -12,7 +12,7 @@ static pthread_mutex_t g_print_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void gl_log_vpush(const char *format, gl_log_type_t type, va_list args) {
     pthread_mutex_lock(&g_print_mutex);
-
+    
     if (!g_is_newline) {
         char buf[512] = { 0 };
         vsprintf(buf, format, args);
@@ -37,7 +37,7 @@ void gl_log_vpush(const char *format, gl_log_type_t type, va_list args) {
     }
     
     if (strcmp(format + strlen(format) - 1, "\n") == 0) {
-#if GHOSTLAB_GUI
+#if !GHOSTLAB_TUI
         printf("%s", gl_array_get_last(g_logs)->data);
 #endif
         g_is_newline = true;
@@ -85,7 +85,7 @@ void gl_log_push_user(const char *format, ...) {
     va_end(args);
 }
 
-void gl_logs_free() {
+void gl_log_free() {
     if (g_logs) {
         for (uint32_t i = 0; i < gl_array_get_size(g_logs); i++) {
             gl_free(g_logs[i]);

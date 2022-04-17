@@ -181,7 +181,7 @@ void gl_igConsole(const struct gl_command_definition_t **cmd_defs, uint32_t cmd_
     if (igBeginMenuBar()) {
         if (igBeginMenu("Options", true)) {
             if (igMenuItemBool("Clear", 0, false, true)) {
-                gl_logs_free();
+                gl_log_free();
             }
             
             igMenuItemBoolPtr("Show Info ", 0, &g_console_show_info, true);

@@ -11,10 +11,18 @@
 #include <stddef.h>
 
 // The name of the currently built executable (used for logging purposes).
-#ifdef GHOSTLAB_CLIENT
+#if GHOSTLAB_CLIENT
+#ifndef GHOSTLAB_EXECUTABLE_NAME
 #define GHOSTLAB_EXECUTABLE_NAME "client"
-#else
+#endif
+#elif GHOSTLAB_SERVER
+#ifndef GHOSTLAB_EXECUTABLE_NAME
 #define GHOSTLAB_EXECUTABLE_NAME "server"
+#endif
+#else
+#ifndef GHOSTLAB_EXECUTABLE_NAME
+#define GHOSTLAB_EXECUTABLE_NAME "app"
+#endif
 #endif
 #define GHOSTLAB_VERSION "1.0.0"
 #define GHOSTLAB_DEFAULT_SERVER_IP "127.0.0.1"

@@ -129,8 +129,8 @@ int main(int argc, char **argv) {
     gl_free(g_server_port);
     gl_free(g_multicast_ip);
     gl_free(g_multicast_port);
-
-    gl_logs_free();
+    
+    gl_log_free();
 
     gl_memory_check_for_leaks();
 
