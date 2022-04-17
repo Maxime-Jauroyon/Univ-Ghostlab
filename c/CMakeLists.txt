@@ -139,7 +139,3 @@ add_executable(client_gui ${CLIENT_SRC} ${COMMON_SRC} ${DEPS_SRC} ${DEPS_GUI_SRC
 target_link_libraries(client_gui PRIVATE ${DEPS_LIBS} ${DEPS_GUI_LIBS})
 target_include_directories(client_gui PRIVATE ${INCLUDE_DIRS} ${DEPS_GUI_INCLUDE_DIRS})
 target_compile_definitions(client_gui PRIVATE ${CLIENT_DEFINITIONS} ${DEPS_GUI_DEFINITIONS})
-
-add_executable(maze src/test/maze.c ${COMMON_SRC})
-target_include_directories(maze PRIVATE ${INCLUDE_DIRS})
-target_compile_definitions(maze PRIVATE GHOSTLAB_EXECUTABLE_NAME="maze")
