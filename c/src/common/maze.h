@@ -16,7 +16,7 @@ typedef struct gl_maze_t {
     gl_maze_element_t **grid;
 } gl_maze_t;
 
-gl_maze_t *gl_maze_create(uint8_t base_width, uint8_t base_height, uint8_t num_ghosts);
+gl_maze_t *gl_maze_create(uint8_t base_width, uint8_t base_height);
 
 void gl_maze_free(gl_maze_t *maze);
 

@@ -5,7 +5,7 @@
 #include "array.h"
 #include "memory.h"
 
-gl_maze_t *gl_maze_create(uint8_t base_width, uint8_t base_height, uint8_t num_ghosts) {
+gl_maze_t *gl_maze_create(uint8_t base_width, uint8_t base_height) {
     uint8_t width = 2 * base_width + 1;
     uint8_t height = 2 * base_height + 1;
     uint8_t color_scheme[2][2] = {

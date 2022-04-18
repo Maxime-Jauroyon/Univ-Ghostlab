@@ -154,6 +154,12 @@ int main(int argc, char **argv) {
     }
 
     if (g_server_tcp_socket) {
+        if (g_current_game_id != -1) {
+            gl_message_t msg = {.type = GL_MESSAGE_TYPE_UNREG, .parameters_value = 0};
+            gl_message_send_tcp(g_server_tcp_socket, &msg);
+            gl_message_wait_and_execute(g_server_tcp_socket, GL_MESSAGE_PROTOCOL_TCP);
+        }
+        
         gl_message_t msg = {.type = GL_MESSAGE_TYPE_IQUIT, .parameters_value = 0};
         gl_message_send_tcp(g_server_tcp_socket, &msg);
         gl_message_wait_and_execute(g_server_tcp_socket, GL_MESSAGE_PROTOCOL_TCP);
@@ -234,9 +240,16 @@ static void draw_main_gui() {
             }
             igSameLine(0, -1);
             if (igButton("Disconnect", (ImVec2) { 0, 0 })) {
-                gl_message_t msg = { .type = GL_MESSAGE_TYPE_IQUIT, .parameters_value = 0 };
-                gl_message_send_tcp(g_server_tcp_socket, &msg);
-                gl_message_wait_and_execute(g_server_tcp_socket, GL_MESSAGE_PROTOCOL_TCP);
+                {
+                    gl_message_t msg = {.type = GL_MESSAGE_TYPE_UNREG, .parameters_value = 0};
+                    gl_message_send_tcp(g_server_tcp_socket, &msg);
+                    gl_message_wait_and_execute(g_server_tcp_socket, GL_MESSAGE_PROTOCOL_TCP);
+                }
+                {
+                    gl_message_t msg = { .type = GL_MESSAGE_TYPE_GAME_REQ, .parameters_value = 0 };
+                    gl_message_send_tcp(g_server_tcp_socket, &msg);
+                    gl_message_wait_and_execute(g_server_tcp_socket, GL_MESSAGE_PROTOCOL_TCP);
+                }
             }
             igSameLine(0, -1);
             if (igButton("Quit", (ImVec2) { 0, 0 })) {
@@ -314,6 +327,7 @@ static void draw_join_game_popup(bool create) {
             if (join_game_error == 1) {
                 igText("Your name must be made with 8 characters in the range [a-zA-Z0-9].");
             } else {
+                // TODO: Add custom message to know precisely the error?
                 igText("This name is already used or the game is not accessible anymore!");
             }
         }

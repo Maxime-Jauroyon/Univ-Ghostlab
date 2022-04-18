@@ -67,13 +67,33 @@ void message_game_req(gl_message_t *msg, int32_t socket_id, void *user_data) {
     }
 }
 
-void message_iquit(gl_message_t *msg, int32_t socket_id, void *user_data) {
-    gl_message_t new_msg = {.type = GL_MESSAGE_TYPE_GOBYE, 0};
-    gl_message_send_tcp(socket_id, &new_msg);
+void message_start(gl_message_t *msg, int32_t socket_id, void *user_data) {
+    gl_player_t *player = gl_game_find_player_with_socket(g_games, socket_id);
+    player->ready = true;
+    
+    gl_game_t *game = gl_game_find_game_with_socket(g_games, socket_id);
+    bool all_ready = true;
+    for (uint32_t i = 0; i < gl_array_get_size(game->players); i++) {
+        if (!game->players[i].ready) {
+            all_ready = false;
+            break;
+        }
+    }
+    
+    if (all_ready) {
+        game->maze = gl_maze_create(7 + 1 * gl_array_get_size(game->players), 7 + 1 * gl_array_get_size(game->players));
+        game->ghosts = gl_game_generate_ghosts(game->maze, gl_array_get_size(game->players));
+        game->started = true;
+    }
+}
+
+void message_unreg(gl_message_t *msg, int32_t socket_id, void *user_data) {
     bool found = false;
+    uint32_t game_id;
     for (uint32_t i = 0; i < gl_array_get_size(g_games); i++) {
         for (uint32_t j = 0; j < gl_array_get_size(g_games[i].players); j++) {
             if (g_games[i].players[j].socket_id == socket_id) {
+                game_id = g_games[i].id;
                 found = true;
                 gl_array_remove(g_games[i].players, j);
                 if (gl_array_get_size(g_games[i].players) == 0) {
@@ -89,6 +109,20 @@ void message_iquit(gl_message_t *msg, int32_t socket_id, void *user_data) {
             break;
         }
     }
+    
+    if (found) {
+        gl_message_t new_msg = {.type = GL_MESSAGE_TYPE_UNROK, 0};
+        gl_message_push_parameter(&new_msg, (gl_message_parameter_t) {.uint8_value = game_id });
+        gl_message_send_tcp(socket_id, &new_msg);
+    } else {
+        gl_message_t new_msg = {.type = GL_MESSAGE_TYPE_DUNNO, 0};
+        gl_message_send_tcp(socket_id, &new_msg);
+    }
+}
+
+void message_iquit(gl_message_t *msg, int32_t socket_id, void *user_data) {
+    gl_message_t new_msg = {.type = GL_MESSAGE_TYPE_GOBYE, 0};
+    gl_message_send_tcp(socket_id, &new_msg);
     gl_socket_close(&socket_id);
 }
 
@@ -109,10 +143,11 @@ void message_shutd(gl_message_t *msg, int32_t socket_id, void *user_data) {
 }
 
 void gl_message_add_functions() {
-    // TODO: START
     gl_message_definitions()[GL_MESSAGE_TYPE_NEWPL]->function = message_newpl;
     gl_message_definitions()[GL_MESSAGE_TYPE_REGIS]->function = message_regis;
     gl_message_definitions()[GL_MESSAGE_TYPE_GAME_REQ]->function = message_game_req;
+    gl_message_definitions()[GL_MESSAGE_TYPE_START]->function = message_start;
+    gl_message_definitions()[GL_MESSAGE_TYPE_UNREG]->function = message_unreg;
     gl_message_definitions()[GL_MESSAGE_TYPE_IQUIT]->function = message_iquit;
     gl_message_definitions()[GL_MESSAGE_TYPE_MULTI]->function = message_multi;
     gl_message_definitions()[GL_MESSAGE_TYPE_SHUTD]->function = message_shutd;

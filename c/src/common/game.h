@@ -11,6 +11,7 @@ typedef struct gl_player_t {
     uint8_t score;
     gl_pos_t pos;
     int32_t socket_id;
+    bool ready;
 } gl_player_t;
 
 typedef struct gl_ghost_t {
@@ -23,7 +24,12 @@ typedef struct gl_game_t {
     gl_player_t *players;
     gl_ghost_t *ghosts;
     struct gl_maze_t *maze;
+    bool started;
 } gl_game_t;
+
+gl_player_t *gl_game_find_player_with_socket(gl_game_t *games, int32_t socket_id);
+
+gl_game_t *gl_game_find_game_with_socket(gl_game_t *games, int32_t socket_id);
 
 gl_ghost_t *gl_game_generate_ghosts(struct gl_maze_t *maze, uint8_t num_ghosts);
 
