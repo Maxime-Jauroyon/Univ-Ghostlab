@@ -31,7 +31,7 @@ static bool g_show_console = true;
 static bool g_join_game_popup = false;
 static bool g_create_game_popup = false;
 static char join_game_player_id_buf[9] = {0 };
-static bool join_game_error = false;
+static uint32_t join_game_error = 0;
 static uint8_t join_game_id = 0;
 
 int main(int argc, char **argv) {
@@ -255,14 +255,20 @@ static void draw_main_gui() {
 static void draw_join_game_popup(bool create) {
     igOpenPopup("###Game", 0);
     
-    if (igBeginPopupModal(create ? "Create Game###Game" : "Join Game###Game", 0, ImGuiWindowFlags_AlwaysAutoResize)) {
+    char buf[512];
+    if (!create) {
+        sprintf(buf, "Join Game %d###Game", join_game_id);
+    } else {
+        sprintf(buf, "Create Game###Game");
+    }
+    if (igBeginPopupModal(buf, 0, ImGuiWindowFlags_AlwaysAutoResize)) {
         igText(" ");
         igInputText("Choose a name.", join_game_player_id_buf, 9, 0, 0, 0);
         igText(" ");
         if (igButton("Back", (ImVec2) { 0, 0 })) {
             g_join_game_popup = false;
             g_create_game_popup = false;
-            join_game_error = false;
+            join_game_error = 0;
         }
         igSameLine(0, -1);
         if (igButton(create ? "Create" : "Join", (ImVec2) { 0, 0 })) {
@@ -290,18 +296,26 @@ static void draw_join_game_popup(bool create) {
                     gl_message_push_parameter(&msg, (gl_message_parameter_t) {.uint8_value = join_game_id });
                 }
                 gl_message_send_tcp(g_server_tcp_socket, &msg);
-                g_join_game_popup = false;
-                g_create_game_popup = false;
-                bzero(join_game_player_id_buf, 9);
                 gl_message_wait_and_execute_no_lock(g_server_tcp_socket, GL_MESSAGE_PROTOCOL_TCP);
+                if (g_current_game_id != -1) {
+                    g_join_game_popup = false;
+                    g_create_game_popup = false;
+                    bzero(join_game_player_id_buf, 9);
+                } else {
+                    join_game_error = 2;
+                }
             } else {
-                join_game_error = true;
+                join_game_error = 1;
             }
         }
         igText(" ");
         if (join_game_error) {
             igText("Error:");
-            igText("Your name must be made with 8 characters in the range [a-zA-Z0-9].");
+            if (join_game_error == 1) {
+                igText("Your name must be made with 8 characters in the range [a-zA-Z0-9].");
+            } else {
+                igText("This name is already used or the game is not accessible anymore!");
+            }
         }
         igText(" ");
         

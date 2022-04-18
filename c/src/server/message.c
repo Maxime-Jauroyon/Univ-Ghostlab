@@ -40,6 +40,13 @@ void message_regis(gl_message_t *msg, int32_t socket_id, void *user_data) {
     memcpy(player.id, msg->parameters_value[0].string_value, 8);
     memcpy(player.port, msg->parameters_value[1].string_value, 4);
     player.socket_id = socket_id;
+    for (uint32_t i = 0; i < gl_array_get_size(g_games[game_id].players); i++) {
+        if (strcmp(g_games[game_id].players[i].id, player.id) == 0) {
+            gl_message_t new_msg = {.type = GL_MESSAGE_TYPE_REGNO, 0};
+            gl_message_send_tcp(socket_id, &new_msg);
+            return;
+        }
+    }
     gl_array_push(g_games[game_id].players, player);
     gl_message_t new_msg = {.type = GL_MESSAGE_TYPE_REGOK, 0};
     gl_message_push_parameter(&new_msg, (gl_message_parameter_t) {.uint8_value = game_id});

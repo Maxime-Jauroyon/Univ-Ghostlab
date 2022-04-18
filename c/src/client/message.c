@@ -34,6 +34,7 @@ void message_regok(gl_message_t *msg, int32_t socket_id, void *user_data) {
 
 void message_regno(gl_message_t *msg, int32_t socket_id, void *user_data) {
     gl_log_push("there was an issue joining the game\n");
+    g_current_game_id = -1;
 }
 
 void message_gobye(gl_message_t *msg, int32_t socket_id, void *user_data) {

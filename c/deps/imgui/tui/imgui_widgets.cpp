@@ -6873,7 +6873,9 @@ bool ImGui::MenuItem(const char* label, const char* shortcut, bool selected, boo
 
 bool ImGui::MenuItem(const char* label, const char* shortcut, bool* p_selected, bool enabled)
 {
-    if (MenuItem(label, shortcut, p_selected ? *p_selected : false, enabled))
+    char buf[512];
+    sprintf(buf, "%s ", label);
+    if (MenuItem(buf, shortcut, p_selected ? *p_selected : false, enabled))
     {
         if (p_selected)
             *p_selected = !*p_selected;
