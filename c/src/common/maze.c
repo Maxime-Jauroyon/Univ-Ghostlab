@@ -23,12 +23,10 @@ gl_maze_t *gl_maze_create(uint8_t base_width, uint8_t base_height, uint8_t num_g
     gl_log_push("3. generate maze:\n");
     gl_log_push("\n");
     gl_maze_generate_from_grid(maze_grid, gl_initial_room_random, gl_wall_random);
-    gl_ghost_t *ghosts = gl_maze_generate_ghosts(maze_grid, num_ghosts);
-    
+
     gl_maze_t *maze = gl_malloc(sizeof(*maze));
     maze->grid = maze_grid;
-    maze->ghosts = ghosts;
-    
+  
     return maze;
 }
 
@@ -37,7 +35,6 @@ void gl_maze_free(gl_maze_t *maze) {
         gl_array_free(maze->grid[y]);
     }
     gl_array_free(maze->grid);
-    gl_array_free(maze->ghosts);
     
     gl_free(maze);
 }
@@ -301,44 +298,4 @@ gl_maze_element_t **gl_maze_generate_from_grid_with_seed(gl_maze_element_t **maz
 
 gl_maze_element_t **gl_maze_generate_from_grid(gl_maze_element_t **maze, gl_pos_t (* initial_room_comparator)(gl_maze_element_t **, uint8_t, uint8_t), uint32_t ( *wall_comparator)(gl_pos_t *, uint32_t)) {
     return gl_maze_generate_from_grid_with_seed(maze, time(0), initial_room_comparator, wall_comparator);
-}
-
-gl_ghost_t *gl_maze_generate_ghosts(gl_maze_element_t **maze, uint8_t num_ghosts) {
-    gl_ghost_t *ghosts = 0;
-    
-    uint32_t i = 0;
-    while (gl_array_get_size(ghosts) < num_ghosts) {
-        gl_pos_t pos;
-    
-        uint32_t j = 0;
-        do {
-            pos.x = rand() % gl_array_get_size(maze[0]);
-            pos.y = rand() % gl_array_get_size(maze);
-            
-            if (j++ >= 100) {
-                break;
-            }
-        } while (maze[pos.y][pos.x] != GL_MAZE_ELEMENT_ROOM || gl_maze_ghost_is_at_pos(maze, ghosts, pos));
-        
-        if (j < 100) {
-            gl_array_push(ghosts, ((gl_ghost_t) { .pos = pos }));
-        } else if (i++ > 5) {
-            break;
-        }
-    }
-    
-    return ghosts;
-}
-
-bool gl_maze_ghost_is_at_pos(gl_maze_element_t **maze, gl_ghost_t *ghosts, gl_pos_t pos) {
-    bool found = false;
-    
-    for (uint32_t i = 0; i < gl_array_get_size(ghosts); i++) {
-        if (ghosts[i].pos.x == pos.x && ghosts[i].pos.y == pos.y) {
-            found = true;
-            break;
-        }
-    }
-    
-    return found;
 }

@@ -12,7 +12,7 @@
 #include "network.h"
 
 static uint8_t g_max_identifier_size = 0;
-static pthread_mutex_t g_message_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t *g_gameplay_mutex;
 
 static gl_message_parameter_definition_t g_message_parameter_n = {
     .identifier = "n",
@@ -649,6 +649,10 @@ static gl_message_definition_t *g_message_definitions_array[] = {
     [GL_MESSAGE_TYPE_COUNT] = 0
 };
 
+void gl_message_set_mutex(void *mutex) {
+    g_gameplay_mutex = (pthread_mutex_t *)mutex;
+}
+
 uint8_t gl_message_get_max_identifier_size(gl_message_definition_t **msg_defs) {
     if (g_max_identifier_size != 0) {
         return g_max_identifier_size;
@@ -861,11 +865,10 @@ int32_t gl_message_recv(int32_t fd, struct gl_message_t *dst, gl_message_protoco
     total_size += 2;
     
     if (protocol == GL_MESSAGE_PROTOCOL_UDP) {
-        gl_log_push("udp: received: ");
+        gl_log_push("udp: received from %d: ", fd);
     } else {
-        gl_log_push("tcp: received: ");
+        gl_log_push("tcp: received from %d: ", fd);
     }
-    // TODO: Add multicast?
     
     gl_message_printf(dst);
     
@@ -934,26 +937,46 @@ void gl_message_free(struct gl_message_t *msg) {
     }
 }
 
-void gl_message_execute(struct gl_message_t *msg, int32_t socket_id, void *user_data) {
+static void internal_gl_message_execute(struct gl_message_t *msg, int32_t socket_id, void *user_data, bool should_lock) {
     if (gl_message_definitions()[msg->type]->function) {
-        pthread_mutex_lock(&g_message_mutex);
+        if (should_lock) {
+            pthread_mutex_lock(g_gameplay_mutex);
+        }
         gl_message_definitions()[msg->type]->function(msg, socket_id, user_data);
-        pthread_mutex_unlock(&g_message_mutex);
+        if (should_lock) {
+            pthread_mutex_unlock(g_gameplay_mutex);
+        }
     }
 }
 
-int32_t gl_message_wait_and_execute(int32_t socket_id, gl_message_protocol_t protocol) {
+void gl_message_execute(struct gl_message_t *msg, int32_t socket_id, void *user_data) {
+    internal_gl_message_execute(msg, socket_id, user_data, true);
+}
+
+void gl_message_execute_no_lock(struct gl_message_t *msg, int32_t socket_id, void *user_data) {
+    internal_gl_message_execute(msg, socket_id, user_data, false);
+}
+
+int32_t internal_gl_message_wait_and_execute(int32_t socket_id, gl_message_protocol_t protocol, bool should_lock) {
     gl_message_t msg = { 0 };
     int32_t r = gl_message_recv(socket_id, &msg, protocol);
     
     if (r >= 0) {
-        gl_message_execute(&msg, socket_id, 0);
+        internal_gl_message_execute(&msg, socket_id, 0, should_lock);
         gl_message_free(&msg);
     } else {
         return r;
     }
     
     return 0;
+}
+
+int32_t gl_message_wait_and_execute(int32_t socket_id, gl_message_protocol_t protocol) {
+    return internal_gl_message_wait_and_execute(socket_id, protocol, true);
+}
+
+int32_t gl_message_wait_and_execute_no_lock(int32_t socket_id, gl_message_protocol_t protocol) {
+    return internal_gl_message_wait_and_execute(socket_id, protocol, false);
 }
 
 gl_message_parameter_definition_t **gl_message_parameter_definitions() {

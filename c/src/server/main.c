@@ -18,6 +18,9 @@
 #include <netdb.h>
 #include <string.h>
 #include "message.h"
+#include "common/array.h"
+#include "common/game.h"
+#include "common/maze.h"
 
 static void draw_main_gui();
 
@@ -93,7 +96,8 @@ int main(int argc, char **argv) {
     if (!g_multicast_port) {
         g_multicast_port = gl_strdup(GHOSTLAB_DEFAULT_MULTICAST_PORT);
     }
-
+    
+    gl_message_set_mutex(g_gameplay_mutex);
     gl_message_add_functions();
 
     g_thread_tcp = gl_malloc(sizeof(pthread_t));
@@ -113,9 +117,9 @@ int main(int argc, char **argv) {
     g_exit_code = -1;
 
     cleanup:
-    if (!g_legacy_protocol) {
-        gl_message_t msg = {.type = GL_MESSAGE_TYPE_SHUTD, 0};
-        gl_message_send_multicast(g_multicast_ip, g_multicast_port, &msg);
+    {
+        gl_message_t msg = {.type = GL_MESSAGE_TYPE_MULTI, 0};
+        gl_message_execute(&msg, 0, 0);
     }
 
     gl_socket_close(&g_server_socket);
@@ -124,6 +128,13 @@ int main(int argc, char **argv) {
         pthread_join(*(pthread_t *)g_thread_tcp, 0);
         gl_free(g_thread_tcp);
     }
+    
+    for (uint32_t i = 0; i < gl_array_get_size(g_games); i++) {
+        gl_maze_free(g_games[i].maze);
+        gl_array_free(g_games[i].ghosts);
+        gl_array_free(g_games[i].players);
+    }
+    gl_array_free(g_games);
     
     gl_free(g_server_ip);
     gl_free(g_server_port);
@@ -151,16 +162,18 @@ static void draw_main_gui() {
             }
             igEndMenuBar();
         }
-
-        if (igCollapsingHeaderTreeNodeFlags("Informations", 0)) {
-            igText("TCP socket connected:");
-            igText("- IP: 127.0.0.1");
-            igText("- Port: 4750");
-        }
-
-        if (igCollapsingHeaderTreeNodeFlags("Statistics", 0)) {
-            igText("Number of clients connected: 0");
-            igText("Number of matches: 0");
+    
+        if (gl_array_get_size(g_games) > 0) {
+            if (igCollapsingHeaderTreeNodeFlags("Available games", 0)) {
+                for (uint32_t i = 0; i < gl_array_get_size(g_games); i++) {
+                    if (igCollapsingHeaderTreeNodeFlags(g_games[i].name, 0)) {
+                        igText("There are %d player(s) connected%s", gl_array_get_size(g_games[i].players), gl_array_get_size(g_games[i].players) == 0 ? "." : ":");
+                        for (uint32_t j = 0; j <  gl_array_get_size(g_games[i].players); j++) {
+                            igText("- %s", g_games[i].players[j].id);
+                        }
+                    }
+                }
+            }
         }
 
         igEnd();

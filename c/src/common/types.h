@@ -44,4 +44,9 @@ typedef enum gl_conversion_type_t {
     GL_CONVERSION_TYPE_LITTLE_ENDIAN
 } gl_conversion_type_t;
 
+typedef struct gl_pos_t {
+    uint32_t x;
+    uint32_t y;
+} gl_pos_t;
+
 #endif /* GHOSTLAB_TYPES_H */

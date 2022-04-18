@@ -12,18 +12,8 @@ typedef enum gl_maze_element_t {
     GL_MAZE_ELEMENT_COUNT
 } gl_maze_element_t;
 
-typedef struct gl_pos_t {
-    uint32_t x;
-    uint32_t y;
-} gl_pos_t;
-
-typedef struct gl_ghost_t {
-    gl_pos_t pos;
-} gl_ghost_t;
-
 typedef struct gl_maze_t {
     gl_maze_element_t **grid;
-    gl_ghost_t *ghosts;
 } gl_maze_t;
 
 gl_maze_t *gl_maze_create(uint8_t base_width, uint8_t base_height, uint8_t num_ghosts);
@@ -43,9 +33,5 @@ gl_maze_element_t **gl_maze_color_grid_to_maze_grid(uint8_t **grid, void (*gl_co
 gl_maze_element_t **gl_maze_generate_from_grid_with_seed(gl_maze_element_t **maze, uint64_t seed, gl_pos_t (* initial_room_comparator)(gl_maze_element_t **, uint8_t, uint8_t), uint32_t (* wall_comparator)(gl_pos_t *, uint32_t));
 
 gl_maze_element_t **gl_maze_generate_from_grid(gl_maze_element_t **maze, gl_pos_t (* initial_room_comparator)(gl_maze_element_t **, uint8_t, uint8_t), uint32_t ( *wall_comparator)(gl_pos_t *, uint32_t));
-
-gl_ghost_t *gl_maze_generate_ghosts(gl_maze_element_t **maze, uint8_t num_ghosts);
-
-bool gl_maze_ghost_is_at_pos(gl_maze_element_t **maze, gl_ghost_t *ghosts, gl_pos_t pos);
 
 #endif /* GHOSTLAB_MAZE_H */

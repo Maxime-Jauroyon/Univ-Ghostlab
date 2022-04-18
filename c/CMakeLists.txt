@@ -58,6 +58,8 @@ set(COMMON_SRC
         src/common/array.h
         src/common/command.c
         src/common/command.h
+        src/common/game.c
+        src/common/game.h
         src/common/gui.c
         src/common/gui.h
         src/common/log.c

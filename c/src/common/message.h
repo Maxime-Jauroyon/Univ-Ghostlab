@@ -100,7 +100,7 @@ typedef enum gl_message_protocol_t {
 typedef struct gl_message_definition_t {
     const char *identifier;
     const gl_message_protocol_t protocol;
-    void (*function)(struct gl_message_t *, int32_t, void *);
+    void (*function)(struct gl_message_t*, int32_t, void*);
     const gl_message_parameter_type_t parameters[];
 } gl_message_definition_t;
 
@@ -118,6 +118,8 @@ typedef struct gl_message_t {
     gl_message_type_t type;
     gl_message_parameter_t *parameters_value;
 } gl_message_t;
+
+void gl_message_set_mutex(void *mutex);
 
 uint8_t gl_message_get_max_identifier_size(gl_message_definition_t **msg_defs);
 
@@ -141,7 +143,11 @@ void gl_message_free(struct gl_message_t *msg);
 
 void gl_message_execute(struct gl_message_t *msg, int32_t socket_id, void *user_data);
 
+void gl_message_execute_no_lock(struct gl_message_t *msg, int32_t socket_id, void *user_data);
+
 int32_t gl_message_wait_and_execute(int32_t socket_id, gl_message_protocol_t protocol);
+
+int32_t gl_message_wait_and_execute_no_lock(int32_t socket_id, gl_message_protocol_t protocol);
 
 gl_message_parameter_definition_t **gl_message_parameter_definitions();
 

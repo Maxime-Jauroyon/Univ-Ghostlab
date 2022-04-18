@@ -1,4 +1,13 @@
 #include <client/shared.h>
+#include <pthread.h>
+#include "common/maze.h"
+#include "common/array.h"
+#include "common/game.h"
+#include "common/network.h"
+#include "common/log.h"
+#include "common/message.h"
+
+static pthread_mutex_t internal_g_gameplay_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 const char g_help[] =
     "usage: " GHOSTLAB_EXECUTABLE_NAME " [options]\n"
@@ -27,3 +36,24 @@ int32_t g_multicast_server_socket = -1;
 void *g_multicast_server_thread = 0;
 int32_t g_udp_socket = -1;
 void *g_udp_thread = 0;
+void *g_gameplay_mutex = &internal_g_gameplay_mutex;
+struct gl_game_t *g_games = 0;
+int32_t g_current_game_id = -1;
+
+void gl_connect_to_server() {
+    g_server_tcp_socket = gl_socket_create(g_server_ip, g_server_port, GL_SOCKET_TYPE_TCP_CLIENT, 0);
+    gl_log_push("connection to server established.");
+    if (!g_legacy_protocol) {
+        gl_message_wait_and_execute_no_lock(g_server_tcp_socket, GL_MESSAGE_PROTOCOL_TCP);
+    }
+    gl_message_wait_and_execute_no_lock(g_server_tcp_socket, GL_MESSAGE_PROTOCOL_TCP);
+}
+
+void gl_free_games() {
+    for (uint32_t i = 0; i < gl_array_get_size(g_games); i++) {
+        gl_maze_free(g_games[i].maze);
+        gl_array_free(g_games[i].ghosts);
+        gl_array_free(g_games[i].players);
+    }
+    gl_array_free(g_games);
+}
