@@ -187,9 +187,12 @@ static void draw_main_gui() {
         gl_igBegin("Ghostlab Client", g_show_console ? 0.6f : 1.0f);
 
         if (igBeginMenuBar()) {
-            if (igBeginMenu("Options", true)) {
-                igMenuItemBoolPtr("Show Logs ", 0, &g_show_console, true);
+            if (igBeginMenu("File", true)) {
                 igMenuItemBoolPtr("Quit", 0, &g_quit, true);
+                igEndMenu();
+            }
+            if (igBeginMenu("View", true)) {
+                igMenuItemBoolPtr("Show Logs", 0, &g_show_console, true);
                 igEndMenu();
             }
             igEndMenuBar();
@@ -206,11 +209,17 @@ static void draw_main_gui() {
                 gl_message_send_tcp(g_server_tcp_socket, &msg);
                 gl_message_wait_and_execute(g_server_tcp_socket, GL_MESSAGE_PROTOCOL_TCP);
             }
-    
+            igSameLine(0, -1);
+            if (igButton("Quit", (ImVec2) { 0, 0 })) {
+                g_quit = true;
+            }
+            
             if (gl_array_get_size(g_games) > 0) {
                 if (igCollapsingHeaderTreeNodeFlags("Available Games", 0)) {
                     for (uint32_t i = 0; i < gl_array_get_size(g_games); i++) {
-                        if (igButton(g_games[i].name, (ImVec2) { 0, 0 })) {
+                        char buf[512] = { 0 };
+                        sprintf(buf, "Join %s", g_games[i].name);
+                        if (igButton(buf, (ImVec2) { 0, 0 })) {
                             g_join_game_popup = true;
                             g_create_game_popup = false;
                             join_game_id = g_games[i].id;
@@ -228,6 +237,10 @@ static void draw_main_gui() {
                 gl_message_t msg = { .type = GL_MESSAGE_TYPE_IQUIT, .parameters_value = 0 };
                 gl_message_send_tcp(g_server_tcp_socket, &msg);
                 gl_message_wait_and_execute(g_server_tcp_socket, GL_MESSAGE_PROTOCOL_TCP);
+            }
+            igSameLine(0, -1);
+            if (igButton("Quit", (ImVec2) { 0, 0 })) {
+                g_quit = true;
             }
         }
 

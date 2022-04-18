@@ -153,16 +153,22 @@ int main(int argc, char **argv) {
 static void draw_main_gui() {
     {
         gl_igBegin("Ghostlab Server", g_show_console ? 0.6f : 1.0f);
-
+    
         if (igBeginMenuBar()) {
-            if (igBeginMenu("Options", true)) {
-                igMenuItemBoolPtr("Show Logs ", 0, &g_show_console, true);
+            if (igBeginMenu("File", true)) {
                 igMenuItemBoolPtr("Quit", 0, &g_quit, true);
+                igEndMenu();
+            }
+            if (igBeginMenu("View", true)) {
+                igMenuItemBoolPtr("Show Logs", 0, &g_show_console, true);
                 igEndMenu();
             }
             igEndMenuBar();
         }
     
+        if (igButton("Quit", (ImVec2) { 0, 0 })) {
+            g_quit = true;
+        }
         if (gl_array_get_size(g_games) > 0) {
             if (igCollapsingHeaderTreeNodeFlags("Available games", 0)) {
                 for (uint32_t i = 0; i < gl_array_get_size(g_games); i++) {

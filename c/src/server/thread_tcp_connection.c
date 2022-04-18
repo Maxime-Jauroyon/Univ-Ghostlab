@@ -14,7 +14,7 @@ void *gl_thread_tcp_connection_main(void *user_data) {
     
     gl_log_push("connection %d thread started.\n", id);
    
-    {
+    if (!g_legacy_protocol) {
         gl_message_t msg = {.type = GL_MESSAGE_TYPE_MULTI, 0};
         gl_message_execute(&msg, socket_id, 0);
     }
