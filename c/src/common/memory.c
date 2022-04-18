@@ -131,13 +131,13 @@ void gl_memory_check_for_leaks() {
         
         gl_gui_end_render();
     }
-#else
+#endif
+    
     if (g_allocated_ptrs > 0) {
 #ifdef __APPLE__
-        printf("At least %llu memory leaks detected!    ", g_allocated_ptrs);
+        printf(GHOSTLAB_EXECUTABLE_NAME ": error: at least %llu memory leaks detected!    ", g_allocated_ptrs);
 #else
-        printf("At least %lu memory leaks detected!    ", g_allocated_ptrs);
+        printf(GHOSTLAB_EXECUTABLE_NAME ": error: at least %lu memory leaks detected!    ", g_allocated_ptrs);
 #endif
     }
-#endif
 }

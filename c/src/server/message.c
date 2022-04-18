@@ -2,12 +2,12 @@
 #include <string.h>
 #include "message.h"
 #include "common/message.h"
-#include "common/log.h"
 #include "common/game.h"
 #include "common/array.h"
 #include "shared.h"
 #include "common/string.h"
 #include "common/network.h"
+#include "common/maze.h"
 
 void message_newpl(gl_message_t *msg, int32_t socket_id, void *user_data) {
     if (gl_array_get_size(g_games) == 255) {
@@ -70,6 +70,9 @@ void message_iquit(gl_message_t *msg, int32_t socket_id, void *user_data) {
                 found = true;
                 gl_array_remove(g_games[i].players, j);
                 if (gl_array_get_size(g_games[i].players) == 0) {
+                    gl_maze_free(g_games[i].maze);
+                    gl_array_free(g_games[i].ghosts);
+                    gl_array_free(g_games[i].players);
                     gl_array_remove(g_games, i);
                 }
                 break;
@@ -99,6 +102,7 @@ void message_shutd(gl_message_t *msg, int32_t socket_id, void *user_data) {
 }
 
 void gl_message_add_functions() {
+    // TODO: START
     gl_message_definitions()[GL_MESSAGE_TYPE_NEWPL]->function = message_newpl;
     gl_message_definitions()[GL_MESSAGE_TYPE_REGIS]->function = message_regis;
     gl_message_definitions()[GL_MESSAGE_TYPE_GAME_REQ]->function = message_game_req;

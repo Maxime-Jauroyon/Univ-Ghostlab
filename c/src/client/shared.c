@@ -42,7 +42,7 @@ int32_t g_current_game_id = -1;
 
 void gl_connect_to_server() {
     g_server_tcp_socket = gl_socket_create(g_server_ip, g_server_port, GL_SOCKET_TYPE_TCP_CLIENT, 0);
-    gl_log_push("connection to server established.");
+    gl_log_push("connection to server established.\n");
     if (!g_legacy_protocol) {
         gl_message_wait_and_execute_no_lock(g_server_tcp_socket, GL_MESSAGE_PROTOCOL_TCP);
     }

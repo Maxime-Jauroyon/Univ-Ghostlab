@@ -6,21 +6,17 @@
 #include <cimgui/cimgui.h>
 #include <common/log.h>
 #include <common/gui.h>
-#include <common/utils.h>
+#include <common/game.h>
+#include <common/maze.h>
+#include <common/array.h>
 #include <common/memory.h>
+#include <common/message.h>
 #include <common/network.h>
 #include <common/command.h>
 #include <server/shared.h>
+#include <server/message.h>
 #include <server/command.h>
 #include <server/thread_tcp.h>
-#include <common/message.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <string.h>
-#include "message.h"
-#include "common/array.h"
-#include "common/game.h"
-#include "common/maze.h"
 
 static void draw_main_gui();
 
@@ -118,7 +114,7 @@ int main(int argc, char **argv) {
 
     cleanup:
     {
-        gl_message_t msg = {.type = GL_MESSAGE_TYPE_MULTI, 0};
+        gl_message_t msg = {.type = GL_MESSAGE_TYPE_SHUTD, 0};
         gl_message_execute(&msg, 0, 0);
     }
 

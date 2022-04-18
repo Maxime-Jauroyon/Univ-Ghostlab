@@ -723,12 +723,12 @@ int32_t gl_message_send_tcp(int32_t fd, struct gl_message_t *dst) {
     int32_t r;
     r = (int32_t)send(fd, buf, size, 0);
     gl_array_free(buf);
+    gl_message_free(dst);
     if (r < 0) {
         return r;
     }
     gl_log_push("tcp: sent to %d: ", fd);
     gl_message_printf(dst);
-    gl_message_free(dst);
     return size;
 }
 
@@ -747,6 +747,8 @@ static int32_t gl_message_send_to_address(const char *ip, const char *port, stru
     int32_t size = gl_array_get_size(buf);
     
     if ((int32_t)sendto(fd, buf, size, 0, saddr, (socklen_t)sizeof(struct sockaddr_in)) == -1) {
+        gl_array_free(buf);
+        gl_message_free(dst);
         goto error;
     }
     
@@ -923,16 +925,18 @@ void gl_message_free(struct gl_message_t *msg) {
     if (msg) {
         gl_message_definition_t *msg_def = gl_message_definitions()[msg->type];
     
-        for (uint32_t i = 0; i < gl_message_get_num_parameters(msg_def); i++) {
-            gl_message_parameter_definition_t *msg_param_def = gl_message_parameter_definitions()[msg_def->parameters[i]];
+        if (msg->parameters_value) {
+            for (uint32_t i = 0; i < gl_message_get_num_parameters(msg_def); i++) {
+                gl_message_parameter_definition_t *msg_param_def = gl_message_parameter_definitions()[msg_def->parameters[i]];
         
-            if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING) {
-                gl_array_free(msg->parameters_value[i].string_value);
+                if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_STRING) {
+                    gl_array_free(msg->parameters_value[i].string_value);
+                }
             }
-        }
     
-        if (gl_message_get_num_parameters(msg_def) > 0) {
-            gl_array_free(msg->parameters_value);
+            if (gl_message_get_num_parameters(msg_def) > 0) {
+                gl_array_free(msg->parameters_value);
+            }
         }
     }
 }
@@ -947,6 +951,7 @@ static void internal_gl_message_execute(struct gl_message_t *msg, int32_t socket
             pthread_mutex_unlock(g_gameplay_mutex);
         }
     }
+    gl_message_free(msg);
 }
 
 void gl_message_execute(struct gl_message_t *msg, int32_t socket_id, void *user_data) {
@@ -963,7 +968,6 @@ int32_t internal_gl_message_wait_and_execute(int32_t socket_id, gl_message_proto
     
     if (r >= 0) {
         internal_gl_message_execute(&msg, socket_id, 0, should_lock);
-        gl_message_free(&msg);
     } else {
         return r;
     }

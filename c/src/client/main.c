@@ -112,7 +112,7 @@ int main(int argc, char **argv) {
         draw_server_down_popup();
         goto error;
     }
-    gl_log_push("connection to server established.");
+    gl_log_push("connection to server established.\n");
     if (!g_legacy_protocol) {
         gl_message_wait_and_execute(g_server_tcp_socket, GL_MESSAGE_PROTOCOL_TCP);
         g_multicast_server_thread = gl_malloc(sizeof(pthread_t));
@@ -134,7 +134,7 @@ int main(int argc, char **argv) {
         
         gl_gui_end_render();
     }
-
+    
     goto cleanup;
 
     error:

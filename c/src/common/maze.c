@@ -31,12 +31,14 @@ gl_maze_t *gl_maze_create(uint8_t base_width, uint8_t base_height, uint8_t num_g
 }
 
 void gl_maze_free(gl_maze_t *maze) {
-    for (uint32_t y = 0; y < gl_array_get_size(maze->grid); y++) {
-        gl_array_free(maze->grid[y]);
-    }
-    gl_array_free(maze->grid);
+    if (maze) {
+        for (uint32_t y = 0; y < gl_array_get_size(maze->grid); y++) {
+            gl_array_free(maze->grid[y]);
+        }
+        gl_array_free(maze->grid);
     
-    gl_free(maze);
+        gl_free(maze);
+    }
 }
 
 void gl_color_to_maze_element_from_color(gl_maze_element_t **maze, uint8_t **grid, uint8_t width, uint8_t height, const gl_maze_element_t *element_per_color, uint8_t size_element_per_color) {
