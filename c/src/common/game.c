@@ -1,7 +1,7 @@
 #include <common/game.h>
 #include <stdlib.h>
-#include "array.h"
-#include "maze.h"
+#include <common/array.h>
+#include <common/maze.h>
 
 gl_game_t *gl_game_find_game_with_socket(gl_game_t *games, int32_t socket_id) {
     for (uint32_t i = 0; i < gl_array_get_size(games); i++) {

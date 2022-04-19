@@ -1,15 +1,13 @@
 #include <common/message.h>
 #include <string.h>
-#include <unistd.h>
-#include <common/array.h>
-#include <common/utils.h>
-#include <common/log.h>
-#include <common/string.h>
 #include <pthread.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include "memory.h"
-#include "network.h"
+#include <common/log.h>
+#include <common/array.h>
+#include <common/utils.h>
+#include <common/string.h>
+#include <common/network.h>
 
 static uint8_t g_max_identifier_size = 0;
 static pthread_mutex_t *g_main_mutex;

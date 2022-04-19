@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <pthread.h>
-#include "array.h"
-#include "memory.h"
+#include <common/array.h>
+#include <common/memory.h>
 
 static bool g_scroll = true;
 static bool g_is_newline = true;

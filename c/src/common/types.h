@@ -3,12 +3,12 @@
 
 // Includes integer types (`uint8_t`, `uint16_t`, `uint32_t`, `uint64_t`, `int8_t`, `int16_t`, `int32_t`, `int64_t`).
 #include <stdint.h>
-// Include boolean type.
-#include <stdbool.h>
 // Include variadic types.
 #include <stdarg.h>
 // Include `size_t`.
 #include <stddef.h>
+// Include boolean type.
+#include <stdbool.h>
 
 // The name of the currently built executable (used for logging purposes).
 #if GHOSTLAB_CLIENT

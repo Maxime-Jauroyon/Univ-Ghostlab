@@ -1,6 +1,6 @@
 #include <common/command.h>
 #include <string.h>
-#include "log.h"
+#include <common/log.h>
 
 static uint8_t g_max_name_size = 0;
 

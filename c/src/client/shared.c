@@ -1,16 +1,14 @@
 #include <client/shared.h>
-#include <pthread.h>
-#include <string.h>
 #include <ctype.h>
 #include <stdio.h>
-#include "common/maze.h"
-#include "common/array.h"
-#include "common/game.h"
-#include "common/network.h"
-#include "common/log.h"
-#include "common/message.h"
-#include "common/memory.h"
-#include "common/gui.h"
+#include <string.h>
+#include <pthread.h>
+#include <common/log.h>
+#include <common/maze.h>
+#include <common/game.h>
+#include <common/array.h>
+#include <common/network.h>
+#include <common/message.h>
 
 static pthread_mutex_t internal_g_main_mutex = PTHREAD_MUTEX_INITIALIZER;
 

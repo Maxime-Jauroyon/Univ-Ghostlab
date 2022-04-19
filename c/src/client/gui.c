@@ -1,12 +1,12 @@
 #include <client/gui.h>
-#include "shared.h"
-#include "cimgui/cimgui.h"
-#include "common/message.h"
-#include "common/array.h"
-#include "common/game.h"
-#include "common/gui.h"
-#include "command.h"
-#include "common/string.h"
+#include <cimgui/cimgui.h>
+#include <common/gui.h>
+#include <common/game.h>
+#include <common/array.h>
+#include <common/string.h>
+#include <common/message.h>
+#include <client/shared.h>
+#include <client/command.h>
 
 static bool g_console_window_visible = true;
 static bool g_create_game_popup_visible = false;

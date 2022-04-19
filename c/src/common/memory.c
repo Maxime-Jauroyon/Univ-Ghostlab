@@ -1,13 +1,12 @@
 #include <common/memory.h>
 #include <string.h>
 #include <stdlib.h>
-#include <common/log.h>
-#include <printf.h>
-
 #if GHOSTLAB_TUI || GHOSTLAB_GUI
-#include "cimtui/cimtui.h"
-#include "cimgui/cimgui.h"
-#include "gui.h"
+#include <cimgui/cimgui.h>
+#endif
+#include <common/log.h>
+#if GHOSTLAB_TUI || GHOSTLAB_GUI
+#include <common/gui.h>
 #endif
 
 static uint64_t g_allocated_ptrs = 0;

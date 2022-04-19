@@ -1,9 +1,9 @@
 #include <client/thread_udp.h>
 #include <sys/socket.h>
-#include "common/log.h"
-#include "shared.h"
-#include "common/message.h"
-#include "common/network.h"
+#include <common/log.h>
+#include <common/message.h>
+#include <common/network.h>
+#include <client/shared.h>
 
 void *gl_client_thread_udp_main(void *user_data) {
     gl_log_push("udp thread started.\n");

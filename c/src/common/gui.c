@@ -1,23 +1,21 @@
-#include <common/gui.h>
-
 #if GHOSTLAB_TUI || GHOSTLAB_GUI
 
+#include <common/gui.h>
 #include <string.h>
 #include <cimgui/cimgui.h>
-#include "command.h"
-#include "log.h"
-#include "array.h"
-#include "glad/gl.h"
-
 #if GHOSTLAB_TUI
-#include "cimtui/cimtui.h"
+#include <cimtui/cimtui.h>
 #elif GHOSTLAB_GUI
 #include <SDL.h>
-#include "imgui/gui/imgui_impl_sdl.h"
-#include "imgui/gui/imgui_impl_opengl3.h"
-#include "imgui/gui/fonts/sourcesanspro.h"
-#include "imgui/gui/fonts/firacode.h"
+#include <glad/gl.h>
+#include <imgui/gui/imgui_impl_sdl.h>
+#include <imgui/gui/imgui_impl_opengl3.h>
+#include <imgui/gui/fonts/sourcesanspro.h>
+#include <imgui/gui/fonts/firacode.h>
 #endif
+#include <common/log.h>
+#include <common/array.h>
+#include <common/command.h>
 
 static float g_current_pos_y = 0.0f;
 static char g_console_buf[512] = { 0 };

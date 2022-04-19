@@ -1,9 +1,9 @@
 #include <client/thread_multicast_server.h>
 #include <sys/socket.h>
-#include "common/log.h"
-#include "shared.h"
-#include "common/message.h"
-#include "common/network.h"
+#include <common/log.h>
+#include <common/message.h>
+#include <common/network.h>
+#include <client/shared.h>
 
 void *gl_client_thread_multicast_server_main(void *user_data) {
     gl_log_push("multicast server thread started.\n");

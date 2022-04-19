@@ -1,11 +1,11 @@
 #include <common/network.h>
+#include <netdb.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <arpa/inet.h>
-#include <netdb.h>
 #include <string.h>
 #include <pthread.h>
-#include "message.h"
+#include <arpa/inet.h>
+#include <common/message.h>
 
 static pthread_mutex_t g_close_mutex = PTHREAD_MUTEX_INITIALIZER;
 

@@ -1,9 +1,8 @@
 #include <common/maze.h>
 #include <time.h>
 #include <stdlib.h>
-#include "log.h"
-#include "array.h"
-#include "memory.h"
+#include <common/array.h>
+#include <common/memory.h>
 
 gl_maze_t *gl_maze_create(uint8_t base_width, uint8_t base_height) {
     uint8_t width = 2 * base_width + 1;
@@ -12,22 +11,9 @@ gl_maze_t *gl_maze_create(uint8_t base_width, uint8_t base_height) {
         {0, 1},
         {2, 3}
     };
-    gl_maze_element_t element_per_color[4] = {GL_MAZE_ELEMENT_PILLAR, GL_MAZE_ELEMENT_WALL_CLOSED,
-                                              GL_MAZE_ELEMENT_WALL_CLOSED, GL_MAZE_ELEMENT_ROOM};
-#ifdef MAZE_DEBUG
-    gl_log_push("1. create color grid:\n");
-    gl_log_push("\n");
-#endif
+    gl_maze_element_t element_per_color[4] = {GL_MAZE_ELEMENT_PILLAR, GL_MAZE_ELEMENT_WALL_CLOSED, GL_MAZE_ELEMENT_WALL_CLOSED, GL_MAZE_ELEMENT_ROOM};
     uint8_t **grid = gl_maze_create_color_grid(width, height, (uint8_t *) color_scheme, 2, 2);
-#ifdef MAZE_DEBUG
-    gl_log_push("2. convert color grid to maze elements grid:\n");
-    gl_log_push("\n");
-#endif
     gl_maze_element_t **maze_grid = gl_maze_color_grid_to_maze_grid(grid, gl_color_to_maze_element_from_color, element_per_color, 4);
-#ifdef MAZE_DEBUG
-    gl_log_push("3. generate maze:\n");
-    gl_log_push("\n");
-#endif
     gl_maze_generate_from_grid(maze_grid, gl_initial_room_random, gl_wall_random);
 
     gl_maze_t *maze = gl_malloc(sizeof(*maze));
@@ -75,20 +61,6 @@ uint8_t **gl_maze_create_color_grid(uint8_t width, uint8_t height, uint8_t *sche
         return 0;
     }
 
-#ifdef MAZE_DEBUG
-    gl_log_push("width: %d\n", width);
-    gl_log_push("height: %d\n", height);
-    gl_log_push("scheme:\n");
-    for (uint32_t y = 0; y < scheme_height; y++) {
-        gl_log_push("{");
-        for (uint32_t x = 0; x < scheme_width; x++) {
-            gl_log_push("%d%s", scheme[y * scheme_width + x], x < scheme_width - 1 ? ", " : "");
-        }
-        gl_log_push("}%s\n", y < scheme_height - 1 ? "," : "");
-    }
-    gl_log_push("\n");
-#endif
-    
     uint8_t **grid = gl_array_create(uint8_t*, height);
     for (uint32_t y = 0; y < height; y++) {
         grid[y] = gl_array_create(uint8_t, width);
@@ -97,18 +69,6 @@ uint8_t **gl_maze_create_color_grid(uint8_t width, uint8_t height, uint8_t *sche
         }
     }
 
-#ifdef MAZE_DEBUG
-    gl_log_push("base scheme with color:\n");
-    for (uint32_t y = 0; y < height; y++) {
-        for (uint32_t x = 0; x < width; x++) {
-            gl_log_push("%d", grid[y][x]);
-        }
-        
-        gl_log_push("\n");
-    }
-    gl_log_push("\n");
-#endif
-    
     return grid;
 }
 
@@ -128,47 +88,8 @@ gl_maze_element_t **gl_maze_color_grid_to_maze_grid(uint8_t **grid, void (*gl_co
         }
     }
 
-#ifdef MAZE_DEBUG
-    if (element_per_color) {
-        gl_log_push("color - maze element:\n");
-        for (uint32_t i = 0; i < size_element_per_color; i++) {
-            gl_log_push("> %d - ", i);
-            if (element_per_color[i] == GL_MAZE_ELEMENT_PILLAR) {
-                gl_log_push("GL_MAZE_ELEMENT_PILLAR (#)");
-            } else if (element_per_color[i] == GL_MAZE_ELEMENT_WALL_CLOSED) {
-                gl_log_push("GL_MAZE_ELEMENT_WALL_CLOSED (C)");
-            } else if (element_per_color[i] == GL_MAZE_ELEMENT_WALL_OPENED) {
-                gl_log_push("GL_MAZE_ELEMENT_WALL_OPENED (O)");
-            } else if (element_per_color[i] == GL_MAZE_ELEMENT_ROOM) {
-                gl_log_push("GL_MAZE_ELEMENT_ROOM (.)");
-            }
-            gl_log_push("\n");
-        }
-        gl_log_push("\n");
-    }
-#endif
-    
     gl_color_to_maze_comparator(maze, grid, width, height, element_per_color, size_element_per_color);
 
-#ifdef MAZE_DEBUG
-    gl_log_push("convert colors to maze elements:\n");
-    for (uint32_t y = 0; y < height; y++) {
-        for (uint32_t x = 0; x < width; x++) {
-            if (maze[y][x] == GL_MAZE_ELEMENT_PILLAR) {
-                gl_log_push("#");
-            } else if (maze[y][x] == GL_MAZE_ELEMENT_WALL_CLOSED) {
-                gl_log_push("C");
-            } else if (maze[y][x] == GL_MAZE_ELEMENT_WALL_OPENED) {
-                gl_log_push("O");
-            } else {
-                gl_log_push(".");
-            }
-        }
-        gl_log_push("\n");
-    }
-    gl_log_push("\n");
-#endif
-    
     for (uint32_t y = 0; y < gl_array_get_size(grid); y++) {
         gl_array_free(grid[y]);
     }
@@ -178,15 +99,6 @@ gl_maze_element_t **gl_maze_color_grid_to_maze_grid(uint8_t **grid, void (*gl_co
 }
 
 gl_maze_element_t **gl_maze_generate_from_grid_with_seed(gl_maze_element_t **maze, uint64_t seed, gl_pos_t (* initial_room_comparator)(gl_maze_element_t **, uint8_t, uint8_t), uint32_t (* wall_comparator)(gl_pos_t *, uint32_t)) {
-#ifdef MAZE_DEBUG
-#ifdef __APPLE__
-    gl_log_push("seed: %llu\n", seed);
-    gl_log_push("\n");
-#else
-    gl_log_push("seed: %lu\n\n", seed);
-    gl_log_push("\n");
-#endif
-#endif
     srand(seed);
     
     if (!maze) {
@@ -275,44 +187,6 @@ gl_maze_element_t **gl_maze_generate_from_grid_with_seed(gl_maze_element_t **maz
     gl_array_free(walls);
     gl_array_free(path);
 
-#ifdef MAZE_DEBUG
-    gl_log_push("maze after generating with prim algorithm:\n");
-    for (uint32_t y = 0; y < height; y++) {
-        for (uint32_t x = 0; x < width; x++) {
-            if (maze[y][x] == GL_MAZE_ELEMENT_PILLAR) {
-                gl_log_push("#");
-            } else if (maze[y][x] == GL_MAZE_ELEMENT_WALL_CLOSED) {
-                gl_log_push("C");
-            } else if (maze[y][x] == GL_MAZE_ELEMENT_WALL_OPENED) {
-                gl_log_push("O");
-            } else {
-                gl_log_push(".");
-            }
-        }
-        
-        gl_log_push("\n");
-    }
-    gl_log_push("\n");
-    
-    gl_log_push("maze with another style:\n");
-    for (uint32_t y = 0; y < height; y++) {
-        for (uint32_t x = 0; x < width; x++) {
-            if (maze[y][x] == GL_MAZE_ELEMENT_PILLAR) {
-                gl_log_push("#");
-            } else if (maze[y][x] == GL_MAZE_ELEMENT_WALL_CLOSED) {
-                gl_log_push("#");
-            } else if (maze[y][x] == GL_MAZE_ELEMENT_WALL_OPENED) {
-                gl_log_push(" ");
-            } else {
-                gl_log_push(" ");
-            }
-        }
-        
-        gl_log_push("\n");
-    }
-    gl_log_push("\n");
-#endif
-    
     return maze;
 }
 
