@@ -3,6 +3,6 @@
 
 #include <common/types.h>
 
-void *gl_thread_udp_main(void *user_data);
+void *gl_client_thread_udp_main(void *user_data);
 
 #endif /* GHOSTLAB_CLIENT_THREAD_UDP_H */

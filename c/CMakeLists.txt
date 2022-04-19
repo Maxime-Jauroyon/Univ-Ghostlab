@@ -94,6 +94,8 @@ set(SERVER_SRC
 set(CLIENT_SRC
         src/client/command.c
         src/client/command.h
+        src/client/gui.c
+        src/client/gui.h
         src/client/main.c
         src/client/message.c
         src/client/message.h

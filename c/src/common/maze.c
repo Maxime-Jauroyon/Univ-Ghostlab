@@ -42,9 +42,9 @@ void gl_maze_free(gl_maze_t *maze) {
             gl_array_free(maze->grid[y]);
         }
         gl_array_free(maze->grid);
-    
-        gl_free(maze);
     }
+    
+    gl_free(maze);
 }
 
 void gl_color_to_maze_element_from_color(gl_maze_element_t **maze, uint8_t **grid, uint8_t width, uint8_t height, const gl_maze_element_t *element_per_color, uint8_t size_element_per_color) {

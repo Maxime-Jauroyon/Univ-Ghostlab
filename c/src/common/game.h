@@ -34,6 +34,12 @@ gl_game_t *gl_game_find_game_with_socket(gl_game_t *games, int32_t socket_id);
 
 gl_ghost_t *gl_game_generate_ghosts(struct gl_maze_t *maze, uint8_t num_ghosts);
 
+gl_player_t *gl_game_generate_players_pos(struct gl_maze_t *maze, gl_player_t *players, gl_ghost_t *ghosts);
+
 bool gl_game_is_ghost_at_pos(gl_ghost_t *ghosts, gl_pos_t pos);
+
+bool gl_game_is_player_at_pos(gl_player_t *players, gl_pos_t pos);
+
+void gl_game_free(gl_game_t *game);
 
 #endif /* GHOSTLAB_GAME_H */

@@ -180,7 +180,7 @@ void gl_igConsole(const struct gl_command_definition_t **cmd_defs, uint32_t cmd_
     
     if (igBeginMenuBar()) {
         if (igBeginMenu("View", true)) {
-            if (igMenuItemBool("Clear", 0, false, true)) {
+            if (igMenuItemBool("Clear Logs", 0, false, true)) {
                 gl_log_free();
             }
             igSeparator();

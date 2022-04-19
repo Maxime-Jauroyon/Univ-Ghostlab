@@ -53,10 +53,10 @@ typedef struct gl_array_header_t {
 #define gl_array_get_capacity(a) ((a) ? gl_array_get_header(a)->capacity : 0)
 
 // Returns the first element of the array.
-#define gl_array_get_first(a) ((a) ? (a)[0] : 0)
+#define gl_array_get_first(a) ( (a)[0])
 
 // Returns the last element of the array.
-#define gl_array_get_last(a) ((a) ? (a)[gl_array_get_size(a) - 1] : 0)
+#define gl_array_get_last(a) ((a)[gl_array_get_size(a) - 1])
 
 // Returns `true` if the array is empty.
 #define gl_array_is_empty(a) (!gl_array_get_size(a))

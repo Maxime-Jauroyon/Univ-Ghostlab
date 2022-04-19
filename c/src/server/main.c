@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
             g_multicast_port = gl_strdup(optarg);
             break;
         case 'l':
-            g_legacy_protocol = true;
+            g_use_legacy_protocol = true;
             break;
         case 'h':
             gl_log_push("%s", g_help);
@@ -93,16 +93,16 @@ int main(int argc, char **argv) {
         g_multicast_port = gl_strdup(GHOSTLAB_DEFAULT_MULTICAST_PORT);
     }
     
-    gl_message_set_mutex(g_gameplay_mutex);
-    gl_message_add_functions();
+    gl_message_set_mutex(g_main_mutex);
+    gl_client_message_add_functions();
 
     g_thread_tcp = gl_malloc(sizeof(pthread_t));
     pthread_create(g_thread_tcp, 0, gl_thread_tcp_main, 0);
     
     gl_gui_create("Ghostlab Server");
 
-    while (!g_quit) {
-        gl_gui_start_render(&g_quit);
+    while (!g_should_quit) {
+        gl_gui_start_render(&g_should_quit);
         draw_main_gui();
         gl_gui_end_render();
     }
@@ -152,7 +152,7 @@ static void draw_main_gui() {
     
         if (igBeginMenuBar()) {
             if (igBeginMenu("File", true)) {
-                igMenuItemBoolPtr("Quit", 0, &g_quit, true);
+                igMenuItemBoolPtr("Quit", 0, &g_should_quit, true);
                 igEndMenu();
             }
             if (igBeginMenu("View", true)) {
@@ -163,10 +163,10 @@ static void draw_main_gui() {
         }
     
         if (igButton("Quit", (ImVec2) { 0, 0 })) {
-            g_quit = true;
+            g_should_quit = true;
         }
         if (gl_array_get_size(g_games) > 0) {
-            if (igCollapsingHeaderTreeNodeFlags("Available games", 0)) {
+            if (igCollapsingHeaderTreeNodeFlags("Available Games", 0)) {
                 for (uint32_t i = 0; i < gl_array_get_size(g_games); i++) {
                     if (igCollapsingHeaderTreeNodeFlags(g_games[i].name, 0)) {
                         if (g_games[i].started) {
@@ -219,6 +219,6 @@ static void draw_main_gui() {
     }
 
     if (g_show_console) {
-        gl_igConsole(gl_command_definitions(), GL_COMMAND_TYPE_COUNT);
+        gl_igConsole(gl_client_command_definitions(), GL_COMMAND_TYPE_COUNT);
     }
 }

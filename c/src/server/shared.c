@@ -17,8 +17,8 @@ const char g_help[] =
     "\t-h, --help                                 displays this help message and terminates.\n"
     "\t-v, --version                              displays the program's version and terminates.\n";
 
-bool g_quit = false;
-bool g_legacy_protocol = false;
+bool g_should_quit = false;
+bool g_use_legacy_protocol = false;
 
 int32_t g_server_socket = -1;
 int32_t *g_client_sockets = 0;
@@ -30,5 +30,5 @@ char *g_server_port = 0;
 char *g_multicast_ip = 0;
 char *g_multicast_port = 0;
 
-void *g_gameplay_mutex = &internal_g_gameplay_mutex;
+void *g_main_mutex = &internal_g_gameplay_mutex;
 struct gl_game_t *g_games = 0;

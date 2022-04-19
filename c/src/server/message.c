@@ -85,6 +85,7 @@ void message_start(gl_message_t *msg, int32_t socket_id, void *user_data) {
     if (all_ready) {
         game->maze = gl_maze_create(7 + 1 * gl_array_get_size(game->players), 7 + 1 * gl_array_get_size(game->players));
         game->ghosts = gl_game_generate_ghosts(game->maze, gl_array_get_size(game->players));
+        game->players = gl_game_generate_players_pos(game->maze, game->players, game->ghosts);
         game->started = true;
     }
 }
@@ -128,6 +129,7 @@ void message_unreg(gl_message_t *msg, int32_t socket_id, void *user_data) {
         if (all_ready) {
             g_games[game_id].maze = gl_maze_create(7 + 1 * gl_array_get_size(g_games[game_id].players), 7 + 1 * gl_array_get_size(g_games[game_id].players));
             g_games[game_id].ghosts = gl_game_generate_ghosts(g_games[game_id].maze, gl_array_get_size(g_games[game_id].players));
+            g_games[game_id].players = gl_game_generate_players_pos(g_games[game_id].maze, g_games[game_id].players, g_games[game_id].ghosts);
             g_games[game_id].started = true;
         }
     } else {
@@ -156,7 +158,7 @@ void message_iquit(gl_message_t *msg, int32_t socket_id, void *user_data) {
 }
 
 void message_multi(gl_message_t *msg, int32_t socket_id, void *user_data) {
-    if (!g_legacy_protocol) {
+    if (!g_use_legacy_protocol) {
         gl_message_t new_msg = {.type = GL_MESSAGE_TYPE_MULTI, 0};
         gl_message_push_parameter(&new_msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_ip(g_multicast_ip) });
         gl_message_push_parameter(&new_msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number(g_multicast_port, 4) });
@@ -165,13 +167,13 @@ void message_multi(gl_message_t *msg, int32_t socket_id, void *user_data) {
 }
 
 void message_shutd(gl_message_t *msg, int32_t socket_id, void *user_data) {
-    if (!g_legacy_protocol) {
+    if (!g_use_legacy_protocol) {
         gl_message_t new_msg = {.type = GL_MESSAGE_TYPE_SHUTD, 0};
         gl_message_send_multicast(g_multicast_ip, g_multicast_port, &new_msg);
     }
 }
 
-void gl_message_add_functions() {
+void gl_client_message_add_functions() {
     gl_message_definitions()[GL_MESSAGE_TYPE_NEWPL]->function = message_newpl;
     gl_message_definitions()[GL_MESSAGE_TYPE_REGIS]->function = message_regis;
     gl_message_definitions()[GL_MESSAGE_TYPE_GAME_REQ]->function = message_game_req;

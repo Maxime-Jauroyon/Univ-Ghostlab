@@ -33,7 +33,7 @@ static const gl_command_definition_t g_command_version = {
 };
 
 static void command_quit(void *user_data) {
-    g_quit = true;
+    g_should_quit = true;
 }
 
 static const gl_command_definition_t g_command_quit = {
@@ -55,6 +55,6 @@ static const gl_command_definition_t *gl_command_definitions_array[] = {
     [GL_COMMAND_TYPE_COUNT] = 0
 };
 
-const gl_command_definition_t **gl_command_definitions() {
+const gl_command_definition_t **gl_client_command_definitions() {
     return gl_command_definitions_array;
 }

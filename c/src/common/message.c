@@ -12,7 +12,7 @@
 #include "network.h"
 
 static uint8_t g_max_identifier_size = 0;
-static pthread_mutex_t *g_gameplay_mutex;
+static pthread_mutex_t *g_main_mutex;
 
 static gl_message_parameter_definition_t g_message_parameter_n = {
     .identifier = "n",
@@ -650,7 +650,7 @@ static gl_message_definition_t *g_message_definitions_array[] = {
 };
 
 void gl_message_set_mutex(void *mutex) {
-    g_gameplay_mutex = (pthread_mutex_t *)mutex;
+    g_main_mutex = (pthread_mutex_t *)mutex;
 }
 
 uint8_t gl_message_get_max_identifier_size(gl_message_definition_t **msg_defs) {
@@ -945,11 +945,11 @@ void gl_message_free(struct gl_message_t *msg) {
 static void internal_gl_message_execute(struct gl_message_t *msg, int32_t socket_id, void *user_data, bool should_lock) {
     if (gl_message_definitions()[msg->type]->function) {
         if (should_lock) {
-            pthread_mutex_lock(g_gameplay_mutex);
+            pthread_mutex_lock(g_main_mutex);
         }
         gl_message_definitions()[msg->type]->function(msg, socket_id, user_data);
         if (should_lock) {
-            pthread_mutex_unlock(g_gameplay_mutex);
+            pthread_mutex_unlock(g_main_mutex);
         }
     }
     gl_message_free(msg);

@@ -3063,7 +3063,7 @@ static void ShowDemoWindowLayout()
                 HelpMarker(
                     "Using ImDrawList::AddText() with a fine ClipRect:\n"
                     "Will alter only this specific ImDrawList::AddText() rendering.\n"
-                    "(this is often used internally to avoid altering the clipping rectangle and minimize draw_main_gui calls)");
+                    "(this is often used internally to avoid altering the clipping rectangle and minimize draw_main calls)");
                 ImVec4 clip_rect(p0.x, p0.y, p1.x, p1.y); // AddText() takes a ImVec4* here so let's convert.
                 draw_list->AddRectFilled(p0, p1, IM_COL32(90, 90, 120, 255));
                 draw_list->AddText(ImGui::GetFont(), ImGui::GetFontSize(), text_pos, IM_COL32_WHITE, text_str, NULL, 0.0f, &clip_rect);
@@ -4926,7 +4926,7 @@ static void ShowDemoWindowTables()
                 ImGui::CheckboxFlags("ImGuiTableFlags_PreciseWidths", &flags, ImGuiTableFlags_PreciseWidths);
                 ImGui::SameLine(); HelpMarker("Disable distributing remainder width to stretched columns (width allocation on a 100-wide table with 3 columns: Without this flag: 33,33,34. With this flag: 33,33,33). With larger number of columns, resizing will appear to be less smooth.");
                 ImGui::CheckboxFlags("ImGuiTableFlags_NoClip", &flags, ImGuiTableFlags_NoClip);
-                ImGui::SameLine(); HelpMarker("Disable clipping rectangle for every individual columns (reduce draw_main_gui command count, items will be able to overflow into other columns). Generally incompatible with ScrollFreeze options.");
+                ImGui::SameLine(); HelpMarker("Disable clipping rectangle for every individual columns (reduce draw_main command count, items will be able to overflow into other columns). Generally incompatible with ScrollFreeze options.");
                 ImGui::TreePop();
             }
 
@@ -5527,7 +5527,7 @@ static void ShowDemoWindowMisc()
             ImGui::Text("Hover to see mouse cursors:");
             ImGui::SameLine(); HelpMarker(
                 "Your application can render a different mouse cursor based on what ImGui::GetMouseCursor() returns. "
-                "If software cursor rendering (io.MouseDrawCursor) is set ImGui will draw_main_gui the right cursor for you, "
+                "If software cursor rendering (io.MouseDrawCursor) is set ImGui will draw_main the right cursor for you, "
                 "otherwise your backend needs to handle it.");
             for (int i = 0; i < ImGuiMouseCursor_COUNT; i++)
             {
@@ -7315,14 +7315,14 @@ static void ShowExampleAppCustomRendering(bool* p_open)
             ImGui::EndTabItem();
         }
 
-        if (ImGui::BeginTabItem("BG/FG draw_main_gui lists"))
+        if (ImGui::BeginTabItem("BG/FG draw_main lists"))
         {
             static bool draw_bg = true;
             static bool draw_fg = true;
-            ImGui::Checkbox("Draw in Background draw_main_gui list", &draw_bg);
-            ImGui::SameLine(); HelpMarker("The Background draw_main_gui list will be rendered below every Dear ImGui windows.");
-            ImGui::Checkbox("Draw in Foreground draw_main_gui list", &draw_fg);
-            ImGui::SameLine(); HelpMarker("The Foreground draw_main_gui list will be rendered over every Dear ImGui windows.");
+            ImGui::Checkbox("Draw in Background draw_main list", &draw_bg);
+            ImGui::SameLine(); HelpMarker("The Background draw_main list will be rendered below every Dear ImGui windows.");
+            ImGui::Checkbox("Draw in Foreground draw_main list", &draw_fg);
+            ImGui::SameLine(); HelpMarker("The Foreground draw_main list will be rendered over every Dear ImGui windows.");
             ImVec2 window_pos = ImGui::GetWindowPos();
             ImVec2 window_size = ImGui::GetWindowSize();
             ImVec2 window_center = ImVec2(window_pos.x + window_size.x * 0.5f, window_pos.y + window_size.y * 0.5f);

@@ -13,6 +13,6 @@ typedef enum gl_command_type_t {
     GL_COMMAND_TYPE_COUNT
 } gl_command_type_t;
 
-const struct gl_command_definition_t **gl_command_definitions();
+const struct gl_command_definition_t **gl_client_command_definitions();
 
 #endif /* GHOSTLAB_CLIENT_COMMAND_H */

@@ -5,6 +5,6 @@
 
 
 
-void gl_message_add_functions();
+void gl_client_message_add_functions();
 
 #endif /* GHOSTLAB_SERVER_MESSAGE_H */

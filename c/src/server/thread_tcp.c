@@ -13,7 +13,7 @@ void *gl_thread_tcp_main(void *user_data) {
     
     g_server_socket = gl_socket_create(g_server_ip, g_server_port, GL_SOCKET_TYPE_TCP_SERVER, 0);
     
-    while (!g_quit) {
+    while (!g_should_quit) {
         int32_t client_fd = gl_tcp_accept(g_server_socket);
         
         if (g_server_socket == -1) {

@@ -1,101 +1,70 @@
 #include <client/message.h>
-#include <printf.h>
-#include <string.h>
-#include <unistd.h>
-#include "common/message.h"
-#include "common/log.h"
-#include "shared.h"
-#include "common/string.h"
-#include "common/game.h"
-#include "common/array.h"
-#include "common/network.h"
+#include <common/game.h>
+#include <common/string.h>
+#include <common/network.h>
+#include <common/message.h>
+#include <client/shared.h>
 
-void message_games(gl_message_t *msg, int32_t socket_id, void *user_data) {
-    gl_free_games();
+static void message_games(gl_message_t *msg, int32_t socket_id, void *user_data) {
+    gl_client_free_games();
+    
     for (uint32_t i = 0; i < msg->parameters_value[0].uint8_value; i++) {
         gl_message_wait_and_execute_no_lock(socket_id, GL_MESSAGE_PROTOCOL_TCP);
     }
 }
 
-void message_ogames(gl_message_t *msg, int32_t socket_id, void *user_data) {
-    gl_game_t game = { 0 };
-    game.id = msg->parameters_value[0].uint8_value;
-    game.started = false;
-    sprintf(game.name, "Game %d", game.id);
-    for (uint32_t i = 0; i < msg->parameters_value[1] .uint8_value; i++) {
-        gl_player_t player = { 0 };
-        gl_array_push(game.players, player);
-    }
-    gl_array_push(g_games, game);
+static void message_ogames(gl_message_t *msg, int32_t socket_id, void *user_data) {
+    gl_client_add_game(msg->parameters_value[0].uint8_value);
 }
 
-void message_regok(gl_message_t *msg, int32_t socket_id, void *user_data) {
-    g_current_game_id = msg->parameters_value[0].uint8_value;
+static void message_regok(gl_message_t *msg, int32_t socket_id, void *user_data) {
+    g_game_id = msg->parameters_value[0].uint8_value;
     
-    if (gl_get_current_game() == 0) {
-        gl_game_t game = { 0 };
-        game.id = msg->parameters_value[0].uint8_value;
-        game.started = false;
-        sprintf(game.name, "Game %d", game.id);
-        gl_player_t player = { 0 };
-        memcpy(player.id, g_current_player_id, 9);
-        gl_array_push(game.players, player);
-        gl_array_push(g_games, game);
+    if (gl_client_get_game() == 0) {
+        gl_client_add_game(g_game_id);
+    }
+    
+    gl_client_add_player(gl_client_get_game(), g_player_id);
+}
+
+static void message_unrok(gl_message_t *msg, int32_t socket_id, void *user_data) {
+    g_game_id = -1;
+    
+    if (g_should_quit) {
+        gl_socket_close(&g_server_socket);
     }
 }
 
-void message_regno(gl_message_t *msg, int32_t socket_id, void *user_data) {
-    gl_log_push("there was an issue joining the game\n");
-    g_current_game_id = -1;
-    g_current_game_player_ready = false;
-}
-
-void message_unrok(gl_message_t *msg, int32_t socket_id, void *user_data) {
-    g_current_game_id = -1;
-    g_current_game_player_ready = false;
+static void message_gobye(gl_message_t *msg, int32_t socket_id, void *user_data) {
+    g_game_id = -1;
     
-    if (g_quit) {
-        gl_socket_close(&g_server_tcp_socket);
+    gl_socket_close(&g_server_socket);
+    
+    if (!g_should_quit) {
+        gl_client_connect();
     }
 }
 
-void message_dunno(gl_message_t *msg, int32_t socket_id, void *user_data) {
-    g_current_game_id = -1;
-    g_current_game_player_ready = false;
-}
-
-void message_gobye(gl_message_t *msg, int32_t socket_id, void *user_data) {
-    g_current_game_id = -1;
-    g_current_game_player_ready = false;
-    
-    gl_socket_close(&g_server_tcp_socket);
-    
-    if (g_quit) {
-        return;
-    }
-    
-    gl_connect_to_server();
-}
-
-void message_multi(gl_message_t *msg, int32_t socket_id, void *user_data) {
-    if (!g_multicast_ip && !g_multicast_port) {
+static void message_multi(gl_message_t *msg, int32_t socket_id, void *user_data) {
+    if (!g_multicast_ip) {
         g_multicast_ip = gl_cstring_create_from_ip(msg->parameters_value[0].string_value);
+    }
+    
+    if (!g_multicast_port) {
         g_multicast_port = gl_cstring_create_from_string(msg->parameters_value[1].string_value);
     }
 }
 
-void message_shutd(gl_message_t *msg, int32_t socket_id, void *user_data) {
-    g_server_down = true;
-    g_quit = true;
+static void message_shutd(gl_message_t *msg, int32_t socket_id, void *user_data) {
+    g_is_server_down = true;
+    g_should_quit = true;
 }
 
-void gl_message_add_functions() {
+void gl_client_message_add_functions() {
     gl_message_definitions()[GL_MESSAGE_TYPE_GAMES]->function = message_games;
     gl_message_definitions()[GL_MESSAGE_TYPE_OGAMES]->function = message_ogames;
     gl_message_definitions()[GL_MESSAGE_TYPE_REGOK]->function = message_regok;
-    gl_message_definitions()[GL_MESSAGE_TYPE_REGNO]->function = message_regno;
     gl_message_definitions()[GL_MESSAGE_TYPE_UNROK]->function = message_unrok;
-    gl_message_definitions()[GL_MESSAGE_TYPE_DUNNO]->function = message_dunno;
     gl_message_definitions()[GL_MESSAGE_TYPE_GOBYE]->function = message_gobye;
     gl_message_definitions()[GL_MESSAGE_TYPE_MULTI]->function = message_multi;
     gl_message_definitions()[GL_MESSAGE_TYPE_SHUTD]->function = message_shutd;
