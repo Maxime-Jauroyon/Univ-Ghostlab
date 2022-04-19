@@ -22,6 +22,7 @@ void message_newpl(gl_message_t *msg, int32_t socket_id, void *user_data) {
     memcpy(player.id, msg->parameters_value[0].string_value, 8);
     memcpy(player.port, msg->parameters_value[1].string_value, 4);
     player.socket_id = socket_id;
+    player.has_quit = false;
     gl_array_push(game.players, player);
     gl_array_push(g_games, game);
     gl_message_t new_msg = {.type = GL_MESSAGE_TYPE_REGOK, 0};
@@ -40,6 +41,7 @@ void message_regis(gl_message_t *msg, int32_t socket_id, void *user_data) {
     memcpy(player.id, msg->parameters_value[0].string_value, 8);
     memcpy(player.port, msg->parameters_value[1].string_value, 4);
     player.socket_id = socket_id;
+    player.has_quit = false;
     for (uint32_t i = 0; i < gl_array_get_size(g_games[game_id].players); i++) {
         if (strcmp(g_games[game_id].players[i].id, player.id) == 0) {
             gl_message_t new_msg = {.type = GL_MESSAGE_TYPE_REGNO, 0};
@@ -114,6 +116,20 @@ void message_unreg(gl_message_t *msg, int32_t socket_id, void *user_data) {
         gl_message_t new_msg = {.type = GL_MESSAGE_TYPE_UNROK, 0};
         gl_message_push_parameter(&new_msg, (gl_message_parameter_t) {.uint8_value = game_id });
         gl_message_send_tcp(socket_id, &new_msg);
+    
+        bool all_ready = true;
+        for (uint32_t i = 0; i < gl_array_get_size(g_games[game_id].players); i++) {
+            if (!g_games[game_id].players[i].ready) {
+                all_ready = false;
+                break;
+            }
+        }
+    
+        if (all_ready) {
+            g_games[game_id].maze = gl_maze_create(7 + 1 * gl_array_get_size(g_games[game_id].players), 7 + 1 * gl_array_get_size(g_games[game_id].players));
+            g_games[game_id].ghosts = gl_game_generate_ghosts(g_games[game_id].maze, gl_array_get_size(g_games[game_id].players));
+            g_games[game_id].started = true;
+        }
     } else {
         gl_message_t new_msg = {.type = GL_MESSAGE_TYPE_DUNNO, 0};
         gl_message_send_tcp(socket_id, &new_msg);
@@ -121,6 +137,19 @@ void message_unreg(gl_message_t *msg, int32_t socket_id, void *user_data) {
 }
 
 void message_iquit(gl_message_t *msg, int32_t socket_id, void *user_data) {
+    bool found = false;
+    for (uint32_t i = 0; i < gl_array_get_size(g_games); i++) {
+        for (uint32_t j = 0; j < gl_array_get_size(g_games[i].players); j++) {
+            if (g_games[i].players[j].socket_id == socket_id) {
+                g_games[i].players[j].has_quit = true;
+                break;
+            }
+        }
+        if (found) {
+            break;
+        }
+    }
+    
     gl_message_t new_msg = {.type = GL_MESSAGE_TYPE_GOBYE, 0};
     gl_message_send_tcp(socket_id, &new_msg);
     gl_socket_close(&socket_id);

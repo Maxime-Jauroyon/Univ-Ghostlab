@@ -723,12 +723,13 @@ int32_t gl_message_send_tcp(int32_t fd, struct gl_message_t *dst) {
     int32_t r;
     r = (int32_t)send(fd, buf, size, 0);
     gl_array_free(buf);
-    gl_message_free(dst);
     if (r < 0) {
+        gl_message_free(dst);
         return r;
     }
     gl_log_push("tcp: sent to %d: ", fd);
     gl_message_printf(dst);
+    gl_message_free(dst);
     return size;
 }
 

@@ -20,6 +20,7 @@ void message_games(gl_message_t *msg, int32_t socket_id, void *user_data) {
 void message_ogames(gl_message_t *msg, int32_t socket_id, void *user_data) {
     gl_game_t game = { 0 };
     game.id = msg->parameters_value[0].uint8_value;
+    game.started = false;
     sprintf(game.name, "Game %d", game.id);
     for (uint32_t i = 0; i < msg->parameters_value[1] .uint8_value; i++) {
         gl_player_t player = { 0 };
@@ -30,20 +31,44 @@ void message_ogames(gl_message_t *msg, int32_t socket_id, void *user_data) {
 
 void message_regok(gl_message_t *msg, int32_t socket_id, void *user_data) {
     g_current_game_id = msg->parameters_value[0].uint8_value;
+    
+    if (gl_get_current_game() == 0) {
+        gl_game_t game = { 0 };
+        game.id = msg->parameters_value[0].uint8_value;
+        game.started = false;
+        sprintf(game.name, "Game %d", game.id);
+        gl_player_t player = { 0 };
+        memcpy(player.id, g_current_player_id, 9);
+        gl_array_push(game.players, player);
+        gl_array_push(g_games, game);
+    }
 }
 
 void message_regno(gl_message_t *msg, int32_t socket_id, void *user_data) {
     gl_log_push("there was an issue joining the game\n");
     g_current_game_id = -1;
+    g_current_game_player_ready = false;
 }
 
 void message_unrok(gl_message_t *msg, int32_t socket_id, void *user_data) {
     g_current_game_id = -1;
+    g_current_game_player_ready = false;
+    
+    if (g_quit) {
+        gl_socket_close(&g_server_tcp_socket);
+    }
+}
+
+void message_dunno(gl_message_t *msg, int32_t socket_id, void *user_data) {
+    g_current_game_id = -1;
+    g_current_game_player_ready = false;
 }
 
 void message_gobye(gl_message_t *msg, int32_t socket_id, void *user_data) {
-    gl_socket_close(&g_server_tcp_socket);
     g_current_game_id = -1;
+    g_current_game_player_ready = false;
+    
+    gl_socket_close(&g_server_tcp_socket);
     
     if (g_quit) {
         return;
@@ -70,6 +95,7 @@ void gl_message_add_functions() {
     gl_message_definitions()[GL_MESSAGE_TYPE_REGOK]->function = message_regok;
     gl_message_definitions()[GL_MESSAGE_TYPE_REGNO]->function = message_regno;
     gl_message_definitions()[GL_MESSAGE_TYPE_UNROK]->function = message_unrok;
+    gl_message_definitions()[GL_MESSAGE_TYPE_DUNNO]->function = message_dunno;
     gl_message_definitions()[GL_MESSAGE_TYPE_GOBYE]->function = message_gobye;
     gl_message_definitions()[GL_MESSAGE_TYPE_MULTI]->function = message_multi;
     gl_message_definitions()[GL_MESSAGE_TYPE_SHUTD]->function = message_shutd;

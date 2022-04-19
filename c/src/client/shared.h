@@ -25,6 +25,10 @@ extern void *g_udp_thread;
 extern void *g_gameplay_mutex;
 extern struct gl_game_t *g_games;
 extern int32_t g_current_game_id;
+extern bool g_current_game_player_ready;
+extern char g_current_player_id[9];
+
+struct gl_game_t *gl_get_current_game();
 
 void gl_connect_to_server();
 

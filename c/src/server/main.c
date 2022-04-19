@@ -169,9 +169,46 @@ static void draw_main_gui() {
             if (igCollapsingHeaderTreeNodeFlags("Available games", 0)) {
                 for (uint32_t i = 0; i < gl_array_get_size(g_games); i++) {
                     if (igCollapsingHeaderTreeNodeFlags(g_games[i].name, 0)) {
-                        igText("There are %d player(s) connected%s", gl_array_get_size(g_games[i].players), gl_array_get_size(g_games[i].players) == 0 ? "." : ":");
-                        for (uint32_t j = 0; j <  gl_array_get_size(g_games[i].players); j++) {
-                            igText("- %s", g_games[i].players[j].id);
+                        if (g_games[i].started) {
+                            igText("Game has started.");
+                        } else {
+                            igText("Waiting for all players to be ready to start the game.");
+                        }
+                        
+                        char buf1[128] = { 0 };
+                        sprintf(buf1, "Players (%d connected)###PlayersConnected", (uint32_t)gl_array_get_size(g_games[i].players));
+                        if (igCollapsingHeaderTreeNodeFlags(buf1, 0)) {
+                            for (uint32_t j = 0; j <  gl_array_get_size(g_games[i].players); j++) {
+                                igText("- %s%s", g_games[i].players[j].id, !g_games[i].started && g_games[i].players[j].ready ? " (ready)" : "");
+                            }
+                        }
+    
+                        if (g_games[i].maze) {
+                            if (igCollapsingHeaderTreeNodeFlags("Maze", 0)) {
+                                ImGuiIO *io = igGetIO();
+            
+                                //igBeginChildStr("#maze_output", (ImVec2) { 0, 0 }, true, 0);
+                                igPushFont(io->Fonts->Fonts.Data[io->Fonts->Fonts.Size - 1]);
+                                igPushStyleVarVec2(ImGuiStyleVar_ItemSpacing, (ImVec2) { 0, 0 });
+                                for (uint32_t y = 0; y < gl_array_get_size(g_games[i].maze->grid); y++) {
+                                    char buf2[128] = { 0 };
+                                    uint32_t buf2_idx = 0;
+                
+                                    for (uint32_t x = 0; x < gl_array_get_size(g_games[i].maze->grid[y]); x++) {
+                                        if (g_games[i].maze->grid[y][x] == GL_MAZE_ELEMENT_PILLAR || g_games[i].maze->grid[y][x] == GL_MAZE_ELEMENT_WALL_CLOSED) {
+                                            buf2[buf2_idx++] = '#';
+                                        } else if (g_games[i].maze->grid[y][x] == GL_MAZE_ELEMENT_WALL_OPENED || g_games[i].maze->grid[y][x] == GL_MAZE_ELEMENT_ROOM) {
+                                            buf2[buf2_idx++] = ' ';
+                                        }
+                                    }
+                
+                                    igTextUnformatted(buf2, 0);
+                                }
+            
+                                igPopStyleVar(1);
+                                igPopFont();
+                                //igEndChild();
+                            }
                         }
                     }
                 }

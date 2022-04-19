@@ -39,6 +39,8 @@ void *g_udp_thread = 0;
 void *g_gameplay_mutex = &internal_g_gameplay_mutex;
 struct gl_game_t *g_games = 0;
 int32_t g_current_game_id = -1;
+bool g_current_game_player_ready = false;
+char g_current_player_id[9] = { 0 };
 
 void gl_connect_to_server() {
     g_server_tcp_socket = gl_socket_create(g_server_ip, g_server_port, GL_SOCKET_TYPE_TCP_CLIENT, 0);
@@ -56,4 +58,14 @@ void gl_free_games() {
         gl_array_free(g_games[i].players);
     }
     gl_array_free(g_games);
+}
+
+gl_game_t *gl_get_current_game() {
+    for (uint32_t i = 0; i < gl_array_get_size(g_games); i++) {
+        if (g_games[i].id == g_current_game_id) {
+            return &g_games[i];
+        }
+    }
+    
+    return 0;
 }

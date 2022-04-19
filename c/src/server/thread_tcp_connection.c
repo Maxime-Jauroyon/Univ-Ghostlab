@@ -30,6 +30,21 @@ void *gl_thread_tcp_connection_main(void *user_data) {
         }
     }
     
+    pthread_mutex_lock(g_gameplay_mutex);
+    bool found = false;
+    for (uint32_t i = 0; i < gl_array_get_size(g_games); i++) {
+        for (uint32_t j = 0; j < gl_array_get_size(g_games[i].players); j++) {
+            if (g_games[i].players[j].socket_id == socket_id) {
+                g_games[i].players[j].has_quit = true;
+                break;
+            }
+        }
+        if (found) {
+            break;
+        }
+    }
+    pthread_mutex_unlock(g_gameplay_mutex);
+    
     gl_socket_close(&socket_id);
     
     gl_log_push("connection %d thread stopped.\n", id);

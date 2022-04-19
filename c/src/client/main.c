@@ -30,7 +30,6 @@ static int32_t g_exit_code = EXIT_SUCCESS;
 static bool g_show_console = true;
 static bool g_join_game_popup = false;
 static bool g_create_game_popup = false;
-static char join_game_player_id_buf[9] = {0 };
 static uint32_t join_game_error = 0;
 static uint8_t join_game_id = 0;
 
@@ -155,14 +154,18 @@ int main(int argc, char **argv) {
 
     if (g_server_tcp_socket) {
         if (g_current_game_id != -1) {
-            gl_message_t msg = {.type = GL_MESSAGE_TYPE_UNREG, .parameters_value = 0};
-            gl_message_send_tcp(g_server_tcp_socket, &msg);
-            gl_message_wait_and_execute(g_server_tcp_socket, GL_MESSAGE_PROTOCOL_TCP);
+            if (gl_get_current_game()->started) {
+                gl_message_t msg = {.type = GL_MESSAGE_TYPE_IQUIT, .parameters_value = 0};
+                gl_message_send_tcp(g_server_tcp_socket, &msg);
+                gl_message_wait_and_execute(g_server_tcp_socket, GL_MESSAGE_PROTOCOL_TCP);
+            } else if (!g_current_game_player_ready) {
+                gl_message_t msg = {.type = GL_MESSAGE_TYPE_UNREG, .parameters_value = 0};
+                gl_message_send_tcp(g_server_tcp_socket, &msg);
+                gl_message_wait_and_execute(g_server_tcp_socket, GL_MESSAGE_PROTOCOL_TCP);
+            }
         }
-        
-        gl_message_t msg = {.type = GL_MESSAGE_TYPE_IQUIT, .parameters_value = 0};
-        gl_message_send_tcp(g_server_tcp_socket, &msg);
-        gl_message_wait_and_execute(g_server_tcp_socket, GL_MESSAGE_PROTOCOL_TCP);
+    
+        gl_socket_close(&g_server_tcp_socket);
     }
     
     if (g_server_down) {
@@ -233,10 +236,11 @@ static void draw_main_gui() {
                     }
                 }
             }
-        } else {
+        } else if (!g_current_game_player_ready) {
             if (igButton("Ready To Start", (ImVec2) { 0, 0 })) {
                 gl_message_t msg = { .type = GL_MESSAGE_TYPE_START, .parameters_value = 0 };
                 gl_message_send_tcp(g_server_tcp_socket, &msg);
+                g_current_game_player_ready = true;
             }
             igSameLine(0, -1);
             if (igButton("Disconnect", (ImVec2) { 0, 0 })) {
@@ -255,6 +259,10 @@ static void draw_main_gui() {
             if (igButton("Quit", (ImVec2) { 0, 0 })) {
                 g_quit = true;
             }
+        } else if (gl_get_current_game()->started) {
+            igText("GAME STARTED");
+        } else {
+            igText("Waiting for %s to start...", gl_get_current_game()->name);
         }
 
         igEnd();
@@ -276,7 +284,7 @@ static void draw_join_game_popup(bool create) {
     }
     if (igBeginPopupModal(buf, 0, ImGuiWindowFlags_AlwaysAutoResize)) {
         igText(" ");
-        igInputText("Choose a name.", join_game_player_id_buf, 9, 0, 0, 0);
+        igInputText("Choose a name.", g_current_player_id, 9, 0, 0, 0);
         igText(" ");
         if (igButton("Back", (ImVec2) { 0, 0 })) {
             g_join_game_popup = false;
@@ -285,11 +293,11 @@ static void draw_join_game_popup(bool create) {
         }
         igSameLine(0, -1);
         if (igButton(create ? "Create" : "Join", (ImVec2) { 0, 0 })) {
-            bool error = strlen(join_game_player_id_buf) != 8;
+            bool error = strlen(g_current_player_id) != 8;
             
             if (!error) {
-                for (uint32_t i = 0; i < strlen(join_game_player_id_buf); i++) {
-                    if (!isalpha(join_game_player_id_buf[i]) && !isdigit(join_game_player_id_buf[i])) {
+                for (uint32_t i = 0; i < strlen(g_current_player_id); i++) {
+                    if (!isalpha(g_current_player_id[i]) && !isdigit(g_current_player_id[i])) {
                         error = true;
                         break;
                     }
@@ -303,7 +311,7 @@ static void draw_join_game_popup(bool create) {
                 } else {
                     msg = (gl_message_t) { .type = GL_MESSAGE_TYPE_REGIS, .parameters_value = 0 };
                 }
-                gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring(join_game_player_id_buf) });
+                gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring(g_current_player_id) });
                 gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number(g_udp_port, 4) });
                 if (!create) {
                     gl_message_push_parameter(&msg, (gl_message_parameter_t) {.uint8_value = join_game_id });
@@ -313,7 +321,7 @@ static void draw_join_game_popup(bool create) {
                 if (g_current_game_id != -1) {
                     g_join_game_popup = false;
                     g_create_game_popup = false;
-                    bzero(join_game_player_id_buf, 9);
+                    bzero(g_current_player_id, 9);
                 } else {
                     join_game_error = 2;
                 }

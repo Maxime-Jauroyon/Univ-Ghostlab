@@ -12,6 +12,7 @@ typedef struct gl_player_t {
     gl_pos_t pos;
     int32_t socket_id;
     bool ready;
+    bool has_quit;
 } gl_player_t;
 
 typedef struct gl_ghost_t {
