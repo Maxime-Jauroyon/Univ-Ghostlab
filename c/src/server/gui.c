@@ -68,10 +68,12 @@ void gl_server_draw_main_window() {
                         
                         if (g_games[i].maze) {
                             ImGuiIO *io = igGetIO();
-    
+
+#if GHOSTLAB_GUI
                             igPushFont(io->Fonts->Fonts.Data[io->Fonts->Fonts.Size - 1]);
                             igPushStyleVarVec2(ImGuiStyleVar_ItemSpacing, (ImVec2) { 0, 0 });
-    
+#endif
+                            
                             for (uint32_t y = 0; y < gl_array_get_size(g_games[i].maze->grid); y++) {
                                 char buf2[128] = { 0 };
                                 uint32_t buf2_idx = 0;
@@ -102,15 +104,19 @@ void gl_server_draw_main_window() {
                                         }
                                     }
                                 }
-    
+
+#if GHOSTLAB_GUI
                                 if (y > 0) {
                                     igSetCursorPosY(igGetCursorPosY() - 6);
                                 }
+#endif
                                 igTextUnformatted(buf2, 0);
                             }
-    
+
+#if GHOSTLAB_GUI
                             igPopStyleVar(1);
                             igPopFont();
+#endif
                         }
                     }
                 }

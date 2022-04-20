@@ -72,28 +72,44 @@ void gl_client_main_window_draw() {
                 igSameLine(0, -1);
     
                 igInputText("###NumberInput", g_main_window_movement, 4, ImGuiInputTextFlags_CharsDecimal, 0, 0);
-    
-                if (igButton("Move Up", (ImVec2) { 207, 0 })) {
+
+#if GHOSTLAB_GUI
+                if (igButton("Move Up", (ImVec2) { 208, 0 })) {
+#else
+                    if (igButton("Move Up", (ImVec2) { 0, 0 })) {
+#endif
                     gl_message_t msg = { .type = GL_MESSAGE_TYPE_UPMOV, .parameters_value = 0 };
                     gl_message_push_parameter(&msg, (gl_message_parameter_t) { .string_value = gl_string_create_from_number(g_main_window_movement, 3) });
                     gl_message_send_tcp(g_tcp_listener_socket, &msg);
                 }
-    
+
+#if GHOSTLAB_GUI
                 if (igButton("Move Left", (ImVec2) { 100, 0 })) {
+#else
+                    if (igButton("Move Left", (ImVec2) { 0, 0 })) {
+#endif
                     gl_message_t msg = { .type = GL_MESSAGE_TYPE_LEMOV, .parameters_value = 0 };
                     gl_message_push_parameter(&msg, (gl_message_parameter_t) { .string_value = gl_string_create_from_number(g_main_window_movement, 3) });
                     gl_message_send_tcp(g_tcp_listener_socket, &msg);
                 }
     
                 igSameLine(0, -1);
-                
+
+#if GHOSTLAB_GUI
                 if (igButton("Move Right", (ImVec2) { 100, 0 })) {
+#else
+                    if (igButton("Move Right", (ImVec2) { 0, 0 })) {
+#endif
                     gl_message_t msg = { .type = GL_MESSAGE_TYPE_RIMOV, .parameters_value = 0 };
                     gl_message_push_parameter(&msg, (gl_message_parameter_t) { .string_value = gl_string_create_from_number(g_main_window_movement, 3) });
                     gl_message_send_tcp(g_tcp_listener_socket, &msg);
                 }
-    
-                if (igButton("Move Down", (ImVec2) { 207, 0 })) {
+
+#if GHOSTLAB_GUI
+                if (igButton("Move Down", (ImVec2) { 208, 0 })) {
+#else
+                    if (igButton("Move Down", (ImVec2) { 0, 0 })) {
+#endif
                     gl_message_t msg = { .type = GL_MESSAGE_TYPE_DOMOV, .parameters_value = 0 };
                     gl_message_push_parameter(&msg, (gl_message_parameter_t) { .string_value = gl_string_create_from_number(g_main_window_movement, 3) });
                     gl_message_send_tcp(g_tcp_listener_socket, &msg);
@@ -198,9 +214,11 @@ void gl_client_main_window_game_data_draw(struct gl_game_t *game, bool show_play
         
         if (game->started) {
             ImGuiIO *io = igGetIO();
-            
+
+#if GHOSTLAB_GUI
             igPushFont(io->Fonts->Fonts.Data[io->Fonts->Fonts.Size - 1]);
             igPushStyleVarVec2(ImGuiStyleVar_ItemSpacing, (ImVec2) { 0, 0 });
+#endif
             
             for (uint32_t y = 0; y < game->maze_size.y; y++) {
                 char buf2[128] = { 0 };
@@ -223,15 +241,19 @@ void gl_client_main_window_game_data_draw(struct gl_game_t *game, bool show_play
                         buf2[buf2_idx++] = '?';
                     }
                 }
-    
+
+#if GHOSTLAB_GUI
                 if (y > 0) {
                     igSetCursorPosY(igGetCursorPosY() - 6);
                 }
+#endif
                 igTextUnformatted(buf2, 0);
             }
-    
+
+#if GHOSTLAB_GUI
             igPopStyleVar(1);
             igPopFont();
+#endif
         }
     } else if (!game->started) {
         game->reload_maze_data = true;
