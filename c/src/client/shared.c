@@ -32,31 +32,25 @@ char *g_server_port = 0;
 char *g_udp_port = 0;
 char *g_multicast_ip = 0;
 char *g_multicast_port = 0;
-int32_t g_server_socket = -1;
+int32_t g_tcp_acceptor_socket = -1;
 int32_t g_multicast_general_socket = -1;
 int32_t g_udp_socket = -1;
 void *g_multicast_general_listener_thread = 0;
 void *g_udp_listener_thread = 0;
-void *g_start_handler_thread = 0;
+void *g_tcp_listener_thread = 0;
 void *g_main_mutex = &internal_g_main_mutex;
 gl_game_t *g_games = 0;
 int32_t g_game_id = -1;
 char g_player_id[9] = { 0 };
 
 int32_t gl_client_connect() {
-    g_server_socket = gl_socket_create(g_server_ip, g_server_port, GL_SOCKET_TYPE_TCP_CLIENT, 0);
+    g_tcp_acceptor_socket = gl_socket_create(g_server_ip, g_server_port, GL_SOCKET_TYPE_TCP_CLIENT, 0);
     
-    if (g_server_socket == -1) {
+    if (g_tcp_acceptor_socket == -1) {
         return -1;
     }
     
     gl_log_push("connection to server established.\n");
-    
-    if (!g_use_legacy_protocol) {
-        gl_message_wait_and_execute_no_lock(g_server_socket, GL_MESSAGE_PROTOCOL_TCP); // MULTI
-    }
-    
-    gl_message_wait_and_execute_no_lock(g_server_socket, GL_MESSAGE_PROTOCOL_TCP); // GAMES
     
     return 0;
 }
@@ -66,20 +60,17 @@ void gl_client_disconnect(bool close_socket) {
     
     if (game && game->started) {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_IQUIT, .parameters_value = 0 };
-        gl_message_send_tcp(g_server_socket, &msg);
-        gl_message_wait_and_execute(g_server_socket, GL_MESSAGE_PROTOCOL_TCP); // GOBYE
+        gl_message_send_tcp(g_tcp_acceptor_socket, &msg);
     } else if (game && !gl_client_get_player()->ready) {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_UNREG, .parameters_value = 0 };
-        gl_message_send_tcp(g_server_socket, &msg);
-        gl_message_wait_and_execute(g_server_socket, GL_MESSAGE_PROTOCOL_TCP); //  UNROK, DUNNO
+        gl_message_send_tcp(g_tcp_acceptor_socket, &msg);
     }
     
     if (close_socket) {
-        gl_socket_close(&g_server_socket);
+        gl_socket_close(&g_tcp_acceptor_socket);
     } else {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_GAME_REQ, .parameters_value = 0 };
-        gl_message_send_tcp(g_server_socket, &msg);
-        gl_message_wait_and_execute(g_server_socket, GL_MESSAGE_PROTOCOL_TCP); //  GAMES
+        gl_message_send_tcp(g_tcp_acceptor_socket, &msg);
     }
 }
 

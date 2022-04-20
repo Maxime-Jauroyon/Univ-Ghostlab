@@ -10,31 +10,30 @@
 
 static bool g_console_window_visible = true;
 static bool g_create_game_popup_visible = false;
-static uint32_t g_create_game_popup_error_type = 0;
 static bool g_join_game_popup_visible = false;
 static uint32_t g_join_game_popup_game_id = 0;
-static uint32_t g_join_game_popup_error_type = 0;
+static uint32_t g_error = 0;
 
 void gl_client_draw() {
     while (!g_should_quit) {
         gl_gui_start_render(&g_should_quit);
     
         if (g_create_game_popup_visible) {
-            gl_client_draw_create_game_popup();
+            gl_client_create_game_popup_draw();
         } else if (g_join_game_popup_visible) {
-            gl_client_draw_join_game_popup();
+            gl_client_join_game_popup_draw();
         } else {
-            gl_client_draw_main_window();
+            gl_client_main_window_draw();
         }
     
         gl_gui_end_render();
     }
 }
 
-void gl_client_draw_main_window() {
+void gl_client_main_window_draw() {
     gl_igBegin("Ghostlab Client", g_console_window_visible ? 0.6f : 1.0f);
     
-    gl_client_draw_main_window_menu_bar();
+    gl_client_main_window_menu_bar_draw();
     
     if (!gl_client_get_game()) {
         if (igButton("Create Game", (ImVec2) {0, 0})) {
@@ -46,8 +45,7 @@ void gl_client_draw_main_window() {
         if (!gl_client_get_player()->ready) {
             if (igButton("Ready To Start", (ImVec2) { 0, 0 })) {
                 gl_message_t msg = { .type = GL_MESSAGE_TYPE_START, .parameters_value = 0 };
-                gl_message_send_tcp(g_server_socket, &msg);
-                gl_message_wait_and_execute(g_server_socket, GL_MESSAGE_PROTOCOL_TCP);
+                gl_message_send_tcp(g_tcp_acceptor_socket, &msg);
             }
         } else {
             // TODO: When game started
@@ -56,9 +54,6 @@ void gl_client_draw_main_window() {
         if (!gl_client_get_player()->ready || gl_client_get_game()->started) {
             if (igButton("Disconnect", (ImVec2) { 0, 0 })) {
                 gl_client_disconnect(false);
-                gl_message_t msg = { .type = GL_MESSAGE_TYPE_GAME_REQ, .parameters_value = 0 };
-                gl_message_send_tcp(g_server_socket, &msg);
-                gl_message_wait_and_execute(g_server_socket, GL_MESSAGE_PROTOCOL_TCP);
             }
         }
     }
@@ -67,8 +62,7 @@ void gl_client_draw_main_window() {
         if (igCollapsingHeaderTreeNodeFlags("Available Games", 0)) {
             if (igButton("Reload", (ImVec2) {0, 0})) {
                 gl_message_t msg = { .type = GL_MESSAGE_TYPE_GAME_REQ, .parameters_value = 0 };
-                gl_message_send_tcp(g_server_socket, &msg);
-                gl_message_wait_and_execute(g_server_socket, GL_MESSAGE_PROTOCOL_TCP);
+                gl_message_send_tcp(g_tcp_acceptor_socket, &msg);
             }
             
             if (gl_array_get_size(g_games) > 0) {
@@ -76,7 +70,6 @@ void gl_client_draw_main_window() {
                     if ((!gl_client_get_game() || gl_client_get_game()->id != g_games[i].id) && igCollapsingHeaderTreeNodeFlags(g_games[i].name, 0)) {
                         if (igButton("Join", (ImVec2) {0, 0})) {
                             g_join_game_popup_visible = true;
-                            g_create_game_popup_visible = false;
                             g_join_game_popup_game_id = g_games[i].id;
                         }
                     }
@@ -89,10 +82,10 @@ void gl_client_draw_main_window() {
     
     igEnd();
     
-    gl_client_draw_console_window();
+    gl_client_console_window_draw();
 }
 
-void gl_client_draw_main_window_menu_bar() {
+void gl_client_main_window_menu_bar_draw() {
     if (igBeginMenuBar()) {
         if (igBeginMenu("File", true)) {
             igMenuItemBoolPtr("Quit", 0, &g_should_quit, true);
@@ -108,13 +101,13 @@ void gl_client_draw_main_window_menu_bar() {
     }
 }
 
-void gl_client_draw_console_window() {
+void gl_client_console_window_draw() {
     if (g_console_window_visible) {
         gl_igConsole(gl_client_command_definitions(), GL_COMMAND_TYPE_COUNT);
     }
 }
 
-void gl_client_draw_create_game_popup() {
+void gl_client_create_game_popup_draw() {
     igOpenPopup("###CreateGame", 0);
     
     if (igBeginPopupModal("Create Game###CreateGame", 0, ImGuiWindowFlags_AlwaysAutoResize)) {
@@ -125,8 +118,7 @@ void gl_client_draw_create_game_popup() {
         igInputText("###PlayerName", g_player_id, 9, 0, 0, 0);
         
         if (igButton("Back", (ImVec2) { 0, 0 })) {
-            g_create_game_popup_visible = false;
-            g_create_game_popup_error_type = 0;
+            gl_client_create_game_popup_close();
         }
         
         igSameLine(0, -1);
@@ -136,24 +128,16 @@ void gl_client_draw_create_game_popup() {
                 gl_message_t msg = { .type = GL_MESSAGE_TYPE_NEWPL, .parameters_value = 0 };
                 gl_message_push_parameter(&msg, (gl_message_parameter_t) { .string_value = gl_string_create_from_cstring(g_player_id) });
                 gl_message_push_parameter(&msg, (gl_message_parameter_t) { .string_value = gl_string_create_from_number(g_udp_port, 4) });
-                gl_message_send_tcp(g_server_socket, &msg);
-                gl_message_wait_and_execute_no_lock(g_server_socket, GL_MESSAGE_PROTOCOL_TCP);
-                
-                if (g_game_id != -1) {
-                    g_create_game_popup_visible = false;
-                    g_create_game_popup_error_type = 0;
-                } else {
-                    g_create_game_popup_error_type = 2;
-                }
+                gl_message_send_tcp(g_tcp_acceptor_socket, &msg);
             } else {
-                g_create_game_popup_error_type = 1;
+                gl_client_error(1);
             }
         }
         
-        if (g_create_game_popup_error_type) {
+        if (g_error) {
             igText("Error(s):");
             
-            if (g_create_game_popup_error_type == 1) {
+            if (g_error == 1) {
                 igText("- This name format is invalid, it should contain 8 characters in the range [a-zA-Z0-9]!");
             } else {
                 // TODO: Separate these two errors
@@ -165,7 +149,7 @@ void gl_client_draw_create_game_popup() {
     }
 }
 
-void gl_client_draw_join_game_popup() {
+void gl_client_join_game_popup_draw() {
     igOpenPopup("###JoinGame", 0);
     
     char title[512] = { 0 };
@@ -178,9 +162,7 @@ void gl_client_draw_join_game_popup() {
         igInputText("###PlayerName", g_player_id, 9, 0, 0, 0);
         
         if (igButton("Back", (ImVec2) { 0, 0 })) {
-            g_join_game_popup_visible = false;
-            g_join_game_popup_game_id = 0;
-            g_join_game_popup_error_type = 0;
+            gl_client_join_game_popup_close();
         }
         
         igSameLine(0, -1);
@@ -191,25 +173,16 @@ void gl_client_draw_join_game_popup() {
                 gl_message_push_parameter(&msg, (gl_message_parameter_t) { .string_value = gl_string_create_from_cstring(g_player_id) });
                 gl_message_push_parameter(&msg, (gl_message_parameter_t) { .string_value = gl_string_create_from_number(g_udp_port, 4) });
                 gl_message_push_parameter(&msg, (gl_message_parameter_t) { .uint8_value = g_join_game_popup_game_id });
-                gl_message_send_tcp(g_server_socket, &msg);
-                gl_message_wait_and_execute_no_lock(g_server_socket, GL_MESSAGE_PROTOCOL_TCP);
-                
-                if (g_game_id != -1) {
-                    g_join_game_popup_visible = false;
-                    g_join_game_popup_game_id = 0;
-                    g_join_game_popup_error_type = 0;
-                } else {
-                    g_join_game_popup_error_type = 2;
-                }
+                gl_message_send_tcp(g_tcp_acceptor_socket, &msg);
             } else {
-                g_join_game_popup_error_type = 1;
+                gl_client_error(1);
             }
         }
         
-        if (g_join_game_popup_error_type) {
+        if (g_error) {
             igText("Error(s):");
             
-            if (g_join_game_popup_error_type == 1) {
+            if (g_error == 1) {
                 igText("- This name format is invalid, it should contain 8 characters in the range [a-zA-Z0-9]!");
             } else {
                 // TODO: Separate these two errors
@@ -221,7 +194,7 @@ void gl_client_draw_join_game_popup() {
     }
 }
 
-void gl_client_draw_server_down_popup() {
+void gl_client_server_down_popup_draw() {
     bool quit = false;
     while (!quit) {
         gl_gui_start_render(&quit);
@@ -245,4 +218,19 @@ void gl_client_draw_server_down_popup() {
         
         gl_gui_end_render();
     }
+}
+
+void gl_client_create_game_popup_close() {
+    g_create_game_popup_visible = false;
+    gl_client_error(0);
+}
+
+void gl_client_join_game_popup_close() {
+    g_join_game_popup_visible = false;
+    g_join_game_popup_game_id = 0;
+    gl_client_error(0);
+}
+
+void gl_client_error(uint32_t error) {
+    g_error = error;
 }

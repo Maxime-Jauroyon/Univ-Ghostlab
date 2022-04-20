@@ -107,8 +107,8 @@ set(CLIENT_SRC
         src/client/thread_multicast_game_listener.h
         src/client/thread_multicast_general_listener.c
         src/client/thread_multicast_general_listener.h
-        src/client/thread_start_handler.c
-        src/client/thread_start_handler.h
+        src/client/thread_tcp_listener.c
+        src/client/thread_tcp_listener.h
         src/client/thread_udp_listener.c
         src/client/thread_udp_listener.h)
 

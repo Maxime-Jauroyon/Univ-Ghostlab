@@ -33,7 +33,7 @@ void gl_execute_command(char *cmd, uint32_t buf_size, const gl_command_definitio
     if (found_pos < cmd_defs_count) {
         cmd_defs[found_pos]->function(0);
     } else {
-        gl_log_push_warning("invalid option -- %s\n", cmd);
+        gl_log_push_warning("invalid option `%s`!\n", cmd);
         gl_log_push_warning("use `h` for more informations.\n");
     }
     

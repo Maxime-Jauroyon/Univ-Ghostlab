@@ -22,8 +22,8 @@ void gl_server_draw_main_window() {
     
     gl_server_draw_main_window_menu_bar();
     
-    if (gl_array_get_size(g_games) > 0) {
-        if (igCollapsingHeaderTreeNodeFlags("Available Games", 0)) {
+    if (igCollapsingHeaderTreeNodeFlags("Available Games", 0)) {
+        if (gl_array_get_size(g_games) > 0) {
             for (uint32_t i = 0; i < gl_array_get_size(g_games); i++) {
                 if (igCollapsingHeaderTreeNodeFlags(g_games[i].name, 0)) {
                     if (g_games[i].started) {
@@ -68,9 +68,9 @@ void gl_server_draw_main_window() {
                     }
                 }
             }
+        } else {
+            igText("There are currently no games.");
         }
-    } else {
-        igText("There are currently no games.");
     }
     
     igEnd();

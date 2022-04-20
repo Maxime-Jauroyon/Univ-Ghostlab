@@ -13,6 +13,7 @@
 #include <client/gui.h>
 #include <client/shared.h>
 #include <client/message.h>
+#include <client/thread_tcp_listener.h>
 #include <client/thread_udp_listener.h>
 #include <client/thread_multicast_general_listener.h>
 
@@ -67,16 +68,12 @@ static int32_t gl_client_init(int argc, char **argv) {
     gl_gui_create("Ghostlab Client");
     
     if (gl_client_connect() == -1) {
-        gl_client_draw_server_down_popup();
+        gl_client_server_down_popup_draw();
         return -1;
     }
     
-    g_start_handler_thread = gl_malloc(sizeof(pthread_t));
-    
-    if (!g_use_legacy_protocol) {
-        g_multicast_general_listener_thread = gl_malloc(sizeof(pthread_t));
-        pthread_create(g_multicast_general_listener_thread, 0, gl_client_thread_multicast_general_listener_main, 0);
-    }
+    g_tcp_listener_thread = gl_malloc(sizeof(pthread_t));
+    pthread_create(g_tcp_listener_thread, 0, gl_client_thread_tcp_listener_main, 0);
     
     g_udp_listener_thread = gl_malloc(sizeof(pthread_t));
     pthread_create(g_udp_listener_thread, 0, gl_client_thread_udp_listener_main, 0);
@@ -150,17 +147,17 @@ static void gl_client_free() {
         gl_free(g_multicast_general_listener_thread);
     }
     
-    if (g_server_socket) {
+    if (g_tcp_acceptor_socket) {
         gl_client_disconnect(true);
     }
     
-    if (g_start_handler_thread) {
-        pthread_join(*(pthread_t *)g_start_handler_thread, 0);
-        gl_free(g_start_handler_thread);
+    if (g_tcp_listener_thread) {
+        pthread_join(*(pthread_t *)g_tcp_listener_thread, 0);
+        gl_free(g_tcp_listener_thread);
     }
     
     if (g_is_server_down) {
-        gl_client_draw_server_down_popup();
+        gl_client_server_down_popup_draw();
     }
     
     gl_game_free_all(g_games);

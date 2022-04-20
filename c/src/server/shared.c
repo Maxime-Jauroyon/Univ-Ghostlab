@@ -30,8 +30,8 @@ char *g_server_ip = 0;
 char *g_server_port = 0;
 char *g_multicast_ip = 0;
 char *g_multicast_port = 0;
-int32_t g_server_socket = -1;
-int32_t *g_client_sockets = 0;
+int32_t g_tcp_acceptor_socket = -1;
+int32_t *g_tcp_listener_sockets = 0;
 void *g_tcp_acceptor_thread = 0;
 void **g_tcp_listener_threads = 0;
 void *g_main_mutex = &internal_g_main_mutex;
@@ -175,13 +175,13 @@ void gl_server_send_game_list(int32_t socket_id) {
 
 void gl_server_free_listeners() {
     for (uint32_t i = 0; i < gl_array_get_size(g_tcp_listener_threads); i++) {
-        gl_socket_close(&g_client_sockets[i]);
+        gl_socket_close(&g_tcp_listener_sockets[i]);
         pthread_join(*(pthread_t *)g_tcp_listener_threads[i], 0);
         gl_free(g_tcp_listener_threads[i]);
     }
     
-    gl_array_free(g_client_sockets);
+    gl_array_free(g_tcp_listener_sockets);
     gl_array_free(g_tcp_listener_threads);
     
-    gl_socket_close(&g_server_socket);
+    gl_socket_close(&g_tcp_acceptor_socket);
 }
