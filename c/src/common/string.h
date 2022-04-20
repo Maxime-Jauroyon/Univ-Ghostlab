@@ -21,4 +21,6 @@ int32_t gl_write_cstring(uint8_t **buf, const char **n);
 
 void gl_string_printf(uint8_t **str);
 
+int64_t gl_string_strtol(const uint8_t *str);
+
 #endif /* GHOSTLAB_STRING_H */

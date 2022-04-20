@@ -6,6 +6,7 @@
 #include <common/utils.h>
 #include <common/memory.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 uint8_t *gl_string_create_from_cstring(const char *src) {
     uint8_t *dst = 0;
@@ -140,4 +141,15 @@ void gl_string_printf(uint8_t **str) {
     for (uint32_t i = 0; i < gl_array_get_size(*str); i++) {
         gl_log_push("%c", (*str)[i]);
     }
+}
+
+int64_t gl_string_strtol(const uint8_t *str) {
+    uint64_t size = gl_array_get_size(str);
+    char buf[size + 1];
+    bzero(buf, size + 1);
+    for (uint32_t i = 0; i < size; i++) {
+        buf[i] = (char)str[i];
+    }
+    buf[size] = 0;
+    return strtol(buf, 0, 10);
 }

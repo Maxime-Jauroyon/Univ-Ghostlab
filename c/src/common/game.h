@@ -35,7 +35,8 @@ typedef struct gl_game_t {
 #if GHOSTLAB_CLIENT
     gl_pos_t maze_size;
     bool reload_maze_data;
-    bool reload_players_data;
+    bool reload_players_data_1;
+    bool reload_players_data_2;
 #endif
 } gl_game_t;
 

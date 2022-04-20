@@ -174,6 +174,7 @@ static void gl_client_free() {
     gl_free(g_udp_port);
     gl_free(g_multicast_ip);
     gl_free(g_multicast_port);
+    gl_array_free(g_players_message_list);
     
     gl_log_free();
     

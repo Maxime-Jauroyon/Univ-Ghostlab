@@ -28,6 +28,8 @@ extern struct gl_game_t *g_games;
 extern int32_t g_game_id;
 extern char g_player_id[9];
 extern char g_temp_player_id[9];
+extern char **g_players_message_list;
+extern char g_everyone[];
 
 int32_t gl_client_connect();
 

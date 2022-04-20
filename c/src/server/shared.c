@@ -224,7 +224,7 @@ void gl_server_send_game_list(int32_t socket_id) {
 void gl_server_send_move(int32_t socket_id, struct gl_message_t *msg, enum gl_movement_t movement) {
     gl_game_t *game = gl_server_get_game_with_socket(socket_id);
     gl_player_t *player = gl_server_get_player_with_socket(socket_id);
-    uint32_t quantity = strtol((char *)msg->parameters_value[0].string_value, 0, 10);
+    uint32_t quantity = gl_string_strtol(msg->parameters_value[0].string_value);
     uint32_t removed = gl_game_move_player(game, player, quantity, movement);
     
     if (removed > 0) {

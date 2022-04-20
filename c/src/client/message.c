@@ -94,7 +94,8 @@ static void message_list_res(gl_message_t *msg, int32_t socket_id, void *user_da
 static void message_playr(gl_message_t *msg, int32_t socket_id, void *user_data) {
     gl_game_t *game = gl_client_get_game_with_id(g_message_list_res_game_id);
     
-    char *player_id = (char *)msg->parameters_value[0].string_value;
+    char player_id[9] = { 0 };
+    memcpy(player_id, msg->parameters_value[0].string_value, 8);
     
     if (strcmp(player_id, g_player_id) != 0) {
         gl_player_t player = { 0 };
@@ -127,10 +128,10 @@ static void message_welco(gl_message_t *msg, int32_t socket_id, void *user_data)
 static void message_posit(gl_message_t *msg, int32_t socket_id, void *user_data) {
     gl_player_t *player = gl_client_get_player();
     
-    player->pos.x = strtol((char *)msg->parameters_value[1].string_value, 0, 10);
-    player->pos.y = strtol((char *)msg->parameters_value[2].string_value, 0, 10);
+    player->pos.x = gl_string_strtol(msg->parameters_value[1].string_value);
+    player->pos.y = gl_string_strtol(msg->parameters_value[2].string_value);
     
-    gl_client_get_game()->reload_players_data = true;
+    gl_client_get_game()->reload_players_data_1 = true;
 }
 
 static void message_gobye(gl_message_t *msg, int32_t socket_id, void *user_data) {
@@ -166,55 +167,68 @@ static void message_glis_res(gl_message_t *msg, int32_t socket_id, void *user_da
     }
     
     g_message_list_res_game_id = game->id;
+    
+    if (g_players_message_list) {
+        gl_array_free(g_players_message_list);
+    }
+    gl_array_push(g_players_message_list, g_everyone);
 }
 
 static void message_gplyr(gl_message_t *msg, int32_t socket_id, void *user_data) {
     gl_game_t *game = gl_client_get_game_with_id(g_message_list_res_game_id);
     
-    char *player_id = (char *)msg->parameters_value[0].string_value;
+    char player_id[9] = { 0 };
+    memcpy(player_id, msg->parameters_value[0].string_value, 8);
     
     if (strcmp(player_id, g_player_id) != 0) {
         gl_player_t player = { 0 };
         memcpy(player.id, msg->parameters_value[0].string_value, 8);
-        player.pos.x = strtol((char *)msg->parameters_value[1].string_value, 0, 10);
-        player.pos.y = strtol((char *)msg->parameters_value[2].string_value, 0, 10);
-        player.score = strtol((char *)msg->parameters_value[3].string_value, 0, 10);
+        player.pos.x = gl_string_strtol(msg->parameters_value[1].string_value);
+        player.pos.y = gl_string_strtol(msg->parameters_value[2].string_value);
+        player.score = gl_string_strtol(msg->parameters_value[3].string_value);
         gl_array_push(game->players, player);
+        gl_array_push(g_players_message_list, gl_array_get_last(game->players).id);
     } else {
         gl_player_t *player = gl_client_get_player();
-        player->pos.x = strtol((char *)msg->parameters_value[1].string_value, 0, 10);
-        player->pos.y = strtol((char *)msg->parameters_value[2].string_value, 0, 10);
-        player->score = strtol((char *)msg->parameters_value[3].string_value, 0, 10);
+        player->pos.x = gl_string_strtol(msg->parameters_value[1].string_value);
+        player->pos.y = gl_string_strtol(msg->parameters_value[2].string_value);
+        player->score = gl_string_strtol(msg->parameters_value[3].string_value);
     }
 }
 
 static void message_move_res(gl_message_t *msg, int32_t socket_id, void *user_data) {
     gl_player_t *player = gl_client_get_player();
-    player->pos.x = strtol((char *)msg->parameters_value[0].string_value, 0, 10);
-    player->pos.y = strtol((char *)msg->parameters_value[1].string_value, 0, 10);
+    player->pos.x = gl_string_strtol(msg->parameters_value[0].string_value);
+    player->pos.y = gl_string_strtol(msg->parameters_value[1].string_value);
 }
 
 static void message_movef(gl_message_t *msg, int32_t socket_id, void *user_data) {
     gl_player_t *player = gl_client_get_player();
-    player->pos.x = strtol((char *)msg->parameters_value[0].string_value, 0, 10);
-    player->pos.y = strtol((char *)msg->parameters_value[1].string_value, 0, 10);
-    player->score = strtol((char *)msg->parameters_value[2].string_value, 0, 10);
+    player->pos.x = gl_string_strtol(msg->parameters_value[0].string_value);
+    player->pos.y = gl_string_strtol(msg->parameters_value[1].string_value);
+    player->score = gl_string_strtol(msg->parameters_value[2].string_value);
 }
 
 static void message_score(gl_message_t *msg, int32_t socket_id, void *user_data) {
     gl_game_t *game = gl_client_get_game();
     
     for (uint32_t i = 0; i < gl_array_get_size(game->players); i++) {
-        if (strcmp(game->players[i].id, (char *)msg->parameters_value[0].string_value) == 0) {
-            game->players[i].score = strtol((char *)msg->parameters_value[1].string_value, 0, 10);
-            game->players[i].pos.x = strtol((char *)msg->parameters_value[2].string_value, 0, 10);
-            game->players[i].pos.y = strtol((char *)msg->parameters_value[3].string_value, 0, 10);
+        char player_id[9] = { 0 };
+        memcpy(player_id, msg->parameters_value[0].string_value, 8);
+        
+        if (strcmp(game->players[i].id, player_id) == 0) {
+            game->players[i].score = gl_string_strtol(msg->parameters_value[1].string_value);
+            game->players[i].pos.x = gl_string_strtol(msg->parameters_value[2].string_value);
+            game->players[i].pos.y = gl_string_strtol(msg->parameters_value[3].string_value);
         }
     }
 }
 
 static void message_endga(gl_message_t *msg, int32_t socket_id, void *user_data) {
-    if ((strcmp(g_player_id, (char *)msg->parameters_value[0].string_value) == 0) || (gl_client_get_player()->score >= strtol((char *)msg->parameters_value[1].string_value, 0, 10))) {
+    char player_id[9] = { 0 };
+    memcpy(player_id, msg->parameters_value[0].string_value, 8);
+    
+    if (strcmp(g_player_id, player_id) == 0) {
         gl_client_get_player()->won = true;
     }
     

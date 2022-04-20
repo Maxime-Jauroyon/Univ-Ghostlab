@@ -17,6 +17,8 @@ static bool g_game_over_popup_visible = false;
 static uint32_t g_join_game_popup_game_id = 0;
 static uint32_t g_error = 0;
 static char g_main_window_movement[4] = { '1', 0, 0, 0 };
+static char g_main_window_message[201] = { 0 };
+static int32_t g_main_window_message_target = 0;
 
 void gl_client_draw() {
     while (!g_should_quit) {
@@ -69,7 +71,7 @@ void gl_client_main_window_draw() {
         }
         
         if (gl_client_get_game()->started) {
-            if (igCollapsingHeaderTreeNodeFlags("Move", 0)) {
+            if (igCollapsingHeaderTreeNodeFlags("Movements", 0)) {
                 igText("Enter a number:");
     
                 igSameLine(0, -1);
@@ -127,6 +129,34 @@ void gl_client_main_window_draw() {
                     igPopStyleVar(1);
                     igPopItemFlag();
                 }
+            }
+    
+    
+            if (igCollapsingHeaderTreeNodeFlags("Messages", 0)) {
+                gl_game_t *game = gl_client_get_game();
+        
+                if (igButton("Reload Players Data###ReloadPlayersData2", (ImVec2) {0, 0}) || game->reload_players_data_2) {
+                    gl_client_reload_game_players_data(game->id);
+                    game->reload_players_data_2 = false;
+                }
+        
+                if (gl_array_get_size(gl_client_get_game()->players) > 1) {
+                    igText("Enter a message:");
+            
+                    igInputText("###SendMessage", g_main_window_message, 201, 0, 0, 0);
+            
+                    igText("Target:");
+            
+                    igComboStr_arr("###Targets", &g_main_window_message_target, (const char *const *)g_players_message_list, gl_array_get_size(g_players_message_list), -1);
+            
+                    if (igButton("Send", (ImVec2) { 0, 0 })) {
+                
+                    }
+                } else {
+                    igText("Not enough players.");
+                }
+            } else {
+                gl_client_get_game()->reload_players_data_2 = true;
             }
         }
     
@@ -190,9 +220,9 @@ void gl_client_main_window_menu_bar_draw() {
 
 void gl_client_main_window_game_data_draw(struct gl_game_t *game, bool show_player) {
     if (igCollapsingHeaderTreeNodeFlags("Players", 0)) {
-        if (game->reload_players_data || igButton("Reload Players Data", (ImVec2) {0, 0})) {
+        if (igButton("Reload Players Data###ReloadPlayersData1", (ImVec2) {0, 0}) || game->reload_players_data_1) {
             gl_client_reload_game_players_data(game->id);
-            game->reload_players_data = false;
+            game->reload_players_data_1 = false;
         }
         
         if (show_player) {
@@ -214,7 +244,7 @@ void gl_client_main_window_game_data_draw(struct gl_game_t *game, bool show_play
             }
         }
     } else {
-        game->reload_players_data = true;
+        game->reload_players_data_1 = true;
     }
     
     if (igCollapsingHeaderTreeNodeFlags("Maze", 0)) {

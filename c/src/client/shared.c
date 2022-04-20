@@ -45,6 +45,8 @@ gl_game_t *g_games = 0;
 int32_t g_game_id = -1;
 char g_player_id[9] = { 0 };
 char g_temp_player_id[9] = { 0 };
+char **g_players_message_list = { 0 };
+char g_everyone[] = "Everyone";
 
 int32_t gl_client_connect() {
     g_tcp_listener_socket = gl_socket_create(g_server_ip, g_server_port, GL_SOCKET_TYPE_TCP_CLIENT, 0);

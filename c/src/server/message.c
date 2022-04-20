@@ -42,8 +42,10 @@ void message_regis(gl_message_t *msg, int32_t socket_id, void *user_data) {
     }
     
     gl_game_t *game = gl_server_get_game(game_id);
-    char *player_id = (char *)msg->parameters_value[0].string_value;
-    char *player_port = (char *)msg->parameters_value[1].string_value;
+    char player_id[9] = { 0 };
+    memcpy(player_id, msg->parameters_value[0].string_value, 8);
+    char player_port[5] = { 0 };
+    memcpy(player_port, msg->parameters_value[1].string_value, 4);
     
     for (uint32_t i = 0; i < gl_array_get_size(game->players); i++) {
         if (strcmp(game->players[i].id, player_id) == 0) {
