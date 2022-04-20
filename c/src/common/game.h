@@ -11,7 +11,7 @@ typedef struct gl_player_t {
     gl_pos_t pos;
     bool ready;
 #if GHOSTLAB_SERVER
-    char port[4];
+    char udp_port[4];
     int32_t socket_id;
 #endif
 } gl_player_t;
@@ -27,6 +27,7 @@ typedef struct gl_game_t {
     gl_ghost_t *ghosts;
     struct gl_maze_t *maze;
     bool started;
+    char multicast_port[4];
 } gl_game_t;
 
 gl_ghost_t *gl_game_generate_ghosts(struct gl_maze_t *maze, uint8_t num_ghosts);

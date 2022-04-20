@@ -8,6 +8,7 @@
 #include <common/memory.h>
 #include <common/message.h>
 #include <common/network.h>
+#include <stdlib.h>
 
 static pthread_mutex_t internal_g_main_mutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -43,6 +44,7 @@ gl_game_t *gl_server_add_game(uint32_t id) {
     
     game.id = id;
     sprintf(game.name, "Game %d", game.id);
+    sprintf(game.multicast_port, "%d", (uint32_t)(strtol(g_multicast_port, 0, 10) + id + 1));
     
     gl_array_push(g_games, game);
     
@@ -57,7 +59,7 @@ gl_player_t *gl_server_add_player(struct gl_game_t *game, const char *id, const 
     gl_player_t player = { 0 };
     player.socket_id = socket_id;
     memcpy(player.id, id, 9);
-    memcpy(player.port, port, 4);
+    memcpy(player.udp_port, port, 4);
     
     gl_array_push(game->players, player);
     

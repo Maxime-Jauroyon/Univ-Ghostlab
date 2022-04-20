@@ -147,6 +147,12 @@ static void gl_client_free() {
         gl_free(g_multicast_general_listener_thread);
     }
     
+    if (g_multicast_game_listener_thread) {
+        gl_socket_close(&g_multicast_game_socket);
+        pthread_join(*(pthread_t *)g_multicast_game_listener_thread, 0);
+        gl_free(g_multicast_game_listener_thread);
+    }
+    
     if (g_tcp_acceptor_socket) {
         gl_client_disconnect(true);
     }
