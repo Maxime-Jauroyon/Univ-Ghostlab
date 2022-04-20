@@ -1,3 +1,5 @@
+// Font from: https://fonts.google.com/specimen/Source+Sans+Pro
+
 // File: 'SourceSansPro-Regular.ttf' (248132 bytes)
 // Exported using binary_to_compressed_c.cpp
 const unsigned int SourceSansProRegular_compressed_size = 146569;

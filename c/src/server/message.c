@@ -173,7 +173,7 @@ void message_shutd(gl_message_t *msg, int32_t socket_id, void *user_data) {
     }
 }
 
-void gl_client_message_add_functions() {
+void gl_server_message_add_functions() {
     gl_message_definitions()[GL_MESSAGE_TYPE_NEWPL]->function = message_newpl;
     gl_message_definitions()[GL_MESSAGE_TYPE_REGIS]->function = message_regis;
     gl_message_definitions()[GL_MESSAGE_TYPE_GAME_REQ]->function = message_game_req;

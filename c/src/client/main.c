@@ -11,8 +11,8 @@
 #include <client/gui.h>
 #include <client/shared.h>
 #include <client/message.h>
-#include <client/thread_udp.h>
-#include <client/thread_multicast_server.h>
+#include <client/thread_udp_listener.h>
+#include <client/thread_multicast_general_listener.h>
 
 static int32_t g_exit_code = EXIT_SUCCESS;
 
@@ -71,11 +71,11 @@ static int32_t gl_client_init(int argc, char **argv) {
     
     if (!g_use_legacy_protocol) {
         g_multicast_server_thread = gl_malloc(sizeof(pthread_t));
-        pthread_create(g_multicast_server_thread, 0, gl_client_thread_multicast_server_main, 0);
+        pthread_create(g_multicast_server_thread, 0, gl_client_thread_multicast_general_listener_main, 0);
     }
     
     g_udp_thread = gl_malloc(sizeof(pthread_t));
-    pthread_create(g_udp_thread, 0, gl_client_thread_udp_main, 0);
+    pthread_create(g_udp_thread, 0, gl_client_thread_udp_listener_main, 0);
     
     return 0;
 }

@@ -1,3 +1,5 @@
+// From: https://github.com/Dav1dde/glad/fork
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

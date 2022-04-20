@@ -3,8 +3,6 @@
 
 #include <common/types.h>
 
-
-
-void gl_client_message_add_functions();
+void gl_server_message_add_functions();
 
 #endif /* GHOSTLAB_SERVER_MESSAGE_H */

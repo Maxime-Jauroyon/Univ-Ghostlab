@@ -1,3 +1,5 @@
+// From: https://github.com/Dav1dde/glad/fork
+
 #ifndef __khrplatform_h_
 #define __khrplatform_h_
 

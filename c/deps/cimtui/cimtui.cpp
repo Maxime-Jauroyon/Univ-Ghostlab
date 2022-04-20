@@ -1,9 +1,9 @@
-#include "cimtui.h"
+#include <cimtui/cimtui.h>
 #include <imgui/tui/imgui.h>
 #include <imtui/imtui.h>
+#include <imtui/imtui-demo.h>
 #include <imtui/imtui-impl-text.h>
 #include <imtui/imtui-impl-ncurses.h>
-#include <imtui/imtui-demo.h>
 
 static ImTui::TScreen *screen = nullptr;
 

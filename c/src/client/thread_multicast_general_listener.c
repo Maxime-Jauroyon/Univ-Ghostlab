@@ -1,11 +1,11 @@
-#include <client/thread_multicast_server.h>
+#include <client/thread_multicast_general_listener.h>
 #include <sys/socket.h>
 #include <common/log.h>
 #include <common/message.h>
 #include <common/network.h>
 #include <client/shared.h>
 
-void *gl_client_thread_multicast_server_main(void *user_data) {
+void *gl_client_thread_multicast_general_listener_main(void *user_data) {
     gl_log_push("multicast server thread started.\n");
     
     g_multicast_server_socket = gl_socket_create(g_multicast_ip, g_multicast_port, GL_SOCKET_TYPE_MULTICAST_RECEIVER, 0);

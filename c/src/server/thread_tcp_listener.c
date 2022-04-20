@@ -1,4 +1,4 @@
-#include <server/thread_tcp_connection.h>
+#include <server/thread_tcp_listener.h>
 #include <common/log.h>
 #include <common/message.h>
 #include <common/network.h>
@@ -9,7 +9,7 @@
 #include "common/game.h"
 #include "common/maze.h"
 
-void *gl_thread_tcp_connection_main(void *user_data) {
+void *gl_thread_tcp_listener_main(void *user_data) {
     uint32_t id = *(uint32_t *)user_data;
     int32_t socket_id = g_client_sockets[id];
     

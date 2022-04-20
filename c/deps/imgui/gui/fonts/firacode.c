@@ -1,3 +1,5 @@
+// Font from: https://github.com/tonsky/FiraCode
+
 // File: 'FiraCode-Regular.ttf' (289624 bytes)
 // Exported using binary_to_compressed_c.cpp
 const unsigned int FiraCodeRegular_compressed_size = 189078;

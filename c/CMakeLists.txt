@@ -80,17 +80,19 @@ set(COMMON_SRC
 set(SERVER_SRC
         src/server/command.c
         src/server/command.h
+        src/server/gui.c
+        src/server/gui.h
         src/server/main.c
         src/server/message.c
         src/server/message.h
         src/server/shared.c
         src/server/shared.h
-        src/server/thread_games_handler.c
-        src/server/thread_games_handler.h
-        src/server/thread_tcp.c
-        src/server/thread_tcp.h
-        src/server/thread_tcp_connection.c
-        src/server/thread_tcp_connection.h)
+        src/server/thread_handler_ghosts.c
+        src/server/thread_handler_ghosts.h
+        src/server/thread_tcp_acceptor.c
+        src/server/thread_tcp_acceptor.h
+        src/server/thread_tcp_listener.c
+        src/server/thread_tcp_listener.h)
 set(CLIENT_SRC
         src/client/command.c
         src/client/command.h
@@ -101,10 +103,12 @@ set(CLIENT_SRC
         src/client/message.h
         src/client/shared.c
         src/client/shared.h
-        src/client/thread_multicast_server.c
-        src/client/thread_multicast_server.h
-        src/client/thread_udp.c
-        src/client/thread_udp.h)
+        src/client/thread_multicast_general_listener.c
+        src/client/thread_multicast_general_listener.h
+        src/client/thread_handler_start.c
+        src/client/thread_handler_start.h
+        src/client/thread_udp_listener.c
+        src/client/thread_udp_listener.h)
 
 if (UNIX AND NOT APPLE)
     set(THREADS_PREFER_PTHREAD_FLAG ON)

@@ -16,7 +16,7 @@
 #include <server/shared.h>
 #include <server/message.h>
 #include <server/command.h>
-#include <server/thread_tcp.h>
+#include <server/thread_tcp_acceptor.h>
 
 static void draw_main_gui();
 
@@ -94,10 +94,10 @@ int main(int argc, char **argv) {
     }
     
     gl_message_set_mutex(g_main_mutex);
-    gl_client_message_add_functions();
+    gl_server_message_add_functions();
 
     g_thread_tcp = gl_malloc(sizeof(pthread_t));
-    pthread_create(g_thread_tcp, 0, gl_thread_tcp_main, 0);
+    pthread_create(g_thread_tcp, 0, gl_thread_tcp_acceptor_main, 0);
     
     gl_gui_create("Ghostlab Server");
 
