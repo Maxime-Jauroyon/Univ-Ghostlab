@@ -181,21 +181,29 @@ void gl_igConsole(const struct gl_command_definition_t **cmd_defs, uint32_t cmd_
             if (igMenuItemBool("Clear Logs", 0, false, true)) {
                 gl_log_free();
             }
+            
             igSeparator();
+            
             igMenuItemBoolPtr("Show Info", 0, &g_console_show_info, true);
             igMenuItemBoolPtr("Show Warnings", 0, &g_console_show_warning, true);
             igMenuItemBoolPtr("Show Errors", 0, &g_console_show_error, true);
+            
             igEndMenu();
         }
+        
         igEndMenuBar();
     }
     
     igText("Enter a command:");
+    
     igSameLine(0, -1);
+    
     if (igInputText("", g_console_buf, 512, ImGuiInputTextFlags_EnterReturnsTrue, 0, 0) && strcmp(g_console_buf, "") != 0) {
         gl_execute_command(g_console_buf, 512, cmd_defs, cmd_defs_count, true);
     }
+    
     igSameLine(0, -1);
+    
     if (igButton("Send", (ImVec2) { 0, 0 }) && strcmp(g_console_buf, "") != 0) {
         gl_execute_command(g_console_buf, 512, cmd_defs, cmd_defs_count, true);
     }

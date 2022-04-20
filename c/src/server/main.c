@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <getopt.h>
 #include <pthread.h>
-#include <cimgui/cimgui.h>
 #include <common/log.h>
 #include <common/gui.h>
 #include <common/game.h>
@@ -11,21 +10,71 @@
 #include <common/array.h>
 #include <common/memory.h>
 #include <common/message.h>
-#include <common/network.h>
-#include <common/command.h>
+#include <server/gui.h>
 #include <server/shared.h>
 #include <server/message.h>
-#include <server/command.h>
 #include <server/thread_tcp_acceptor.h>
 
-static void draw_main_gui();
-
 static int32_t g_exit_code = EXIT_SUCCESS;
-static bool g_show_console = true;
+
+static int32_t gl_server_init(int argc, char **argv);
+static int32_t gl_server_handle_args(int argc, char **argv);
+static void gl_server_free();
 
 int main(int argc, char **argv) {
-    errno = 0;
+    int32_t r = gl_server_init(argc, argv);
+    if (r == -1) {
+        goto error;
+    } else if (r == 1) {
+        goto cleanup;
+    }
+    
+    gl_server_draw();
+    
+    goto cleanup;
+    
+    error:
+    g_exit_code = 1;
+    
+    cleanup:
+    gl_server_free();
+    
+    return g_exit_code;
+}
 
+static int32_t gl_server_init(int argc, char **argv) {
+    errno = 0;
+    
+    int32_t r = gl_server_handle_args(argc, argv);
+    if (r != 0) {
+        return r;
+    }
+    
+    if (!g_server_ip) {
+        g_server_ip = gl_strdup(GHOSTLAB_DEFAULT_SERVER_IP);
+    }
+    if (!g_server_port) {
+        g_server_port = gl_strdup(GHOSTLAB_DEFAULT_SERVER_PORT);
+    }
+    if (!g_multicast_ip) {
+        g_multicast_ip = gl_strdup(GHOSTLAB_DEFAULT_MULTICAST_IP);
+    }
+    if (!g_multicast_port) {
+        g_multicast_port = gl_strdup(GHOSTLAB_DEFAULT_MULTICAST_PORT);
+    }
+    
+    gl_message_set_mutex(g_main_mutex);
+    gl_server_message_add_functions();
+    
+    gl_gui_create("Ghostlab Server");
+    
+    g_tcp_acceptor_thread = gl_malloc(sizeof(pthread_t));
+    pthread_create(g_tcp_acceptor_thread, 0, gl_thread_tcp_acceptor_main, 0);
+    
+    return 0;
+}
+
+static int32_t gl_server_handle_args(int argc, char **argv) {
     static struct option opts[] = {
         { "ip", required_argument, 0, 'i' },
         { "port", required_argument, 0, 'p' },
@@ -61,10 +110,10 @@ int main(int argc, char **argv) {
             break;
         case 'h':
             gl_log_push("%s", g_help);
-            goto cleanup;
+            return 1;
         case 'v':
             gl_log_push("version: " GHOSTLAB_VERSION);
-            goto cleanup;
+            return 1;
         case '?':
             used_unknown_opt = 1;
             gl_log_push_error("use `-h` for more informations.\n");
@@ -75,150 +124,36 @@ int main(int argc, char **argv) {
             gl_log_push_error("use `-h` for more informations.\n");
         }
     }
-
+    
     if (used_unknown_opt) {
-        goto error;
+        return -1;
     }
     
-    if (!g_server_ip) {
-        g_server_ip = gl_strdup(GHOSTLAB_DEFAULT_SERVER_IP);
-    }
-    if (!g_server_port) {
-        g_server_port = gl_strdup(GHOSTLAB_DEFAULT_SERVER_PORT);
-    }
-    if (!g_multicast_ip) {
-        g_multicast_ip = gl_strdup(GHOSTLAB_DEFAULT_MULTICAST_IP);
-    }
-    if (!g_multicast_port) {
-        g_multicast_port = gl_strdup(GHOSTLAB_DEFAULT_MULTICAST_PORT);
+    return 0;
+}
+
+static void gl_server_free() {
+    if (!g_use_legacy_protocol) {
+        gl_message_t response = {.type = GL_MESSAGE_TYPE_SHUTD, 0};
+        gl_message_send_multicast(g_multicast_ip, g_multicast_port, &response);
     }
     
-    gl_message_set_mutex(g_main_mutex);
-    gl_server_message_add_functions();
-
-    g_thread_tcp = gl_malloc(sizeof(pthread_t));
-    pthread_create(g_thread_tcp, 0, gl_thread_tcp_acceptor_main, 0);
+    gl_server_free_listeners();
     
-    gl_gui_create("Ghostlab Server");
-
-    while (!g_should_quit) {
-        gl_gui_start_render(&g_should_quit);
-        draw_main_gui();
-        gl_gui_end_render();
-    }
-
-    goto cleanup;
-
-    error:
-    g_exit_code = -1;
-
-    cleanup:
-    {
-        gl_message_t msg = {.type = GL_MESSAGE_TYPE_SHUTD, 0};
-        gl_message_execute(&msg, 0, 0);
-    }
-
-    gl_socket_close(&g_server_socket);
-
-    if (g_thread_tcp) {
-        pthread_join(*(pthread_t *)g_thread_tcp, 0);
-        gl_free(g_thread_tcp);
+    if (g_tcp_acceptor_thread) {
+        pthread_join(*(pthread_t *)g_tcp_acceptor_thread, 0);
+        gl_free(g_tcp_acceptor_thread);
     }
     
-    for (uint32_t i = 0; i < gl_array_get_size(g_games); i++) {
-        gl_maze_free(g_games[i].maze);
-        gl_array_free(g_games[i].ghosts);
-        gl_array_free(g_games[i].players);
-    }
+    gl_game_free_all(g_games);
     gl_array_free(g_games);
-    
     gl_free(g_server_ip);
     gl_free(g_server_port);
     gl_free(g_multicast_ip);
     gl_free(g_multicast_port);
     
     gl_log_free();
-
+    
     gl_memory_check_for_leaks();
-
     gl_gui_free();
-
-    return g_exit_code;
-}
-
-static void draw_main_gui() {
-    {
-        gl_igBegin("Ghostlab Server", g_show_console ? 0.6f : 1.0f);
-    
-        if (igBeginMenuBar()) {
-            if (igBeginMenu("File", true)) {
-                igMenuItemBoolPtr("Quit", 0, &g_should_quit, true);
-                igEndMenu();
-            }
-            if (igBeginMenu("View", true)) {
-                igMenuItemBoolPtr("Show Logs", 0, &g_show_console, true);
-                igEndMenu();
-            }
-            igEndMenuBar();
-        }
-    
-        if (igButton("Quit", (ImVec2) { 0, 0 })) {
-            g_should_quit = true;
-        }
-        if (gl_array_get_size(g_games) > 0) {
-            if (igCollapsingHeaderTreeNodeFlags("Available Games", 0)) {
-                for (uint32_t i = 0; i < gl_array_get_size(g_games); i++) {
-                    if (igCollapsingHeaderTreeNodeFlags(g_games[i].name, 0)) {
-                        if (g_games[i].started) {
-                            igText("Game has started.");
-                        } else {
-                            igText("Waiting for all players to be ready to start the game.");
-                        }
-                        
-                        char buf1[128] = { 0 };
-                        sprintf(buf1, "Players (%d connected)###PlayersConnected", (uint32_t)gl_array_get_size(g_games[i].players));
-                        if (igCollapsingHeaderTreeNodeFlags(buf1, 0)) {
-                            for (uint32_t j = 0; j <  gl_array_get_size(g_games[i].players); j++) {
-                                igText("- %s%s", g_games[i].players[j].id, !g_games[i].started && g_games[i].players[j].ready ? " (ready)" : "");
-                            }
-                        }
-    
-                        if (g_games[i].maze) {
-                            if (igCollapsingHeaderTreeNodeFlags("Maze", 0)) {
-                                ImGuiIO *io = igGetIO();
-            
-                                //igBeginChildStr("#maze_output", (ImVec2) { 0, 0 }, true, 0);
-                                igPushFont(io->Fonts->Fonts.Data[io->Fonts->Fonts.Size - 1]);
-                                igPushStyleVarVec2(ImGuiStyleVar_ItemSpacing, (ImVec2) { 0, 0 });
-                                for (uint32_t y = 0; y < gl_array_get_size(g_games[i].maze->grid); y++) {
-                                    char buf2[128] = { 0 };
-                                    uint32_t buf2_idx = 0;
-                
-                                    for (uint32_t x = 0; x < gl_array_get_size(g_games[i].maze->grid[y]); x++) {
-                                        if (g_games[i].maze->grid[y][x] == GL_MAZE_ELEMENT_PILLAR || g_games[i].maze->grid[y][x] == GL_MAZE_ELEMENT_WALL_CLOSED) {
-                                            buf2[buf2_idx++] = '#';
-                                        } else if (g_games[i].maze->grid[y][x] == GL_MAZE_ELEMENT_WALL_OPENED || g_games[i].maze->grid[y][x] == GL_MAZE_ELEMENT_ROOM) {
-                                            buf2[buf2_idx++] = ' ';
-                                        }
-                                    }
-                
-                                    igTextUnformatted(buf2, 0);
-                                }
-            
-                                igPopStyleVar(1);
-                                igPopFont();
-                                //igEndChild();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        igEnd();
-    }
-
-    if (g_show_console) {
-        gl_igConsole(gl_client_command_definitions(), GL_COMMAND_TYPE_COUNT);
-    }
 }

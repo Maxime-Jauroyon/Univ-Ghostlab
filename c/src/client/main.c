@@ -5,6 +5,8 @@
 #include <pthread.h>
 #include <common/log.h>
 #include <common/gui.h>
+#include <common/game.h>
+#include <common/array.h>
 #include <common/memory.h>
 #include <common/message.h>
 #include <common/network.h>
@@ -92,7 +94,6 @@ static int32_t gl_client_handle_args(int argc, char **argv) {
     };
     int32_t used_unknown_opt = 0;
     int32_t opt;
-    
     while ((opt = getopt_long(argc, argv, "i:p:n:u:lhv", opts, 0)) != -1) {
         switch (opt) {
         case 'i':
@@ -151,7 +152,12 @@ static void gl_client_free() {
         gl_client_disconnect(true);
     }
     
-    gl_client_free_games();
+    if (g_is_server_down) {
+        gl_client_draw_server_down_popup();
+    }
+    
+    gl_game_free_all(g_games);
+    gl_array_free(g_games);
     gl_free(g_server_ip);
     gl_free(g_server_port);
     gl_free(g_udp_port);

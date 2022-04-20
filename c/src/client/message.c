@@ -6,15 +6,17 @@
 #include <client/shared.h>
 
 static void message_games(gl_message_t *msg, int32_t socket_id, void *user_data) {
-    gl_client_free_games();
+    gl_game_free_all_with_exception(g_games, g_game_id);
     
     for (uint32_t i = 0; i < msg->parameters_value[0].uint8_value; i++) {
-        gl_message_wait_and_execute_no_lock(socket_id, GL_MESSAGE_PROTOCOL_TCP);
+        gl_message_wait_and_execute_no_lock(socket_id, GL_MESSAGE_PROTOCOL_TCP); // OGAME
     }
 }
 
 static void message_ogames(gl_message_t *msg, int32_t socket_id, void *user_data) {
-    gl_client_add_game(msg->parameters_value[0].uint8_value);
+    if (g_game_id != msg->parameters_value[0].uint8_value) {
+        gl_client_add_game(msg->parameters_value[0].uint8_value);
+    }
 }
 
 static void message_regok(gl_message_t *msg, int32_t socket_id, void *user_data) {

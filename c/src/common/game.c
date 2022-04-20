@@ -3,30 +3,6 @@
 #include <common/array.h>
 #include <common/maze.h>
 
-gl_game_t *gl_game_find_game_with_socket(gl_game_t *games, int32_t socket_id) {
-    for (uint32_t i = 0; i < gl_array_get_size(games); i++) {
-        for (uint32_t j = 0; j < gl_array_get_size(games[i].players); j++) {
-            if (games[i].players[j].socket_id == socket_id) {
-                return &games[i];
-            }
-        }
-    }
-    
-    return 0;
-}
-
-gl_player_t *gl_game_find_player_with_socket(gl_game_t *games, int32_t socket_id) {
-    for (uint32_t i = 0; i < gl_array_get_size(games); i++) {
-        for (uint32_t j = 0; j < gl_array_get_size(games[i].players); j++) {
-            if (games[i].players[j].socket_id == socket_id) {
-                return &games[i].players[i];
-            }
-        }
-    }
-    
-    return 0;
-}
-
 gl_ghost_t *gl_game_generate_ghosts(gl_maze_t *maze, uint8_t num_ghosts) {
     gl_ghost_t *ghosts = 0;
     
@@ -117,5 +93,20 @@ void gl_game_free(gl_game_t *game) {
         gl_maze_free(game->maze);
         gl_array_free(game->ghosts);
         gl_array_free(game->players);
+    }
+}
+
+void gl_game_free_all(gl_game_t *games) {
+    gl_game_free_all_with_exception(games, -1);
+}
+
+void gl_game_free_all_with_exception(gl_game_t *games, int32_t exception) {
+    if (games) {
+        for (uint32_t i = 0; i < gl_array_get_size(games); i++) {
+            if (games[i].id != exception) {
+                gl_game_free(&games[i]);
+                gl_array_remove(games, i);
+            }
+        }
     }
 }

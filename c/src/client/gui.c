@@ -56,7 +56,7 @@ void gl_client_draw_main_window() {
         if (!gl_client_get_player()->ready || gl_client_get_game()->started) {
             if (igButton("Disconnect", (ImVec2) { 0, 0 })) {
                 gl_client_disconnect(false);
-                gl_message_t msg = {.type = GL_MESSAGE_TYPE_GAME_REQ, .parameters_value = 0};
+                gl_message_t msg = { .type = GL_MESSAGE_TYPE_GAME_REQ, .parameters_value = 0 };
                 gl_message_send_tcp(g_server_socket, &msg);
                 gl_message_wait_and_execute(g_server_socket, GL_MESSAGE_PROTOCOL_TCP);
             }
@@ -66,7 +66,7 @@ void gl_client_draw_main_window() {
     if (!gl_client_get_game() || !gl_client_get_game()->started) {
         if (igCollapsingHeaderTreeNodeFlags("Available Games", 0)) {
             if (igButton("Reload", (ImVec2) {0, 0})) {
-                gl_message_t msg = {.type = GL_MESSAGE_TYPE_GAME_REQ, .parameters_value = 0};
+                gl_message_t msg = { .type = GL_MESSAGE_TYPE_GAME_REQ, .parameters_value = 0 };
                 gl_message_send_tcp(g_server_socket, &msg);
                 gl_message_wait_and_execute(g_server_socket, GL_MESSAGE_PROTOCOL_TCP);
             }
@@ -81,6 +81,8 @@ void gl_client_draw_main_window() {
                         }
                     }
                 }
+            } else {
+                igText("There are currently no games.");
             }
         }
     }
@@ -96,10 +98,12 @@ void gl_client_draw_main_window_menu_bar() {
             igMenuItemBoolPtr("Quit", 0, &g_should_quit, true);
             igEndMenu();
         }
+        
         if (igBeginMenu("View", true)) {
             igMenuItemBoolPtr("Show Logs", 0, &g_console_window_visible, true);
             igEndMenu();
         }
+        
         igEndMenuBar();
     }
 }
@@ -130,8 +134,8 @@ void gl_client_draw_create_game_popup() {
         if (igButton("Create", (ImVec2) { 0, 0 })) {
             if (gl_client_is_player_id_valid(g_player_id)) {
                 gl_message_t msg = { .type = GL_MESSAGE_TYPE_NEWPL, .parameters_value = 0 };
-                gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring(g_player_id)});
-                gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number(g_udp_port, 4)});
+                gl_message_push_parameter(&msg, (gl_message_parameter_t) { .string_value = gl_string_create_from_cstring(g_player_id) });
+                gl_message_push_parameter(&msg, (gl_message_parameter_t) { .string_value = gl_string_create_from_number(g_udp_port, 4) });
                 gl_message_send_tcp(g_server_socket, &msg);
                 gl_message_wait_and_execute_no_lock(g_server_socket, GL_MESSAGE_PROTOCOL_TCP);
                 
@@ -184,9 +188,9 @@ void gl_client_draw_join_game_popup() {
         if (igButton("Join", (ImVec2) { 0, 0 })) {
             if (gl_client_is_player_id_valid(g_player_id)) {
                 gl_message_t msg = { .type = GL_MESSAGE_TYPE_REGIS, .parameters_value = 0 };
-                gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_cstring(g_player_id)});
-                gl_message_push_parameter(&msg, (gl_message_parameter_t) {.string_value = gl_string_create_from_number(g_udp_port, 4)});
-                gl_message_push_parameter(&msg, (gl_message_parameter_t) {.uint8_value = g_join_game_popup_game_id});
+                gl_message_push_parameter(&msg, (gl_message_parameter_t) { .string_value = gl_string_create_from_cstring(g_player_id) });
+                gl_message_push_parameter(&msg, (gl_message_parameter_t) { .string_value = gl_string_create_from_number(g_udp_port, 4) });
+                gl_message_push_parameter(&msg, (gl_message_parameter_t) { .uint8_value = g_join_game_popup_game_id });
                 gl_message_send_tcp(g_server_socket, &msg);
                 gl_message_wait_and_execute_no_lock(g_server_socket, GL_MESSAGE_PROTOCOL_TCP);
                 

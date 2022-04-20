@@ -39,6 +39,4 @@ struct gl_game_t *gl_client_get_game();
 
 struct gl_player_t *gl_client_get_player();
 
-void gl_client_free_games();
-
 #endif /* GHOSTLAB_CLIENT_SHARED_H */

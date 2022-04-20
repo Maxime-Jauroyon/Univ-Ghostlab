@@ -38,7 +38,7 @@ int32_t g_udp_socket = -1;
 void *g_multicast_server_thread = 0;
 void *g_udp_thread = 0;
 void *g_main_mutex = &internal_g_main_mutex;
-struct gl_game_t *g_games = 0;
+gl_game_t *g_games = 0;
 int32_t g_game_id = -1;
 char g_player_id[9] = { 0 };
 
@@ -64,17 +64,21 @@ void gl_client_disconnect(bool close_socket) {
     gl_game_t *game = gl_client_get_game();
     
     if (game && game->started) {
-        gl_message_t msg = {.type = GL_MESSAGE_TYPE_IQUIT, .parameters_value = 0};
+        gl_message_t msg = { .type = GL_MESSAGE_TYPE_IQUIT, .parameters_value = 0 };
         gl_message_send_tcp(g_server_socket, &msg);
-        gl_message_wait_and_execute(g_server_socket, GL_MESSAGE_PROTOCOL_TCP);
+        gl_message_wait_and_execute(g_server_socket, GL_MESSAGE_PROTOCOL_TCP); // GOBYE
     } else if (game && !gl_client_get_player()->ready) {
-        gl_message_t msg = {.type = GL_MESSAGE_TYPE_UNREG, .parameters_value = 0};
+        gl_message_t msg = { .type = GL_MESSAGE_TYPE_UNREG, .parameters_value = 0 };
         gl_message_send_tcp(g_server_socket, &msg);
-        gl_message_wait_and_execute(g_server_socket, GL_MESSAGE_PROTOCOL_TCP);
+        gl_message_wait_and_execute(g_server_socket, GL_MESSAGE_PROTOCOL_TCP); //  UNROK, DUNNO
     }
     
     if (close_socket) {
         gl_socket_close(&g_server_socket);
+    } else {
+        gl_message_t msg = { .type = GL_MESSAGE_TYPE_GAME_REQ, .parameters_value = 0 };
+        gl_message_send_tcp(g_server_socket, &msg);
+        gl_message_wait_and_execute(g_server_socket, GL_MESSAGE_PROTOCOL_TCP); //  GAMES
     }
 }
 
@@ -109,7 +113,6 @@ gl_player_t *gl_client_add_player(struct gl_game_t *game, const char *id) {
     }
     
     gl_player_t player = { 0 };
-    
     memcpy(player.id, id, 9);
     
     gl_array_push(game->players, player);
@@ -147,12 +150,4 @@ gl_player_t *gl_client_get_player() {
     }
     
     return 0;
-}
-
-void gl_client_free_games() {
-    for (uint32_t i = 0; i < gl_array_get_size(g_games); i++) {
-        gl_game_free(&g_games[i]);
-    }
-    
-    gl_array_free(g_games);
 }
