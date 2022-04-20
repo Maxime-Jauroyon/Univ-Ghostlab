@@ -71,13 +71,15 @@ static int32_t gl_client_init(int argc, char **argv) {
         return -1;
     }
     
+    g_start_handler_thread = gl_malloc(sizeof(pthread_t));
+    
     if (!g_use_legacy_protocol) {
-        g_multicast_server_thread = gl_malloc(sizeof(pthread_t));
-        pthread_create(g_multicast_server_thread, 0, gl_client_thread_multicast_general_listener_main, 0);
+        g_multicast_general_listener_thread = gl_malloc(sizeof(pthread_t));
+        pthread_create(g_multicast_general_listener_thread, 0, gl_client_thread_multicast_general_listener_main, 0);
     }
     
-    g_udp_thread = gl_malloc(sizeof(pthread_t));
-    pthread_create(g_udp_thread, 0, gl_client_thread_udp_listener_main, 0);
+    g_udp_listener_thread = gl_malloc(sizeof(pthread_t));
+    pthread_create(g_udp_listener_thread, 0, gl_client_thread_udp_listener_main, 0);
     
     return 0;
 }
@@ -136,20 +138,25 @@ static int32_t gl_client_handle_args(int argc, char **argv) {
 }
 
 static void gl_client_free() {
-    if (g_udp_thread) {
+    if (g_udp_listener_thread) {
         gl_socket_close(&g_udp_socket);
-        pthread_join(*(pthread_t *)g_udp_thread, 0);
-        gl_free(g_udp_thread);
+        pthread_join(*(pthread_t *)g_udp_listener_thread, 0);
+        gl_free(g_udp_listener_thread);
     }
     
-    if (!g_use_legacy_protocol && g_multicast_server_thread) {
-        gl_socket_close(&g_multicast_server_socket);
-        pthread_join(*(pthread_t *)g_multicast_server_thread, 0);
-        gl_free(g_multicast_server_thread);
+    if (!g_use_legacy_protocol && g_multicast_general_listener_thread) {
+        gl_socket_close(&g_multicast_general_socket);
+        pthread_join(*(pthread_t *)g_multicast_general_listener_thread, 0);
+        gl_free(g_multicast_general_listener_thread);
     }
     
     if (g_server_socket) {
         gl_client_disconnect(true);
+    }
+    
+    if (g_start_handler_thread) {
+        pthread_join(*(pthread_t *)g_start_handler_thread, 0);
+        gl_free(g_start_handler_thread);
     }
     
     if (g_is_server_down) {

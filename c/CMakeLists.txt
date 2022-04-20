@@ -87,8 +87,8 @@ set(SERVER_SRC
         src/server/message.h
         src/server/shared.c
         src/server/shared.h
-        src/server/thread_handler_ghosts.c
-        src/server/thread_handler_ghosts.h
+        src/server/thread_ghosts_handler.c
+        src/server/thread_ghosts_handler.h
         src/server/thread_tcp_acceptor.c
         src/server/thread_tcp_acceptor.h
         src/server/thread_tcp_listener.c
@@ -107,8 +107,8 @@ set(CLIENT_SRC
         src/client/thread_multicast_game_listener.h
         src/client/thread_multicast_general_listener.c
         src/client/thread_multicast_general_listener.h
-        src/client/thread_handler_start.c
-        src/client/thread_handler_start.h
+        src/client/thread_start_handler.c
+        src/client/thread_start_handler.h
         src/client/thread_udp_listener.c
         src/client/thread_udp_listener.h)
 
