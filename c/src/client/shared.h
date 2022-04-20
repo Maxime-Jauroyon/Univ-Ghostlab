@@ -35,8 +35,6 @@ int32_t gl_client_connect();
 
 void gl_client_disconnect(bool close_socket);
 
-bool gl_client_is_player_id_valid(char *player_id);
-
 struct gl_game_t *gl_client_add_game(uint8_t id);
 
 struct gl_player_t *gl_client_add_player(struct gl_game_t *game, const char *id);

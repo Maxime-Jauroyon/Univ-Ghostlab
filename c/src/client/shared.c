@@ -79,20 +79,6 @@ void gl_client_disconnect(bool close_socket) {
     }
 }
 
-bool gl_client_is_player_id_valid(char *player_id) {
-    if (strlen(player_id) != 8) {
-        return false;
-    }
-    
-    for (uint32_t i = 0; i < strlen(player_id); i++) {
-        if (!isalpha(player_id[i]) && !isdigit(player_id[i])) {
-            return false;
-        }
-    }
-    
-    return true;
-}
-
 gl_game_t *gl_client_add_game(uint8_t id) {
     gl_game_t game = { 0 };
     

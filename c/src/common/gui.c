@@ -250,4 +250,24 @@ void gl_igConsole(const struct gl_command_definition_t **cmd_defs, uint32_t cmd_
     igEnd();
 }
 
+int32_t gl_igFilter(ImGuiInputTextCallbackData *data) {
+    char e = (char)data->EventChar;
+    
+    if (e >= 33 && e <= 126) {
+        return 0;
+    }
+    
+    return 1;
+}
+
+int32_t gl_igFilterWithSpaces(ImGuiInputTextCallbackData *data) {
+    char e = (char)data->EventChar;
+    
+    if (e >= 32 && e <= 126) {
+        return 0;
+    }
+    
+    return 1;
+}
+
 #endif

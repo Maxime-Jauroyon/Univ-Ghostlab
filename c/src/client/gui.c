@@ -143,7 +143,7 @@ void gl_client_main_window_draw() {
                 if (gl_array_get_size(gl_client_get_game()->players) > 1) {
                     igText("Enter a message:");
             
-                    igInputText("###SendMessage", g_main_window_message, 201, 0, 0, 0);
+                    igInputText("###SendMessage", g_main_window_message, 201, ImGuiInputTextFlags_CallbackCharFilter, gl_igFilterWithSpaces, 0);
             
                     igText("Target:");
             
@@ -320,34 +320,35 @@ void gl_client_create_game_popup_draw() {
         
         igSameLine(0, -1);
         
-        igInputText("###PlayerName", g_temp_player_id, 9, ImGuiInputTextFlags_CharsNoBlank, 0, 0);
+        igInputText("###PlayerName", g_temp_player_id, 9, ImGuiInputTextFlags_CallbackCharFilter, gl_igFilter, 0);
         
         if (igButton("Back", (ImVec2) { 0, 0 })) {
             gl_client_create_game_popup_close();
         }
         
         igSameLine(0, -1);
+    
+        if (strlen(g_temp_player_id) != 8) {
+            igPushItemFlag(ImGuiItemFlags_Disabled, true);
+            igPushStyleVarFloat(ImGuiStyleVar_Alpha, igGetStyle()->Alpha * 0.5f);
+        }
         
         if (igButton("Create", (ImVec2) { 0, 0 })) {
-            if (gl_client_is_player_id_valid(g_temp_player_id)) {
-                gl_message_t msg = { .type = GL_MESSAGE_TYPE_NEWPL, .parameters_value = 0 };
-                gl_message_push_parameter(&msg, (gl_message_parameter_t) { .string_value = gl_string_create_from_cstring(g_temp_player_id) });
-                gl_message_push_parameter(&msg, (gl_message_parameter_t) { .string_value = gl_string_create_from_number(g_udp_port, 4) });
-                gl_message_send_tcp(g_tcp_listener_socket, &msg);
-            } else {
-                gl_client_error(1);
-            }
+            gl_message_t msg = { .type = GL_MESSAGE_TYPE_NEWPL, .parameters_value = 0 };
+            gl_message_push_parameter(&msg, (gl_message_parameter_t) { .string_value = gl_string_create_from_cstring(g_temp_player_id) });
+            gl_message_push_parameter(&msg, (gl_message_parameter_t) { .string_value = gl_string_create_from_number(g_udp_port, 4) });
+            gl_message_send_tcp(g_tcp_listener_socket, &msg);
+        }
+    
+        if (strlen(g_temp_player_id) != 8) {
+            igPopItemFlag();
+            igPopStyleVar(1);
         }
         
         if (g_error) {
             igText("Error(s):");
-            
-            if (g_error == 1) {
-                igText("- This name format is invalid, it should contain 8 characters in the range [a-zA-Z0-9]!");
-            } else {
-                // TODO: Separate these two errors
-                igText("- This name is already used or the game is unavailable!");
-            }
+            // TODO: Separate these two errors
+            igText("- This name is already used or the game is unavailable!");
         }
         
         igEndPopup();
@@ -364,35 +365,36 @@ void gl_client_join_game_popup_draw() {
         
         igSameLine(0, -1);
         
-        igInputText("###PlayerName", g_temp_player_id, 9, ImGuiInputTextFlags_CharsNoBlank, 0, 0);
+        igInputText("###PlayerName", g_temp_player_id, 9, ImGuiInputTextFlags_CallbackCharFilter, gl_igFilter, 0);
         
         if (igButton("Back", (ImVec2) { 0, 0 })) {
             gl_client_join_game_popup_close();
         }
         
         igSameLine(0, -1);
+    
+        if (strlen(g_temp_player_id) != 8) {
+            igPushItemFlag(ImGuiItemFlags_Disabled, true);
+            igPushStyleVarFloat(ImGuiStyleVar_Alpha, igGetStyle()->Alpha * 0.5f);
+        }
         
         if (igButton("Join", (ImVec2) { 0, 0 })) {
-            if (gl_client_is_player_id_valid(g_temp_player_id)) {
-                gl_message_t msg = { .type = GL_MESSAGE_TYPE_REGIS, .parameters_value = 0 };
-                gl_message_push_parameter(&msg, (gl_message_parameter_t) { .string_value = gl_string_create_from_cstring(g_temp_player_id) });
-                gl_message_push_parameter(&msg, (gl_message_parameter_t) { .string_value = gl_string_create_from_number(g_udp_port, 4) });
-                gl_message_push_parameter(&msg, (gl_message_parameter_t) { .uint8_value = g_join_game_popup_game_id });
-                gl_message_send_tcp(g_tcp_listener_socket, &msg);
-            } else {
-                gl_client_error(1);
-            }
+            gl_message_t msg = { .type = GL_MESSAGE_TYPE_REGIS, .parameters_value = 0 };
+            gl_message_push_parameter(&msg, (gl_message_parameter_t) { .string_value = gl_string_create_from_cstring(g_temp_player_id) });
+            gl_message_push_parameter(&msg, (gl_message_parameter_t) { .string_value = gl_string_create_from_number(g_udp_port, 4) });
+            gl_message_push_parameter(&msg, (gl_message_parameter_t) { .uint8_value = g_join_game_popup_game_id });
+            gl_message_send_tcp(g_tcp_listener_socket, &msg);
+        }
+    
+        if (strlen(g_temp_player_id) != 8) {
+            igPopItemFlag();
+            igPopStyleVar(1);
         }
         
         if (g_error) {
             igText("Error(s):");
-            
-            if (g_error == 1) {
-                igText("- This name format is invalid, it should contain 8 characters in the range [a-zA-Z0-9]!");
-            } else {
-                // TODO: Separate these two errors
-                igText("- This name is already used or the game is unavailable!");
-            }
+            // TODO: Separate these two errors
+            igText("- This name is already used or the game is unavailable!");
         }
         
         igEndPopup();
