@@ -134,7 +134,7 @@ static int32_t gl_server_handle_args(int argc, char **argv) {
 
 static void gl_server_free() {
     if (!g_use_legacy_protocol) {
-        gl_message_t response = {.type = GL_MESSAGE_TYPE_SHUTD, 0};
+        gl_message_t response = { .type = GL_MESSAGE_TYPE_SHUTD,  0 };
         gl_message_send_multicast(g_multicast_ip, g_multicast_port, &response);
     }
     

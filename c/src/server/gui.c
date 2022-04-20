@@ -18,6 +18,8 @@ void gl_server_draw() {
 }
 
 void gl_server_draw_main_window() {
+    char buf[512] = { 0 };
+    
     gl_igBegin("Ghostlab Server", g_console_window_visible ? 0.6f : 1.0f);
     
     gl_server_draw_main_window_menu_bar();
@@ -25,16 +27,16 @@ void gl_server_draw_main_window() {
     if (igCollapsingHeaderTreeNodeFlags("Available Games", 0)) {
         if (gl_array_get_size(g_games) > 0) {
             for (uint32_t i = 0; i < gl_array_get_size(g_games); i++) {
-                if (igCollapsingHeaderTreeNodeFlags(g_games[i].name, 0)) {
+                if (!g_games[i].over && igCollapsingHeaderTreeNodeFlags(g_games[i].name, 0)) {
                     if (g_games[i].started) {
                         igText("Game has started.");
                     } else {
                         igText("Waiting for all players to be ready...");
                     }
                     
-                    if (igCollapsingHeaderTreeNodeFlags("Players", 0)) {
+                    sprintf(buf, "Players###Players%d", g_games[i].id);
+                    if (igCollapsingHeaderTreeNodeFlags(buf, 0)) {
                         for (uint32_t j = 0; j <  gl_array_get_size(g_games[i].players); j++) {
-                            char buf[512]  = { 0 };
                             if (!g_games[i].started) {
                                 if (g_games[i].players[j].ready) {
                                     sprintf(buf, " (ready)");
@@ -49,14 +51,16 @@ void gl_server_draw_main_window() {
                     }
     
                     if (g_games[i].started) {
-                        if (igCollapsingHeaderTreeNodeFlags("Ghosts", 0)) {
+                        sprintf(buf, "Ghosts###Ghosts%d", g_games[i].id);
+                        if (igCollapsingHeaderTreeNodeFlags(buf, 0)) {
                             for (uint32_t j = 0; j <  gl_array_get_size(g_games[i].ghosts); j++) {
                                 igText("- Ghost %d [x: %d, y: %d]", j, g_games[i].ghosts[j].pos.x, g_games[i].ghosts[j].pos.y);
                             }
                         }
                     }
     
-                    if (igCollapsingHeaderTreeNodeFlags("Maze", 0)) {
+                    sprintf(buf, "Maze###Maze%d", g_games[i].id);
+                    if (igCollapsingHeaderTreeNodeFlags(buf, 0)) {
                         gl_pos_t size = gl_game_get_maze_size(&g_games[i]);
                         
                         if  (g_games[i].started) {

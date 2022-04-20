@@ -5,6 +5,8 @@
 
 struct gl_game_t;
 struct gl_player_t;
+struct gl_message_t;
+enum gl_movement_t;
 
 extern const char g_help[];
 extern bool g_should_quit;
@@ -40,6 +42,8 @@ void gl_server_start_game_if_ready(struct gl_game_t *game);
 void gl_server_start_game(struct gl_game_t *game);
 
 void gl_server_send_game_list(int32_t socket_id);
+
+void gl_server_send_move(int32_t socket_id, struct gl_message_t *msg, enum gl_movement_t movement);
 
 void gl_server_free_listeners();
 

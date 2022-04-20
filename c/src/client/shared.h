@@ -51,6 +51,4 @@ void gl_client_reload_game_maze_size(uint32_t game_id);
 
 void gl_client_reload_game_players_data(uint32_t game_id);
 
-void gl_client_reload_game_data(uint32_t game_id);
-
 #endif /* GHOSTLAB_CLIENT_SHARED_H */

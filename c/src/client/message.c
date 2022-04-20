@@ -188,6 +188,39 @@ static void message_gplyr(gl_message_t *msg, int32_t socket_id, void *user_data)
     }
 }
 
+static void message_move_res(gl_message_t *msg, int32_t socket_id, void *user_data) {
+    gl_player_t *player = gl_client_get_player();
+    player->pos.x = strtol((char *)msg->parameters_value[0].string_value, 0, 10);
+    player->pos.y = strtol((char *)msg->parameters_value[1].string_value, 0, 10);
+}
+
+static void message_movef(gl_message_t *msg, int32_t socket_id, void *user_data) {
+    gl_player_t *player = gl_client_get_player();
+    player->pos.x = strtol((char *)msg->parameters_value[0].string_value, 0, 10);
+    player->pos.y = strtol((char *)msg->parameters_value[1].string_value, 0, 10);
+    player->score = strtol((char *)msg->parameters_value[2].string_value, 0, 10);
+}
+
+static void message_score(gl_message_t *msg, int32_t socket_id, void *user_data) {
+    gl_game_t *game = gl_client_get_game();
+    
+    for (uint32_t i = 0; i < gl_array_get_size(game->players); i++) {
+        if (strcmp(game->players[i].id, (char *)msg->parameters_value[0].string_value) == 0) {
+            game->players[i].score = strtol((char *)msg->parameters_value[1].string_value, 0, 10);
+            game->players[i].pos.x = strtol((char *)msg->parameters_value[2].string_value, 0, 10);
+            game->players[i].pos.y = strtol((char *)msg->parameters_value[3].string_value, 0, 10);
+        }
+    }
+}
+
+static void message_endga(gl_message_t *msg, int32_t socket_id, void *user_data) {
+    if ((strcmp(g_player_id, (char *)msg->parameters_value[0].string_value) == 0) || (gl_client_get_player()->score >= strtol((char *)msg->parameters_value[1].string_value, 0, 10))) {
+        gl_client_get_player()->won = true;
+    }
+    
+    gl_client_game_over_popup_show();
+}
+
 static void message_multi(gl_message_t *msg, int32_t socket_id, void *user_data) {
     if (!g_multicast_ip && !g_multicast_port) {
         g_multicast_ip = gl_cstring_create_from_ip(msg->parameters_value[0].string_value);
@@ -215,6 +248,10 @@ void gl_client_message_add_functions() {
     gl_message_definitions()[GL_MESSAGE_TYPE_GOBYE]->function = message_gobye;
     gl_message_definitions()[GL_MESSAGE_TYPE_GLIS_RES]->function = message_glis_res;
     gl_message_definitions()[GL_MESSAGE_TYPE_GPLYR]->function = message_gplyr;
+    gl_message_definitions()[GL_MESSAGE_TYPE_MOVE_RES]->function = message_move_res;
+    gl_message_definitions()[GL_MESSAGE_TYPE_MOVEF]->function = message_movef;
+    gl_message_definitions()[GL_MESSAGE_TYPE_SCORE]->function = message_score;
+    gl_message_definitions()[GL_MESSAGE_TYPE_ENDGA]->function = message_endga;
     gl_message_definitions()[GL_MESSAGE_TYPE_MULTI]->function = message_multi;
     gl_message_definitions()[GL_MESSAGE_TYPE_SHUTD]->function = message_shutd;
 }

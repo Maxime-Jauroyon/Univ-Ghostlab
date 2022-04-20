@@ -3,6 +3,8 @@
 #include <common/array.h>
 #include <common/maze.h>
 #include "memory.h"
+#include "message.h"
+#include "string.h"
 
 gl_ghost_t *gl_game_generate_ghosts(gl_maze_t *maze, uint8_t num_ghosts) {
     gl_ghost_t *ghosts = 0;
@@ -115,9 +117,73 @@ void gl_game_free_all_with_exception(gl_game_t *games, int32_t exception) {
 }
 
 gl_pos_t gl_game_get_maze_size(gl_game_t *game) {
-    if (game->maze) {
+    if (game->maze && game->maze->grid) {
         return (gl_pos_t) { .x = gl_array_get_size(game->maze->grid[0]), .y = gl_array_get_size(game->maze->grid) };
     }
     
     return (gl_pos_t) { .x = 7 + 1 * gl_array_get_size(game->players), .y = 7 + 1 * gl_array_get_size(game->players) };
+}
+
+uint32_t gl_game_move_player(gl_game_t *game, gl_player_t *player, uint32_t quantity, gl_movement_t movement) {
+    uint32_t removed = 0;
+    
+    while (quantity > 0) {
+        gl_pos_t pos;
+        
+        if (movement == GL_MOVEMENT_UP) {
+            pos = (gl_pos_t) { player->pos.x, player->pos.y - 1 };
+        } else if (movement == GL_MOVEMENT_RIGHT) {
+            pos = (gl_pos_t) { player->pos.x + 1, player->pos.y };
+        } else if (movement == GL_MOVEMENT_DOWN) {
+            pos = (gl_pos_t) { player->pos.x, player->pos.y + 1 };
+        } else {
+            pos = (gl_pos_t) { player->pos.x - 1, player->pos.y };
+        }
+    
+        gl_maze_element_t element = game->maze->grid[pos.y][pos.x];
+    
+        if (element == GL_MAZE_ELEMENT_ROOM || element == GL_MAZE_ELEMENT_WALL_OPENED) {
+            player->pos = pos;
+            
+            for (uint32_t i = 0; i < gl_array_get_size(game->ghosts); i++) {
+                if (game->ghosts[i].pos.x == pos.x && game->ghosts[i].pos.y == pos.y) {
+                    player->score++;
+                    
+                    gl_array_remove(game->ghosts, i);
+                    i--;
+                    removed++;
+    
+                    gl_message_t response = { .type = GL_MESSAGE_TYPE_SCORE, 0 };
+                    gl_message_push_parameter(&response, (gl_message_parameter_t) { .string_value = gl_string_create_from_cstring(player->id) });
+                    gl_message_push_parameter(&response, (gl_message_parameter_t) { .string_value = gl_string_create_from_uint32(player->score, 4) });
+                    gl_message_push_parameter(&response, (gl_message_parameter_t) { .string_value = gl_string_create_from_uint32(player->pos.x, 3) });
+                    gl_message_push_parameter(&response, (gl_message_parameter_t) { .string_value = gl_string_create_from_uint32(player->pos.y, 3) });
+                    gl_message_send_multicast(game->multicast_ip, game->multicast_port, &response);
+    
+                    uint32_t score_max = 0;
+                    uint32_t k = 0;
+                    for (uint32_t j = 0; j < gl_array_get_size(game->players); j++) {
+                        if (game->players[j].score > score_max) {
+                            score_max = game->players[j].score;
+                            k = j;
+                        }
+                    }
+                    
+                    if (gl_array_get_size(game->ghosts) == 0) {
+                        response = (gl_message_t) { .type = GL_MESSAGE_TYPE_ENDGA, 0 };
+                        gl_message_push_parameter(&response, (gl_message_parameter_t) { .string_value = gl_string_create_from_cstring(game->players[k].id) });
+                        gl_message_push_parameter(&response, (gl_message_parameter_t) { .string_value = gl_string_create_from_uint32(game->players[k].score, 4) });
+                        gl_message_send_multicast(game->multicast_ip, game->multicast_port, &response);
+                        game->over = true;
+                    }
+                }
+            }
+        } else {
+            break;
+        }
+    
+        quantity--;
+    }
+    
+    return removed;
 }

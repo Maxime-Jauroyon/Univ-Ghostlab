@@ -63,7 +63,18 @@ gl_player_t *gl_server_add_player(struct gl_game_t *game, const char *id, const 
     gl_player_t player = { 0 };
     player.socket_id = socket_id;
     memcpy(player.id, id, 8);
-    memcpy(player.udp_port, port, 4);
+    
+    bool already_exists = false;
+    for (uint32_t i = 0; i < gl_array_get_size(game->players); i++) {
+        if (player.socket_id != socket_id && strcmp(game->players[i].udp_port, port) == 0) {
+            already_exists = true;
+            // TODO: Send message to inform that UDP is already used.
+        }
+    }
+    
+    if (!already_exists) {
+        memcpy(player.udp_port, port, 4);
+    }
     
     gl_array_push(game->players, player);
     
@@ -73,7 +84,7 @@ gl_player_t *gl_server_add_player(struct gl_game_t *game, const char *id, const 
 gl_game_t *gl_server_get_game(uint32_t id) {
     for (uint32_t i = 0; i < gl_array_get_size(g_games); i++) {
         if (g_games[i].id == id) {
-            return &g_games[id];
+            return &g_games[i];
         }
     }
     
@@ -163,7 +174,7 @@ void gl_server_start_game(struct gl_game_t *game) {
     gl_pos_t size = gl_game_get_maze_size(game);
     
     game->maze = gl_maze_create(size.x, size.y);
-    game->ghosts = gl_game_generate_ghosts(game->maze, gl_array_get_size(game->players));
+    game->ghosts = gl_game_generate_ghosts(game->maze, gl_array_get_size(game->players) + 1);
     game->players = gl_game_generate_players_pos(game->maze, game->players, game->ghosts);
     game->started = true;
     
@@ -207,6 +218,26 @@ void gl_server_send_game_list(int32_t socket_id) {
             gl_message_push_parameter(&response, (gl_message_parameter_t) { .uint8_value = gl_array_get_size(g_games[i].players) });
             gl_message_send_tcp(socket_id, &response);
         }
+    }
+}
+
+void gl_server_send_move(int32_t socket_id, struct gl_message_t *msg, enum gl_movement_t movement) {
+    gl_game_t *game = gl_server_get_game_with_socket(socket_id);
+    gl_player_t *player = gl_server_get_player_with_socket(socket_id);
+    uint32_t quantity = strtol((char *)msg->parameters_value[0].string_value, 0, 10);
+    uint32_t removed = gl_game_move_player(game, player, quantity, movement);
+    
+    if (removed > 0) {
+        gl_message_t response = {.type = GL_MESSAGE_TYPE_MOVEF, 0};
+        gl_message_push_parameter(&response, (gl_message_parameter_t) { .string_value = gl_string_create_from_uint32(player->pos.x, 3) });
+        gl_message_push_parameter(&response, (gl_message_parameter_t) { .string_value = gl_string_create_from_uint32(player->pos.y, 3) });
+        gl_message_push_parameter(&response, (gl_message_parameter_t) { .string_value = gl_string_create_from_uint32(player->score, 4) });
+        gl_message_send_tcp(socket_id, &response);
+    } else {
+        gl_message_t response = {.type = GL_MESSAGE_TYPE_MOVE_RES, 0};
+        gl_message_push_parameter(&response, (gl_message_parameter_t) { .string_value = gl_string_create_from_uint32(player->pos.x, 3) });
+        gl_message_push_parameter(&response, (gl_message_parameter_t) { .string_value = gl_string_create_from_uint32(player->pos.y, 3) });
+        gl_message_send_tcp(socket_id, &response);
     }
 }
 

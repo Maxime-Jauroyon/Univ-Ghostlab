@@ -21,6 +21,10 @@ void gl_client_join_game_popup_draw();
 
 void gl_client_server_down_popup_draw();
 
+void gl_client_game_over_popup_draw();
+
+void gl_client_game_over_popup_show();
+
 void gl_client_create_game_popup_close();
 
 void gl_client_join_game_popup_close();

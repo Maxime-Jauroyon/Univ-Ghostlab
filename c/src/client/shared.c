@@ -172,8 +172,3 @@ void gl_client_reload_game_players_data(uint32_t game_id) {
         gl_message_send_tcp(g_tcp_listener_socket, &msg);
     }
 }
-
-void gl_client_reload_game_data(uint32_t game_id) {
-    gl_client_reload_game_maze_size(game_id);
-    gl_client_reload_game_players_data(game_id);
-}

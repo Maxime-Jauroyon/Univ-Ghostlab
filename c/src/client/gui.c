@@ -13,9 +13,10 @@ static bool g_main_window_reload_games = true;
 static bool g_console_window_visible = true;
 static bool g_create_game_popup_visible = false;
 static bool g_join_game_popup_visible = false;
+static bool g_game_over_popup_visible = false;
 static uint32_t g_join_game_popup_game_id = 0;
 static uint32_t g_error = 0;
-static char g_main_window_movement[4] = { 0 };
+static char g_main_window_movement[4] = { '1', 0, 0, 0 };
 
 void gl_client_draw() {
     while (!g_should_quit) {
@@ -27,6 +28,8 @@ void gl_client_draw() {
             gl_client_create_game_popup_draw();
         } else if (g_join_game_popup_visible) {
             gl_client_join_game_popup_draw();
+        } else if (g_game_over_popup_visible) {
+            gl_client_game_over_popup_draw();
         }
     
         gl_gui_end_render();
@@ -73,10 +76,15 @@ void gl_client_main_window_draw() {
     
                 igInputText("###NumberInput", g_main_window_movement, 4, ImGuiInputTextFlags_CharsDecimal, 0, 0);
 
+                if (strlen(g_main_window_movement) == 0) {
+                    igPushItemFlag(ImGuiItemFlags_Disabled, true);
+                    igPushStyleVarFloat(ImGuiStyleVar_Alpha, igGetStyle()->Alpha * 0.5f);
+                }
+                
 #if GHOSTLAB_GUI
                 if (igButton("Move Up", (ImVec2) { 208, 0 })) {
 #else
-                    if (igButton("Move Up", (ImVec2) { 0, 0 })) {
+                if (igButton("Move Up", (ImVec2) { 0, 0 })) {
 #endif
                     gl_message_t msg = { .type = GL_MESSAGE_TYPE_UPMOV, .parameters_value = 0 };
                     gl_message_push_parameter(&msg, (gl_message_parameter_t) { .string_value = gl_string_create_from_number(g_main_window_movement, 3) });
@@ -86,7 +94,7 @@ void gl_client_main_window_draw() {
 #if GHOSTLAB_GUI
                 if (igButton("Move Left", (ImVec2) { 100, 0 })) {
 #else
-                    if (igButton("Move Left", (ImVec2) { 0, 0 })) {
+                if (igButton("Move Left", (ImVec2) { 0, 0 })) {
 #endif
                     gl_message_t msg = { .type = GL_MESSAGE_TYPE_LEMOV, .parameters_value = 0 };
                     gl_message_push_parameter(&msg, (gl_message_parameter_t) { .string_value = gl_string_create_from_number(g_main_window_movement, 3) });
@@ -98,7 +106,7 @@ void gl_client_main_window_draw() {
 #if GHOSTLAB_GUI
                 if (igButton("Move Right", (ImVec2) { 100, 0 })) {
 #else
-                    if (igButton("Move Right", (ImVec2) { 0, 0 })) {
+                if (igButton("Move Right", (ImVec2) { 0, 0 })) {
 #endif
                     gl_message_t msg = { .type = GL_MESSAGE_TYPE_RIMOV, .parameters_value = 0 };
                     gl_message_push_parameter(&msg, (gl_message_parameter_t) { .string_value = gl_string_create_from_number(g_main_window_movement, 3) });
@@ -108,11 +116,16 @@ void gl_client_main_window_draw() {
 #if GHOSTLAB_GUI
                 if (igButton("Move Down", (ImVec2) { 208, 0 })) {
 #else
-                    if (igButton("Move Down", (ImVec2) { 0, 0 })) {
+                if (igButton("Move Down", (ImVec2) { 0, 0 })) {
 #endif
                     gl_message_t msg = { .type = GL_MESSAGE_TYPE_DOMOV, .parameters_value = 0 };
                     gl_message_push_parameter(&msg, (gl_message_parameter_t) { .string_value = gl_string_create_from_number(g_main_window_movement, 3) });
                     gl_message_send_tcp(g_tcp_listener_socket, &msg);
+                }
+    
+                if (strlen(g_main_window_movement) == 0) {
+                    igPopStyleVar(1);
+                    igPopItemFlag();
                 }
             }
         }
@@ -194,7 +207,7 @@ void gl_client_main_window_game_data_draw(struct gl_game_t *game, bool show_play
         for (uint32_t j = 0; j <  gl_array_get_size(game->players); j++) {
             if (strcmp(game->players[j].id, g_player_id) != 0) {
                 if (game->started) {
-                    igText("- %s [x: %d, y: %d, score: %d]", game->players[j].id, game->players[j].pos.x, game->players[j].pos.y, game->players[j].score);
+                    igText("- %s [score: %d]", game->players[j].id, game->players[j].score);
                 } else {
                     igText("- %s", game->players[j].id);
                 }
@@ -219,25 +232,28 @@ void gl_client_main_window_game_data_draw(struct gl_game_t *game, bool show_play
             igPushFont(io->Fonts->Fonts.Data[io->Fonts->Fonts.Size - 1]);
             igPushStyleVarVec2(ImGuiStyleVar_ItemSpacing, (ImVec2) { 0, 0 });
 #endif
-            
+    
+            bool found = false;
             for (uint32_t y = 0; y < game->maze_size.y; y++) {
                 char buf2[128] = { 0 };
                 uint32_t buf2_idx = 0;
-        
+                
                 for (uint32_t x = 0; x < game->maze_size.x; x++) {
-                    bool found = false;
-                    for (uint32_t j = 0; j < gl_array_get_size(game->players); j++) {
-                        if (game->players[j].pos.x == x && game->players[j].pos.y == y) {
-                            found = true;
-                            if (strcmp(game->players[j].id, g_player_id) == 0) {
-                                buf2[buf2_idx++] = '@';
-                            } else {
-                                buf2[buf2_idx++] = 'P';
-                            }
-                            break;
-                        }
-                    }
                     if (!found) {
+                        for (uint32_t j = 0; j < gl_array_get_size(game->players); j++) {
+                            if (game->players[j].pos.x == x && game->players[j].pos.y == y && strcmp(game->players[j].id, g_player_id) == 0) {
+                                found = true;
+                                buf2[buf2_idx++] = '@';
+                                break;
+                            }
+                        }
+                        
+                        if (found) {
+                            continue;
+                        } else {
+                            buf2[buf2_idx++] = '?';
+                        }
+                    } else {
                         buf2[buf2_idx++] = '?';
                     }
                 }
@@ -274,7 +290,7 @@ void gl_client_create_game_popup_draw() {
         
         igSameLine(0, -1);
         
-        igInputText("###PlayerName", g_temp_player_id, 9, 0, 0, 0);
+        igInputText("###PlayerName", g_temp_player_id, 9, ImGuiInputTextFlags_CharsNoBlank, 0, 0);
         
         if (igButton("Back", (ImVec2) { 0, 0 })) {
             gl_client_create_game_popup_close();
@@ -318,7 +334,7 @@ void gl_client_join_game_popup_draw() {
         
         igSameLine(0, -1);
         
-        igInputText("###PlayerName", g_temp_player_id, 9, 0, 0, 0);
+        igInputText("###PlayerName", g_temp_player_id, 9, ImGuiInputTextFlags_CharsNoBlank, 0, 0);
         
         if (igButton("Back", (ImVec2) { 0, 0 })) {
             gl_client_join_game_popup_close();
@@ -377,6 +393,35 @@ void gl_client_server_down_popup_draw() {
         
         gl_gui_end_render();
     }
+}
+
+void gl_client_game_over_popup_draw() {
+    igOpenPopup("###GameOver", 0);
+    
+    char title[512] = { 0 };
+    if (gl_client_get_player()->won) {
+        sprintf(title, "You Won###GameOver");
+    } else {
+        sprintf(title, "Game Over###GameOver");
+    }
+    if (igBeginPopupModal(title, 0, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove)) {
+        if (gl_client_get_player()->won) {
+            igText("Congratulations! You won!");
+        } else {
+            igText("Too bad... You lost! You'll do better next time!");
+        }
+        
+        if (igButton("Back", (ImVec2) { 0, 0 })) {
+            gl_client_disconnect(false);
+            g_game_over_popup_visible = false;
+        }
+        
+        igEndPopup();
+    }
+}
+
+void gl_client_game_over_popup_show() {
+    g_game_over_popup_visible = true;
 }
 
 void gl_client_create_game_popup_close() {

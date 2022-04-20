@@ -9,6 +9,7 @@
 void *gl_thread_tcp_listener_main(void *user_data) {
     uint32_t id = *(uint32_t *)user_data;
     int32_t socket_id = g_tcp_listener_sockets[id];
+    int32_t socket_id_copy = socket_id;
     
     gl_log_push("tcp listener %d thread started.\n", socket_id);
     
@@ -33,7 +34,7 @@ void *gl_thread_tcp_listener_main(void *user_data) {
     
     gl_socket_close(&socket_id);
     
-    gl_log_push("tcp listener %d thread stopped.\n", socket_id);
+    gl_log_push("tcp listener %d thread stopped.\n", socket_id_copy);
     
     return 0;
 }
