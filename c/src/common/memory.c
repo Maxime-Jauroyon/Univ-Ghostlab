@@ -102,7 +102,7 @@ void gl_memory_check_for_leaks() {
     
         igOpenPopup("###Leaks", 0);
         
-        if (igBeginPopupModal("Memory Leaks Detected###Leaks", 0, ImGuiWindowFlags_AlwaysAutoResize)) {
+        if (igBeginPopupModal("Memory Leaks Detected###Leaks", 0, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove)) {
             igText(" ");
 #ifdef __APPLE__
             igText("At least %llu memory leaks detected!    ", g_allocated_ptrs);

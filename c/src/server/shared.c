@@ -9,6 +9,7 @@
 #include <common/message.h>
 #include <common/network.h>
 #include <stdlib.h>
+#include "common/string.h"
 
 static pthread_mutex_t internal_g_main_mutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -44,6 +45,9 @@ gl_game_t *gl_server_add_game(uint32_t id) {
     
     game.id = id;
     sprintf(game.name, "Game %d", game.id);
+    game.multicast_ip = gl_calloc(16, 1);
+    game.multicast_port = gl_calloc(5, 1);
+    memcpy(game.multicast_ip, g_multicast_ip, 15);
     sprintf(game.multicast_port, "%d", (uint32_t)(strtol(g_multicast_port, 0, 10) + id + 1));
     
     gl_array_push(g_games, game);
@@ -92,7 +96,7 @@ gl_player_t *gl_server_get_player_with_socket(int32_t socket_id) {
     for (uint32_t i = 0; i < gl_array_get_size(g_games); i++) {
         for (uint32_t j = 0; j < gl_array_get_size(g_games[i].players); j++) {
             if (g_games[i].players[j].socket_id == socket_id) {
-                return &g_games[i].players[i];
+                return &g_games[i].players[j];
             }
         }
     }
@@ -157,22 +161,52 @@ void gl_server_start_game_if_ready(struct gl_game_t *game) {
 
 void gl_server_start_game(struct gl_game_t *game) {
     gl_pos_t size = gl_game_get_maze_size(game);
+    
     game->maze = gl_maze_create(size.x, size.y);
     game->ghosts = gl_game_generate_ghosts(game->maze, gl_array_get_size(game->players));
     game->players = gl_game_generate_players_pos(game->maze, game->players, game->ghosts);
     game->started = true;
+    
+    for (uint32_t i = 0; i < gl_array_get_size(game->players); i++) {
+        gl_message_t response = { .type = GL_MESSAGE_TYPE_WELCO, 0 };
+        gl_message_push_parameter(&response, (gl_message_parameter_t) { .uint8_value = game->id });
+        gl_message_push_parameter(&response, (gl_message_parameter_t) { .uint16_value = gl_array_get_size(game->maze->grid[0]) });
+        gl_message_push_parameter(&response, (gl_message_parameter_t) { .uint16_value = gl_array_get_size(game->maze->grid) });
+        gl_message_push_parameter(&response, (gl_message_parameter_t) { .uint8_value = gl_array_get_size(game->ghosts) });
+        gl_message_push_parameter(&response, (gl_message_parameter_t) { .string_value = gl_string_create_from_ip(game->multicast_ip) });
+        gl_message_push_parameter(&response, (gl_message_parameter_t) { .string_value = gl_string_create_from_number(game->multicast_port, 4) });
+        gl_message_send_tcp(game->players[i].socket_id, &response);
+    }
+    
+    for (uint32_t i = 0; i < gl_array_get_size(game->players); i++) {
+        gl_message_t response = { .type = GL_MESSAGE_TYPE_POSIT, 0 };
+        gl_message_push_parameter(&response, (gl_message_parameter_t) { .string_value = gl_string_create_from_cstring(game->players[i].id) });
+        gl_message_push_parameter(&response, (gl_message_parameter_t) { .string_value = gl_string_create_from_uint32(game->players[i].pos.x, 3) });
+        gl_message_push_parameter(&response, (gl_message_parameter_t) { .string_value = gl_string_create_from_uint32(game->players[i].pos.y, 3) });
+        gl_message_send_tcp(game->players[i].socket_id, &response);
+    }
 }
 
 void gl_server_send_game_list(int32_t socket_id) {
+    uint32_t num_games_not_started = 0;
+    
+    for (uint32_t i = 0; i < gl_array_get_size(g_games); i++) {
+        if (!g_games[i].started) {
+            num_games_not_started++;
+        }
+    }
+    
     gl_message_t response = { .type = GL_MESSAGE_TYPE_GAMES, 0 };
-    gl_message_push_parameter(&response, (gl_message_parameter_t) { .uint8_value = gl_array_get_size(g_games) });
+    gl_message_push_parameter(&response, (gl_message_parameter_t) { .uint8_value = num_games_not_started });
     gl_message_send_tcp(socket_id, &response);
     
     for (uint32_t i = 0; i < gl_array_get_size(g_games); i++) {
-        response = (gl_message_t) { .type = GL_MESSAGE_TYPE_OGAMES, 0 };
-        gl_message_push_parameter(&response, (gl_message_parameter_t) { .uint8_value = g_games[i].id });
-        gl_message_push_parameter(&response, (gl_message_parameter_t) { .uint8_value = gl_array_get_size(g_games[i].players) });
-        gl_message_send_tcp(socket_id, &response);
+        if (!g_games[i].started) {
+            response = (gl_message_t) { .type = GL_MESSAGE_TYPE_OGAMES, 0 };
+            gl_message_push_parameter(&response, (gl_message_parameter_t) { .uint8_value = g_games[i].id });
+            gl_message_push_parameter(&response, (gl_message_parameter_t) { .uint8_value = gl_array_get_size(g_games[i].players) });
+            gl_message_send_tcp(socket_id, &response);
+        }
     }
 }
 

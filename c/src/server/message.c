@@ -69,8 +69,8 @@ void message_size_req(gl_message_t *msg, int32_t socket_id, void *user_data) {
     gl_pos_t size = gl_game_get_maze_size(game);
     gl_message_t response = { .type = GL_MESSAGE_TYPE_SIZE_RES, 0 };
     gl_message_push_parameter(&response, (gl_message_parameter_t) { .uint8_value = game_id });
-    gl_message_push_parameter(&response, (gl_message_parameter_t) { .uint16_value = size.x });
-    gl_message_push_parameter(&response, (gl_message_parameter_t) { .uint16_value = size.y });
+    gl_message_push_parameter(&response, (gl_message_parameter_t) { .uint16_value = 2 * size.x + 1 }); // TODO: Move to maze.c
+    gl_message_push_parameter(&response, (gl_message_parameter_t) { .uint16_value = 2 * size.y + 1 }); // TODO: Move to maze.c
     gl_message_send_tcp(socket_id, &response);
 }
 
@@ -86,8 +86,7 @@ void message_list_req(gl_message_t *msg, int32_t socket_id, void *user_data) {
     
     gl_message_t response = {.type = GL_MESSAGE_TYPE_LIST_RES, 0};
     gl_message_push_parameter(&response, (gl_message_parameter_t) {.uint8_value = game_id});
-    gl_message_push_parameter(&response,
-                              (gl_message_parameter_t) {.uint8_value = gl_array_get_size(game->players)});
+    gl_message_push_parameter(&response, (gl_message_parameter_t) {.uint8_value = gl_array_get_size(game->players)});
     gl_message_send_tcp(socket_id, &response);
     
     for (uint32_t i = 0; i < gl_array_get_size(game->players); i++) {
@@ -154,6 +153,44 @@ void message_iquit(gl_message_t *msg, int32_t socket_id, void *user_data) {
     gl_socket_close(&socket_id);
 }
 
+void message_upmov(gl_message_t *msg, int32_t socket_id, void *user_data) {
+
+}
+
+void message_domov(gl_message_t *msg, int32_t socket_id, void *user_data) {
+
+}
+
+void message_lemov(gl_message_t *msg, int32_t socket_id, void *user_data) {
+
+}
+
+void message_rimov(gl_message_t *msg, int32_t socket_id, void *user_data) {
+
+}
+
+void message_glis_req(gl_message_t *msg, int32_t socket_id, void *user_data) {
+    gl_game_t *game = gl_server_get_game_with_socket(socket_id);
+    
+    if (game->over) {
+        gl_message_t response = {.type = GL_MESSAGE_TYPE_GOBYE, 0};
+        gl_message_send_tcp(socket_id, &response);
+    }
+    
+    gl_message_t response = {.type = GL_MESSAGE_TYPE_GLIS_RES, 0};
+    gl_message_push_parameter(&response, (gl_message_parameter_t) {.uint8_value = gl_array_get_size(game->players)});
+    gl_message_send_tcp(socket_id, &response);
+    
+    for (uint32_t i = 0; i < gl_array_get_size(game->players); i++) {
+        response = (gl_message_t) { .type = GL_MESSAGE_TYPE_GPLYR, 0 };
+        gl_message_push_parameter(&response, (gl_message_parameter_t) { .string_value = gl_string_create_from_cstring(game->players[i].id) });
+        gl_message_push_parameter(&response, (gl_message_parameter_t) { .string_value = gl_string_create_from_uint32(game->players[i].pos.x, 3) });
+        gl_message_push_parameter(&response, (gl_message_parameter_t) { .string_value = gl_string_create_from_uint32(game->players[i].pos.y, 3) });
+        gl_message_push_parameter(&response, (gl_message_parameter_t) { .string_value = gl_string_create_from_uint32(game->players[i].score, 4) });
+        gl_message_send_tcp(socket_id, &response);
+    }
+}
+
 void gl_server_message_add_functions() {
     gl_message_definitions()[GL_MESSAGE_TYPE_NEWPL]->function = message_newpl;
     gl_message_definitions()[GL_MESSAGE_TYPE_REGIS]->function = message_regis;
@@ -163,4 +200,9 @@ void gl_server_message_add_functions() {
     gl_message_definitions()[GL_MESSAGE_TYPE_START]->function = message_start;
     gl_message_definitions()[GL_MESSAGE_TYPE_UNREG]->function = message_unreg;
     gl_message_definitions()[GL_MESSAGE_TYPE_IQUIT]->function = message_iquit;
+    gl_message_definitions()[GL_MESSAGE_TYPE_UPMOV]->function = message_upmov;
+    gl_message_definitions()[GL_MESSAGE_TYPE_DOMOV]->function = message_domov;
+    gl_message_definitions()[GL_MESSAGE_TYPE_LEMOV]->function = message_lemov;
+    gl_message_definitions()[GL_MESSAGE_TYPE_RIMOV]->function = message_rimov;
+    gl_message_definitions()[GL_MESSAGE_TYPE_GLIS_REQ]->function = message_glis_req;
 }

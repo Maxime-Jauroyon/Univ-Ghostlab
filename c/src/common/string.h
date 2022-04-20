@@ -7,6 +7,8 @@ uint8_t *gl_string_create_from_cstring(const char *src);
 
 uint8_t *gl_string_create_from_number(const char *src, uint8_t size);
 
+uint8_t *gl_string_create_from_uint32(uint32_t value, uint8_t size);
+
 uint8_t *gl_string_create_from_ip(const char *src);
 
 char *gl_cstring_create_from_string(const uint8_t *src);

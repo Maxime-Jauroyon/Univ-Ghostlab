@@ -29,18 +29,42 @@ void gl_server_draw_main_window() {
                     if (g_games[i].started) {
                         igText("Game has started.");
                     } else {
-                        igText("Waiting for all players to be ready to start the game.");
+                        igText("Waiting for all players to be ready...");
                     }
                     
                     if (igCollapsingHeaderTreeNodeFlags("Players", 0)) {
                         for (uint32_t j = 0; j <  gl_array_get_size(g_games[i].players); j++) {
-                            igText("- %s%s", g_games[i].players[j].id, !g_games[i].started && g_games[i].players[j].ready ? " (ready)" : " (not ready)");
+                            char buf[512]  = { 0 };
+                            if (!g_games[i].started) {
+                                if (g_games[i].players[j].ready) {
+                                    sprintf(buf, " (ready)");
+                                } else {
+                                    sprintf(buf, " (not ready)");
+                                }
+                            } else {
+                                sprintf(buf, " [x: %d, y: %d, score: %d]", g_games[i].players[j].pos.x, g_games[i].players[j].pos.y, g_games[i].players[j].score);
+                            }
+                            igText("- %s%s", g_games[i].players[j].id, buf);
+                        }
+                    }
+    
+                    if (g_games[i].started) {
+                        if (igCollapsingHeaderTreeNodeFlags("Ghosts", 0)) {
+                            for (uint32_t j = 0; j <  gl_array_get_size(g_games[i].ghosts); j++) {
+                                igText("- Ghost %d [x: %d, y: %d]", j, g_games[i].ghosts[j].pos.x, g_games[i].ghosts[j].pos.y);
+                            }
                         }
                     }
     
                     if (igCollapsingHeaderTreeNodeFlags("Maze", 0)) {
                         gl_pos_t size = gl_game_get_maze_size(&g_games[i]);
-                        igText("Size: %dx%d", size.x, size.y);
+                        
+                        if  (g_games[i].started) {
+                            igText("Size: %dx%d", size.x, size.y);
+                        } else {
+                            igText("Size: %dx%d", 2 * size.x + 1, 2 * size.y + 1);
+                            igText("Not yet generated!");
+                        }
                         
                         if (g_games[i].maze) {
                             ImGuiIO *io = igGetIO();
@@ -53,10 +77,29 @@ void gl_server_draw_main_window() {
                                 uint32_t buf2_idx = 0;
         
                                 for (uint32_t x = 0; x < gl_array_get_size(g_games[i].maze->grid[y]); x++) {
-                                    if (g_games[i].maze->grid[y][x] == GL_MAZE_ELEMENT_PILLAR || g_games[i].maze->grid[y][x] == GL_MAZE_ELEMENT_WALL_CLOSED) {
-                                        buf2[buf2_idx++] = '#';
-                                    } else if (g_games[i].maze->grid[y][x] == GL_MAZE_ELEMENT_WALL_OPENED || g_games[i].maze->grid[y][x] == GL_MAZE_ELEMENT_ROOM) {
-                                        buf2[buf2_idx++] = ' ';
+                                    bool found = false;
+                                    for (uint32_t j = 0; j < gl_array_get_size(g_games[i].ghosts); j++) {
+                                        if (g_games[i].ghosts[j].pos.x == x && g_games[i].ghosts[j].pos.y == y) {
+                                            found = true;
+                                            buf2[buf2_idx++] = 'G';
+                                            break;
+                                        }
+                                    }
+                                    if (!found) {
+                                        for (uint32_t j = 0; j < gl_array_get_size(g_games[i].players); j++) {
+                                            if (g_games[i].players[j].pos.x == x && g_games[i].players[j].pos.y == y) {
+                                                found = true;
+                                                buf2[buf2_idx++] = 'P';
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    if (!found) {
+                                        if (g_games[i].maze->grid[y][x] == GL_MAZE_ELEMENT_PILLAR || g_games[i].maze->grid[y][x] == GL_MAZE_ELEMENT_WALL_CLOSED) {
+                                            buf2[buf2_idx++] = '#';
+                                        } else if (g_games[i].maze->grid[y][x] == GL_MAZE_ELEMENT_WALL_OPENED || g_games[i].maze->grid[y][x] == GL_MAZE_ELEMENT_ROOM) {
+                                            buf2[buf2_idx++] = ' ';
+                                        }
                                     }
                                 }
         

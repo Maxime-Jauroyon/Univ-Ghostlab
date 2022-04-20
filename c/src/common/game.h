@@ -27,7 +27,9 @@ typedef struct gl_game_t {
     gl_ghost_t *ghosts;
     struct gl_maze_t *maze;
     bool started;
-    char multicast_port[5];
+    bool over;
+    char *multicast_ip;
+    char *multicast_port;
 #if GHOSTLAB_CLIENT
     gl_pos_t maze_size;
     bool reload_maze_data;

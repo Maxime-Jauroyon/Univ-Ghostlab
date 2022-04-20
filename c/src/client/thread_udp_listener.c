@@ -6,7 +6,7 @@
 #include <client/shared.h>
 
 void *gl_client_thread_udp_listener_main(void *user_data) {
-    gl_log_push("udp thread started.\n");
+    gl_log_push("udp listener thread started.\n");
     
     g_udp_socket = gl_socket_create(GHOSTLAB_DEFAULT_UDP_IP, g_udp_port, GL_SOCKET_TYPE_UDP_RECEIVER, 0);
     
@@ -18,7 +18,7 @@ void *gl_client_thread_udp_listener_main(void *user_data) {
     
     gl_socket_close(&g_udp_socket);
     
-    gl_log_push("udp thread stopped.\n");
+    gl_log_push("udp listener thread stopped.\n");
     
     return 0;
 }

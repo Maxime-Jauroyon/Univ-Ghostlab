@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <common/array.h>
 #include <common/maze.h>
+#include "memory.h"
 
 gl_ghost_t *gl_game_generate_ghosts(gl_maze_t *maze, uint8_t num_ghosts) {
     gl_ghost_t *ghosts = 0;
@@ -90,6 +91,8 @@ bool gl_game_is_player_at_pos(gl_player_t *players, gl_pos_t pos) {
 
 void gl_game_free(gl_game_t *game) {
     if (game) {
+        gl_free(game->multicast_ip);
+        gl_free(game->multicast_port);
         gl_maze_free(game->maze);
         gl_array_free(game->ghosts);
         gl_array_free(game->players);

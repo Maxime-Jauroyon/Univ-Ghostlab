@@ -15,7 +15,7 @@ extern char *g_server_port;
 extern char *g_udp_port;
 extern char *g_multicast_ip;
 extern char *g_multicast_port;
-extern int32_t g_tcp_acceptor_socket;
+extern int32_t g_tcp_listener_socket;
 extern int32_t g_multicast_general_socket;
 extern int32_t g_multicast_game_socket;
 extern int32_t g_udp_socket;
@@ -27,6 +27,7 @@ extern void *g_main_mutex;
 extern struct gl_game_t *g_games;
 extern int32_t g_game_id;
 extern char g_player_id[9];
+extern char g_temp_player_id[9];
 
 int32_t gl_client_connect();
 

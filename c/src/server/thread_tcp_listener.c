@@ -10,7 +10,7 @@ void *gl_thread_tcp_listener_main(void *user_data) {
     uint32_t id = *(uint32_t *)user_data;
     int32_t socket_id = g_tcp_listener_sockets[id];
     
-    gl_log_push("tcp listener %d thread started.\n", id);
+    gl_log_push("tcp listener %d thread started.\n", socket_id);
     
     if (!g_use_legacy_protocol) {
         gl_message_t response = {.type = GL_MESSAGE_TYPE_MULTI, 0};
@@ -33,7 +33,7 @@ void *gl_thread_tcp_listener_main(void *user_data) {
     
     gl_socket_close(&socket_id);
     
-    gl_log_push("tcp listener %d thread stopped.\n", id);
+    gl_log_push("tcp listener %d thread stopped.\n", socket_id);
     
     return 0;
 }

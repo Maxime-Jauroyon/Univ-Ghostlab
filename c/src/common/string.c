@@ -5,6 +5,7 @@
 #include <common/array.h>
 #include <common/utils.h>
 #include <common/memory.h>
+#include <stdio.h>
 
 uint8_t *gl_string_create_from_cstring(const char *src) {
     uint8_t *dst = 0;
@@ -40,6 +41,12 @@ uint8_t *gl_string_create_from_number(const char *src, uint8_t size) {
     }
     
     return dst;
+}
+
+uint8_t *gl_string_create_from_uint32(uint32_t value, uint8_t size) {
+    char buf[size + 1];
+    sprintf(buf, "%d", value);
+    return gl_string_create_from_number(buf, size);
 }
 
 uint8_t *gl_string_create_from_ip(const char *src) {

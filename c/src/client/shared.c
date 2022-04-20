@@ -32,7 +32,7 @@ char *g_server_port = 0;
 char *g_udp_port = 0;
 char *g_multicast_ip = 0;
 char *g_multicast_port = 0;
-int32_t g_tcp_acceptor_socket = -1;
+int32_t g_tcp_listener_socket = -1;
 int32_t g_multicast_general_socket = -1;
 int32_t g_multicast_game_socket = -1;
 int32_t g_udp_socket = -1;
@@ -44,11 +44,12 @@ void *g_main_mutex = &internal_g_main_mutex;
 gl_game_t *g_games = 0;
 int32_t g_game_id = -1;
 char g_player_id[9] = { 0 };
+char g_temp_player_id[9] = { 0 };
 
 int32_t gl_client_connect() {
-    g_tcp_acceptor_socket = gl_socket_create(g_server_ip, g_server_port, GL_SOCKET_TYPE_TCP_CLIENT, 0);
+    g_tcp_listener_socket = gl_socket_create(g_server_ip, g_server_port, GL_SOCKET_TYPE_TCP_CLIENT, 0);
     
-    if (g_tcp_acceptor_socket == -1) {
+    if (g_tcp_listener_socket == -1) {
         return -1;
     }
     
@@ -62,17 +63,17 @@ void gl_client_disconnect(bool close_socket) {
     
     if (game && game->started) {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_IQUIT, .parameters_value = 0 };
-        gl_message_send_tcp(g_tcp_acceptor_socket, &msg);
+        gl_message_send_tcp(g_tcp_listener_socket, &msg);
     } else if (game && !gl_client_get_player()->ready) {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_UNREG, .parameters_value = 0 };
-        gl_message_send_tcp(g_tcp_acceptor_socket, &msg);
+        gl_message_send_tcp(g_tcp_listener_socket, &msg);
     }
     
     if (close_socket) {
-        gl_socket_close(&g_tcp_acceptor_socket);
+        gl_socket_close(&g_tcp_listener_socket);
     } else {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_GAME_REQ, .parameters_value = 0 };
-        gl_message_send_tcp(g_tcp_acceptor_socket, &msg);
+        gl_message_send_tcp(g_tcp_listener_socket, &msg);
     }
 }
 
@@ -152,19 +153,24 @@ gl_player_t *gl_client_get_player() {
 
 void gl_client_reload_games() {
     gl_message_t msg = { .type = GL_MESSAGE_TYPE_GAME_REQ, .parameters_value = 0 };
-    gl_message_send_tcp(g_tcp_acceptor_socket, &msg);
+    gl_message_send_tcp(g_tcp_listener_socket, &msg);
 }
 
 void gl_client_reload_game_maze_size(uint32_t game_id) {
     gl_message_t msg = { .type = GL_MESSAGE_TYPE_SIZE_REQ, .parameters_value = 0 };
     gl_message_push_parameter(&msg, (gl_message_parameter_t) { .uint8_value = game_id });
-    gl_message_send_tcp(g_tcp_acceptor_socket, &msg);
+    gl_message_send_tcp(g_tcp_listener_socket, &msg);
 }
 
 void gl_client_reload_game_players_data(uint32_t game_id) {
-    gl_message_t msg = { .type = GL_MESSAGE_TYPE_LIST_REQ, .parameters_value = 0 };
-    gl_message_push_parameter(&msg, (gl_message_parameter_t) { .uint8_value = game_id });
-    gl_message_send_tcp(g_tcp_acceptor_socket, &msg);
+    if  (gl_client_get_game_with_id(game_id)->started) {
+        gl_message_t msg = { .type = GL_MESSAGE_TYPE_GLIS_REQ, .parameters_value = 0 };
+        gl_message_send_tcp(g_tcp_listener_socket, &msg);
+    } else {
+        gl_message_t msg = { .type = GL_MESSAGE_TYPE_LIST_REQ, .parameters_value = 0 };
+        gl_message_push_parameter(&msg, (gl_message_parameter_t) { .uint8_value = game_id });
+        gl_message_send_tcp(g_tcp_listener_socket, &msg);
+    }
 }
 
 void gl_client_reload_game_data(uint32_t game_id) {
