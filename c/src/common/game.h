@@ -11,7 +11,7 @@ typedef struct gl_player_t {
     gl_pos_t pos;
     bool ready;
 #if GHOSTLAB_SERVER
-    char udp_port[4];
+    char udp_port[5];
     int32_t socket_id;
 #endif
 } gl_player_t;
@@ -27,7 +27,12 @@ typedef struct gl_game_t {
     gl_ghost_t *ghosts;
     struct gl_maze_t *maze;
     bool started;
-    char multicast_port[4];
+    char multicast_port[5];
+#if GHOSTLAB_CLIENT
+    gl_pos_t maze_size;
+    bool reload_maze_data;
+    bool reload_players_data;
+#endif
 } gl_game_t;
 
 gl_ghost_t *gl_game_generate_ghosts(struct gl_maze_t *maze, uint8_t num_ghosts);
@@ -43,5 +48,7 @@ void gl_game_free(gl_game_t *game);
 void gl_game_free_all(gl_game_t *games);
 
 void gl_game_free_all_with_exception(gl_game_t *games, int32_t exception);
+
+gl_pos_t gl_game_get_maze_size(gl_game_t *game);
 
 #endif /* GHOSTLAB_GAME_H */

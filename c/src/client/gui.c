@@ -7,7 +7,9 @@
 #include <common/message.h>
 #include <client/shared.h>
 #include <client/command.h>
+#include <string.h>
 
+static bool g_main_window_reload_games = true;
 static bool g_console_window_visible = true;
 static bool g_create_game_popup_visible = false;
 static bool g_join_game_popup_visible = false;
@@ -56,27 +58,39 @@ void gl_client_main_window_draw() {
                 gl_client_disconnect(false);
             }
         }
+    
+        gl_client_main_window_game_data_draw(gl_client_get_game(), true);
     }
     
     if (!gl_client_get_game() || !gl_client_get_game()->started) {
         if (igCollapsingHeaderTreeNodeFlags("Available Games", 0)) {
-            if (igButton("Reload", (ImVec2) {0, 0})) {
-                gl_message_t msg = { .type = GL_MESSAGE_TYPE_GAME_REQ, .parameters_value = 0 };
-                gl_message_send_tcp(g_tcp_acceptor_socket, &msg);
+            if (g_main_window_reload_games) {
+                gl_client_reload_games();
+                g_main_window_reload_games = false;
+            }
+            
+            if (igButton("Reload Games Data", (ImVec2) {0, 0})) {
+                gl_client_reload_games();
             }
             
             if (gl_array_get_size(g_games) > 0) {
                 for (uint32_t i = 0; i < gl_array_get_size(g_games); i++) {
-                    if ((!gl_client_get_game() || gl_client_get_game()->id != g_games[i].id) && igCollapsingHeaderTreeNodeFlags(g_games[i].name, 0)) {
-                        if (igButton("Join", (ImVec2) {0, 0})) {
-                            g_join_game_popup_visible = true;
-                            g_join_game_popup_game_id = g_games[i].id;
+                    if ((!gl_client_get_game() || gl_client_get_game()->id != g_games[i].id)) {
+                        if (igCollapsingHeaderTreeNodeFlags(g_games[i].name, 0)) {
+                            if (igButton("Join", (ImVec2) {0, 0})) {
+                                g_join_game_popup_visible = true;
+                                g_join_game_popup_game_id = g_games[i].id;
+                            }
+    
+                            gl_client_main_window_game_data_draw(&g_games[i], false);
                         }
                     }
                 }
             } else {
                 igText("There are currently no games.");
             }
+        } else {
+            g_main_window_reload_games = true;
         }
     }
     
@@ -98,6 +112,38 @@ void gl_client_main_window_menu_bar_draw() {
         }
         
         igEndMenuBar();
+    }
+}
+
+void gl_client_main_window_game_data_draw(struct gl_game_t *game, bool show_player) {
+    if (igCollapsingHeaderTreeNodeFlags("Players", 0)) {
+        if (game->reload_players_data || igButton("Reload Players Data", (ImVec2) {0, 0})) {
+            gl_client_reload_game_players_data(game->id);
+            game->reload_players_data = false;
+        }
+        
+        if (show_player) {
+            igText("- %s (you)", g_player_id);
+        }
+        
+        for (uint32_t j = 0; j <  gl_array_get_size(game->players); j++) {
+            if (strcmp(game->players[j].id, g_player_id) != 0) {
+                igText("- %s", game->players[j].id);
+            }
+        }
+    } else {
+        game->reload_players_data = true;
+    }
+    
+    if (igCollapsingHeaderTreeNodeFlags("Maze", 0)) {
+        if (game->reload_maze_data || igButton("Reload Maze Data", (ImVec2) {0, 0})) {
+            gl_client_reload_game_maze_size(game->id);
+            game->reload_maze_data = false;
+        }
+    
+        igText("Size: %dx%d", game->maze_size.x, game->maze_size.y);
+    } else {
+        game->reload_maze_data = true;
     }
 }
 

@@ -110,3 +110,11 @@ void gl_game_free_all_with_exception(gl_game_t *games, int32_t exception) {
         }
     }
 }
+
+gl_pos_t gl_game_get_maze_size(gl_game_t *game) {
+    if (game->maze) {
+        return (gl_pos_t) { .x = gl_array_get_size(game->maze->grid[0]), .y = gl_array_get_size(game->maze->grid) };
+    }
+    
+    return (gl_pos_t) { .x = 7 + 1 * gl_array_get_size(game->players), .y = 7 + 1 * gl_array_get_size(game->players) };
+}

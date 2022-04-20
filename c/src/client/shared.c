@@ -120,8 +120,12 @@ gl_game_t *gl_client_get_game() {
         return 0;
     }
     
+    return gl_client_get_game_with_id(g_game_id);
+}
+
+struct gl_game_t *gl_client_get_game_with_id(uint32_t id) {
     for (uint32_t i = 0; i < gl_array_get_size(g_games); i++) {
-        if (g_games[i].id == g_game_id) {
+        if (g_games[i].id == id) {
             return &g_games[i];
         }
     }
@@ -144,4 +148,26 @@ gl_player_t *gl_client_get_player() {
     }
     
     return 0;
+}
+
+void gl_client_reload_games() {
+    gl_message_t msg = { .type = GL_MESSAGE_TYPE_GAME_REQ, .parameters_value = 0 };
+    gl_message_send_tcp(g_tcp_acceptor_socket, &msg);
+}
+
+void gl_client_reload_game_maze_size(uint32_t game_id) {
+    gl_message_t msg = { .type = GL_MESSAGE_TYPE_SIZE_REQ, .parameters_value = 0 };
+    gl_message_push_parameter(&msg, (gl_message_parameter_t) { .uint8_value = game_id });
+    gl_message_send_tcp(g_tcp_acceptor_socket, &msg);
+}
+
+void gl_client_reload_game_players_data(uint32_t game_id) {
+    gl_message_t msg = { .type = GL_MESSAGE_TYPE_LIST_REQ, .parameters_value = 0 };
+    gl_message_push_parameter(&msg, (gl_message_parameter_t) { .uint8_value = game_id });
+    gl_message_send_tcp(g_tcp_acceptor_socket, &msg);
+}
+
+void gl_client_reload_game_data(uint32_t game_id) {
+    gl_client_reload_game_maze_size(game_id);
+    gl_client_reload_game_players_data(game_id);
 }

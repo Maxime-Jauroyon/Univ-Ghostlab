@@ -163,7 +163,7 @@ int32_t gl_uint8_array_recv_until_separator(int32_t fd, uint8_t **dst, uint8_t *
         if (buf) {
             c = buf[(*i)++];
         } else {
-            gl_assert(gl_uint8_recv(fd, &c) != 0);
+            gl_assert(gl_uint8_recv(fd, &c)  > 0);
         }
         first = false;
     }

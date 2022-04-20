@@ -40,6 +40,16 @@ struct gl_player_t *gl_client_add_player(struct gl_game_t *game, const char *id)
 
 struct gl_game_t *gl_client_get_game();
 
+struct gl_game_t *gl_client_get_game_with_id(uint32_t id);
+
 struct gl_player_t *gl_client_get_player();
+
+void gl_client_reload_games();
+
+void gl_client_reload_game_maze_size(uint32_t game_id);
+
+void gl_client_reload_game_players_data(uint32_t game_id);
+
+void gl_client_reload_game_data(uint32_t game_id);
 
 #endif /* GHOSTLAB_CLIENT_SHARED_H */

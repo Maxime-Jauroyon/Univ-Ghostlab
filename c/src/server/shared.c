@@ -58,7 +58,7 @@ gl_player_t *gl_server_add_player(struct gl_game_t *game, const char *id, const 
     
     gl_player_t player = { 0 };
     player.socket_id = socket_id;
-    memcpy(player.id, id, 9);
+    memcpy(player.id, id, 8);
     memcpy(player.udp_port, port, 4);
     
     gl_array_push(game->players, player);
@@ -156,7 +156,8 @@ void gl_server_start_game_if_ready(struct gl_game_t *game) {
 }
 
 void gl_server_start_game(struct gl_game_t *game) {
-    game->maze = gl_maze_create(7 + 1 * gl_array_get_size(game->players), 7 + 1 * gl_array_get_size(game->players));
+    gl_pos_t size = gl_game_get_maze_size(game);
+    game->maze = gl_maze_create(size.x, size.y);
     game->ghosts = gl_game_generate_ghosts(game->maze, gl_array_get_size(game->players));
     game->players = gl_game_generate_players_pos(game->maze, game->players, game->ghosts);
     game->started = true;
