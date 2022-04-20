@@ -127,8 +127,8 @@ static void message_welco(gl_message_t *msg, int32_t socket_id, void *user_data)
 static void message_posit(gl_message_t *msg, int32_t socket_id, void *user_data) {
     gl_player_t *player = gl_client_get_player();
     
-    player->pos.x = strtol((char *)msg->parameters_value[0].string_value, 0, 10);
-    player->pos.y = strtol((char *)msg->parameters_value[1].string_value, 0, 10);
+    player->pos.x = strtol((char *)msg->parameters_value[1].string_value, 0, 10);
+    player->pos.y = strtol((char *)msg->parameters_value[2].string_value, 0, 10);
     
     gl_client_get_game()->reload_players_data = true;
 }

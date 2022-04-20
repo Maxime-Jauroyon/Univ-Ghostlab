@@ -102,7 +102,10 @@ void gl_server_draw_main_window() {
                                         }
                                     }
                                 }
-        
+    
+                                if (y > 0) {
+                                    igSetCursorPosY(igGetCursorPosY() - 6);
+                                }
                                 igTextUnformatted(buf2, 0);
                             }
     

@@ -197,6 +197,11 @@ void gl_client_main_window_game_data_draw(struct gl_game_t *game, bool show_play
         igText("Size: %dx%d", game->maze_size.x, game->maze_size.y);
         
         if (game->started) {
+            ImGuiIO *io = igGetIO();
+            
+            igPushFont(io->Fonts->Fonts.Data[io->Fonts->Fonts.Size - 1]);
+            igPushStyleVarVec2(ImGuiStyleVar_ItemSpacing, (ImVec2) { 0, 0 });
+            
             for (uint32_t y = 0; y < game->maze_size.y; y++) {
                 char buf2[128] = { 0 };
                 uint32_t buf2_idx = 0;
@@ -218,9 +223,15 @@ void gl_client_main_window_game_data_draw(struct gl_game_t *game, bool show_play
                         buf2[buf2_idx++] = '?';
                     }
                 }
-        
+    
+                if (y > 0) {
+                    igSetCursorPosY(igGetCursorPosY() - 6);
+                }
                 igTextUnformatted(buf2, 0);
             }
+    
+            igPopStyleVar(1);
+            igPopFont();
         }
     } else if (!game->started) {
         game->reload_maze_data = true;
