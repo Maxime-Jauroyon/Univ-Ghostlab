@@ -103,6 +103,8 @@ set(CLIENT_SRC
         src/client/message.h
         src/client/shared.c
         src/client/shared.h
+        src/client/thread_multicast_game_listener.c
+        src/client/thread_multicast_game_listener.h
         src/client/thread_multicast_general_listener.c
         src/client/thread_multicast_general_listener.h
         src/client/thread_handler_start.c
