@@ -69,6 +69,10 @@ static void message_unrok(gl_message_t *msg, int32_t socket_id, void *user_data)
     }
 }
 
+static void message_dunno(gl_message_t *msg, int32_t socket_id, void *user_data) {
+    gl_log_push_error("an error occured!\n");
+}
+
 static void message_size_res(gl_message_t *msg, int32_t socket_id, void *user_data) {
     uint32_t game_id = msg->parameters_value[0].uint8_value;
     gl_game_t *game = gl_client_get_game_with_id(game_id);
@@ -134,6 +138,19 @@ static void message_posit(gl_message_t *msg, int32_t socket_id, void *user_data)
     gl_client_get_game()->reload_players_data_1 = true;
 }
 
+static void message_move_res(gl_message_t *msg, int32_t socket_id, void *user_data) {
+    gl_player_t *player = gl_client_get_player();
+    player->pos.x = gl_string_strtol(msg->parameters_value[0].string_value);
+    player->pos.y = gl_string_strtol(msg->parameters_value[1].string_value);
+}
+
+static void message_movef(gl_message_t *msg, int32_t socket_id, void *user_data) {
+    gl_player_t *player = gl_client_get_player();
+    player->pos.x = gl_string_strtol(msg->parameters_value[0].string_value);
+    player->pos.y = gl_string_strtol(msg->parameters_value[1].string_value);
+    player->score = gl_string_strtol(msg->parameters_value[2].string_value);
+}
+
 static void message_gobye(gl_message_t *msg, int32_t socket_id, void *user_data) {
     uint32_t game_id = g_game_id;
     
@@ -196,17 +213,12 @@ static void message_gplyr(gl_message_t *msg, int32_t socket_id, void *user_data)
     }
 }
 
-static void message_move_res(gl_message_t *msg, int32_t socket_id, void *user_data) {
-    gl_player_t *player = gl_client_get_player();
-    player->pos.x = gl_string_strtol(msg->parameters_value[0].string_value);
-    player->pos.y = gl_string_strtol(msg->parameters_value[1].string_value);
+static void message_send_res(gl_message_t *msg, int32_t socket_id, void *user_data) {
+    gl_log_push_info("[you] whispered: %s\n", g_last_sent_message);
 }
 
-static void message_movef(gl_message_t *msg, int32_t socket_id, void *user_data) {
-    gl_player_t *player = gl_client_get_player();
-    player->pos.x = gl_string_strtol(msg->parameters_value[0].string_value);
-    player->pos.y = gl_string_strtol(msg->parameters_value[1].string_value);
-    player->score = gl_string_strtol(msg->parameters_value[2].string_value);
+static void message_ghost(gl_message_t *msg, int32_t socket_id, void *user_data) {
+    gl_log_push_info("[server] says: a ghost just moved!\n");
 }
 
 static void message_score(gl_message_t *msg, int32_t socket_id, void *user_data) {
@@ -222,6 +234,21 @@ static void message_score(gl_message_t *msg, int32_t socket_id, void *user_data)
             game->players[i].pos.y = gl_string_strtol(msg->parameters_value[3].string_value);
         }
     }
+}
+
+static void message_messa(gl_message_t *msg, int32_t socket_id, void *user_data) {
+    char player_id[9] = { 0 };
+    memcpy(player_id, msg->parameters_value[0].string_value, 8);
+    
+    char *buf = gl_cstring_create_from_ip(msg->parameters_value[1].string_value);
+    
+    if (strcmp(g_player_id, player_id) != 0) {
+        gl_log_push_info("[%s] says: %s\n", player_id, buf);
+    } else {
+        gl_log_push_info("[you] said: %s\n", buf);
+    }
+    
+    gl_free(buf);
 }
 
 static void message_endga(gl_message_t *msg, int32_t socket_id, void *user_data) {
@@ -248,29 +275,6 @@ static void message_messp(gl_message_t *msg, int32_t socket_id, void *user_data)
     gl_free(buf);
 }
 
-static void message_messa(gl_message_t *msg, int32_t socket_id, void *user_data) {
-    char player_id[9] = { 0 };
-    memcpy(player_id, msg->parameters_value[0].string_value, 8);
-    
-    char *buf = gl_cstring_create_from_ip(msg->parameters_value[1].string_value);
-    
-    if (strcmp(g_player_id, player_id) != 0) {
-        gl_log_push_info("[%s] says: %s\n", player_id, buf);
-    } else {
-        gl_log_push_info("[you] said: %s\n", buf);
-    }
-    
-    gl_free(buf);
-}
-
-static void message_send_res(gl_message_t *msg, int32_t socket_id, void *user_data) {
-    gl_log_push_info("[you] whispered: %s\n", g_last_sent_message);
-}
-
-static void message_ghost(gl_message_t *msg, int32_t socket_id, void *user_data) {
-    gl_log_push_info("[server] says: a ghost just moved!\n");
-}
-
 static void message_multi(gl_message_t *msg, int32_t socket_id, void *user_data) {
     if (!g_multicast_ip && !g_multicast_port) {
         g_multicast_ip = gl_cstring_create_from_ip(msg->parameters_value[0].string_value);
@@ -290,23 +294,26 @@ void gl_client_message_add_functions() {
     gl_message_definitions()[GL_MESSAGE_TYPE_REGOK]->function = message_regok;
     gl_message_definitions()[GL_MESSAGE_TYPE_REGNO]->function = message_regno;
     gl_message_definitions()[GL_MESSAGE_TYPE_UNROK]->function = message_unrok;
+    gl_message_definitions()[GL_MESSAGE_TYPE_DUNNO]->function = message_dunno;
     gl_message_definitions()[GL_MESSAGE_TYPE_SIZE_RES]->function = message_size_res;
     gl_message_definitions()[GL_MESSAGE_TYPE_LIST_RES]->function = message_list_res;
     gl_message_definitions()[GL_MESSAGE_TYPE_PLAYR]->function = message_playr;
     gl_message_definitions()[GL_MESSAGE_TYPE_WELCO]->function = message_welco;
     gl_message_definitions()[GL_MESSAGE_TYPE_POSIT]->function = message_posit;
+    gl_message_definitions()[GL_MESSAGE_TYPE_MOVE_RES]->function = message_move_res;
+    gl_message_definitions()[GL_MESSAGE_TYPE_MOVEF]->function = message_movef;
     gl_message_definitions()[GL_MESSAGE_TYPE_GOBYE]->function = message_gobye;
     gl_message_definitions()[GL_MESSAGE_TYPE_GLIS_RES]->function = message_glis_res;
     gl_message_definitions()[GL_MESSAGE_TYPE_GPLYR]->function = message_gplyr;
-    gl_message_definitions()[GL_MESSAGE_TYPE_MOVE_RES]->function = message_move_res;
-    gl_message_definitions()[GL_MESSAGE_TYPE_MOVEF]->function = message_movef;
-    gl_message_definitions()[GL_MESSAGE_TYPE_SCORE]->function = message_score;
-    gl_message_definitions()[GL_MESSAGE_TYPE_ENDGA]->function = message_endga;
-    gl_message_definitions()[GL_MESSAGE_TYPE_MESSP]->function = message_messp;
-    gl_message_definitions()[GL_MESSAGE_TYPE_MESSA]->function = message_messa;
     gl_message_definitions()[GL_MESSAGE_TYPE_SEND_RES]->function = message_send_res;
+    
     gl_message_definitions()[GL_MESSAGE_TYPE_GHOST]->function = message_ghost;
     gl_message_definitions()[GL_MESSAGE_TYPE_GHOST]->hide_when_received = true;
+    gl_message_definitions()[GL_MESSAGE_TYPE_SCORE]->function = message_score;
+    gl_message_definitions()[GL_MESSAGE_TYPE_MESSA]->function = message_messa;
+    gl_message_definitions()[GL_MESSAGE_TYPE_ENDGA]->function = message_endga;
+    gl_message_definitions()[GL_MESSAGE_TYPE_MESSP]->function = message_messp;
+    
     gl_message_definitions()[GL_MESSAGE_TYPE_MULTI]->function = message_multi;
     gl_message_definitions()[GL_MESSAGE_TYPE_SHUTD]->function = message_shutd;
 }
