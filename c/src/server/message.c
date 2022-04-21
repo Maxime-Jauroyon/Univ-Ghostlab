@@ -289,7 +289,7 @@ void message_send_req(gl_message_t *msg, int32_t socket_id, void *user_data) {
     
     bool found = false;
     for (uint32_t i = 0; i < gl_array_get_size(game->players); i++) {
-        if (strcmp(player_id, game->players[i].id) == 0 && strlen(game->players[i].udp_port)) {
+        if (strcmp(player_id, game->players[i].id) == 0 && strlen(game->players[i].udp_port) == 4) {
             for (uint32_t j = 0; j < gl_array_get_size(g_ip_sockets); j++) {
                 if (g_ip_sockets[j].socket_id == game->players[i].socket_id) {
                     found = true;
