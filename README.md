@@ -21,7 +21,7 @@ Ghostlab is an online matchmaking based game where you take upon yourself to bec
 - Advanced graphical user interface.
 - Terminal user interface for maximum compatibility.
 - Robust network architecture.
-- Works on Linux (Ubuntu), macOS and Windows (WSL).
+- Works on Linux (Ubuntu/Debian), macOS and Windows (WSL).
 
 ## How To Use
 
@@ -55,7 +55,7 @@ The C sources uses CMake as a cross-platform build system, be sure to have it in
 - Alternatively, run `./c/build/client_tui` to launch the client in TUI mode.
 
 You should always run the server before the client. 
-The recommended user interface is the GUI.
+The recommended user interface to launch with is the GUI mode.
 
 ### Compile And Launch (Java Sources)
 
