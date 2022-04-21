@@ -24,6 +24,8 @@ int32_t gl_igFilter(struct ImGuiInputTextCallbackData *data);
 
 int32_t gl_igFilterWithSpaces(struct ImGuiInputTextCallbackData *data);
 
+bool gl_gui_started();
+
 #endif /* GHOSTLAB_GUI_H */
 
 #endif

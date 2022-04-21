@@ -7,6 +7,7 @@
 #include <common/log.h>
 #include <common/game.h>
 #include <common/array.h>
+#include <common/utils.h>
 #include <common/memory.h>
 #include <common/message.h>
 #include <common/network.h>
@@ -82,6 +83,8 @@ static int32_t gl_client_init(int argc, char **argv) {
 }
 
 static int32_t gl_client_handle_args(int argc, char **argv) {
+    opterr = 0;
+    
     struct option opts[] = {
         { "ip", required_argument, 0, 'i' },
         { "port", required_argument, 0, 'p' },
@@ -91,21 +94,30 @@ static int32_t gl_client_handle_args(int argc, char **argv) {
         { "version", no_argument, 0, 'v' },
         {0, 0, 0, 0}
     };
-    int32_t used_unknown_opt = 0;
+    int32_t used_unknown_or_undefined_opt = 0;
     int32_t opt;
     while ((opt = getopt_long(argc, argv, "i:p:n:u:lhv", opts, 0)) != -1) {
         switch (opt) {
         case 'i':
-            // TODO: Check if ip is valid, if invalid use default
-            g_server_ip = gl_strdup(optarg);
+            if (gl_is_ip_valid(optarg)) {
+                g_server_ip = gl_strdup(optarg);
+            } else {
+                gl_log_push_error("invalid server ip, reverting to default.\n");
+            }
             break;
         case 'p':
-            // TODO: Check if port is valid, if invalid use default
-            g_server_port = gl_strdup(optarg);
+            if (gl_is_number_valid(optarg, 4)) {
+                g_server_port = gl_strdup(optarg);
+            } else {
+                gl_log_push_error("invalid server port, reverting to default.\n");
+            }
             break;
         case 'u':
-            // TODO: Check if port is valid, if invalid use default
-            g_udp_port = gl_strdup(optarg);
+            if (gl_is_number_valid(optarg, 4)) {
+                g_udp_port = gl_strdup(optarg);
+            } else {
+                gl_log_push_error("invalid udp port, reverting to default.\n");
+            }
             break;
         case 'l':
             g_use_legacy_protocol = true;
@@ -117,18 +129,17 @@ static int32_t gl_client_handle_args(int argc, char **argv) {
             gl_log_push("version: " GHOSTLAB_VERSION);
             return 1;
         case '?':
-            used_unknown_opt = 1;
-            gl_log_push_error("use `-h` for more informations.\n");
+            used_unknown_or_undefined_opt = 1;
+            gl_log_push_error("option unknown '%c'!\n", optopt);
             break;
         default:
-            used_unknown_opt = 1;
+            used_unknown_or_undefined_opt = 1;
             gl_log_push_error("option not yet implemented `%c`!\n", opt);
-            gl_log_push_error("use `-h` for more informations.\n");
         }
     }
     
-    if (used_unknown_opt) {
-        return -1;
+    if (used_unknown_or_undefined_opt) {
+        gl_log_push_error("use `-h` for more informations.\n");
     }
     
     return 0;

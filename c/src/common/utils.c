@@ -1,5 +1,7 @@
 #include <common/utils.h>
+#include <ctype.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/socket.h>
 #ifdef __APPLE__
 #include <libkern/OSByteOrder.h>
@@ -182,4 +184,39 @@ uint32_t gl_rand(uint32_t min, uint32_t max) {
     }
     
     return min + rand() % (max + 1 - min);
+}
+
+bool gl_is_ip_valid(const char *src) {
+    int32_t distance_from_last_point = 0;
+    int32_t total_num_points = 0;
+    for (uint32_t i = 0; i < strlen(src); i++) {
+        if (isdigit(src[i]) && distance_from_last_point < 3) {
+            distance_from_last_point++;
+            continue;
+        } else if (src[i] == '.' && distance_from_last_point > 0 && total_num_points < 3) {
+            distance_from_last_point = 0;
+            total_num_points++;
+            continue;
+        } else {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+bool gl_is_number_valid(const char *src, uint32_t size) {
+    if (strlen(src) != size) {
+        return false;
+    }
+    
+    for (uint32_t i = 0; i < strlen(src); i++) {
+        if (isdigit(src[i])) {
+            continue;
+        } else {
+            return false;
+        }
+    }
+    
+    return true;
 }

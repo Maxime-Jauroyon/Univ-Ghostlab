@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <pthread.h>
+#if GHOSTLAB_TUI
+#include <common/gui.h>
+#endif
 #include <common/array.h>
 #include <common/memory.h>
 
@@ -39,6 +42,10 @@ void gl_log_vpush(const char *format, gl_log_type_t type, va_list args) {
     if (strcmp(format + strlen(format) - 1, "\n") == 0) {
 #if !GHOSTLAB_TUI
         printf("%s", gl_array_get_last(g_logs)->data);
+#else
+        if (gl_gui_started()) {
+            printf("%s", gl_array_get_last(g_logs)->data);
+        }
 #endif
         g_is_newline = true;
     } else {

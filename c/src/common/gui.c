@@ -23,6 +23,7 @@ static bool g_console_show_info = true;
 static bool g_console_show_warning = true;
 static bool g_console_show_error = true;
 static bool g_first_time = true;
+static bool g_started = false;
 #if GHOSTLAB_GUI
 static SDL_Window *g_window;
 static SDL_GLContext gl_context;
@@ -78,6 +79,8 @@ int32_t gl_gui_create(const char *gui_title) {
     io->FontDefault = io->Fonts->Fonts.Data[io->Fonts->Fonts.Size - 1];
     ImFontAtlas_AddFontFromMemoryCompressedTTF(io->Fonts, FiraCodeRegular_compressed_data, (int)FiraCodeRegular_compressed_size, 16.0f, g_fontConfig, 0);
 #endif
+    
+    g_started = true;
     
     return 0;
 }
@@ -263,6 +266,10 @@ int32_t gl_igFilterWithSpaces(ImGuiInputTextCallbackData *data) {
     }
     
     return 1;
+}
+
+bool gl_gui_started() {
+    return g_started;
 }
 
 #endif

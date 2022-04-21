@@ -29,4 +29,8 @@ int32_t gl_uint8_array_recv_until_separator(int32_t fd, uint8_t **dst, uint8_t *
 
 uint32_t gl_rand(uint32_t min, uint32_t max);
 
+bool gl_is_ip_valid(const char *src);
+
+bool gl_is_number_valid(const char *src, uint32_t size);
+
 #endif /* GHOSTLAB_UTILS_H */

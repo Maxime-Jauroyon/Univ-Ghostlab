@@ -56,20 +56,8 @@ uint8_t *gl_string_create_from_ip(const char *src) {
         return 0;
     }
     
-    // The format of `src` is a valid IP address.
-    int32_t distance_from_last_point = 0;
-    int32_t total_num_points = 0;
-    for (uint32_t i = 0; i < strlen(src); i++) {
-        if (isdigit(src[i]) && distance_from_last_point < 3) {
-            distance_from_last_point++;
-            continue;
-        } else if (src[i] == '.' && distance_from_last_point > 0 && total_num_points < 3) {
-            distance_from_last_point = 0;
-            total_num_points++;
-            continue;
-        } else {
-            return 0;
-        }
+    if (!gl_is_ip_valid(src)) {
+        return 0;
     }
     
     uint8_t *dst = 0;
