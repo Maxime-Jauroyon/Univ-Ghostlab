@@ -17,6 +17,7 @@
 #define le64toh(x) OSSwapLittleToHostInt64(x)
 #else
 #include <endian.h>
+#include <arpa/inet.h>
 #define htonll(x) htobe64(x)
 #define ntohll(x) be64toh(x)
 #endif
