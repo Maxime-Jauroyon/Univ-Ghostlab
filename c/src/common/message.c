@@ -177,6 +177,7 @@ static gl_message_definition_t g_message_game = {
     .identifier = "GAMES",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_N,
         GL_MESSAGE_PARAMETER_TYPE_COUNT
@@ -187,6 +188,7 @@ static gl_message_definition_t g_message_ogame = {
     .identifier = "OGAMES",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_M,
         GL_MESSAGE_PARAMETER_TYPE_S,
@@ -198,6 +200,7 @@ static gl_message_definition_t g_message_newpl = {
     .identifier = "NEWPL",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_ID,
         GL_MESSAGE_PARAMETER_TYPE_PORT,
@@ -209,6 +212,7 @@ static gl_message_definition_t g_message_regis = {
     .identifier = "REGIS",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_ID,
         GL_MESSAGE_PARAMETER_TYPE_PORT,
@@ -221,6 +225,7 @@ static gl_message_definition_t g_message_regok = {
     .identifier = "REGOK",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_M,
         GL_MESSAGE_PARAMETER_TYPE_COUNT
@@ -231,6 +236,7 @@ static gl_message_definition_t g_message_regno = {
     .identifier = "REGNO",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_COUNT
     }
@@ -240,6 +246,7 @@ static gl_message_definition_t g_message_start = {
     .identifier = "START",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_COUNT
     }
@@ -249,6 +256,7 @@ static gl_message_definition_t g_message_unreg = {
     .identifier = "UNREG",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_COUNT
     }
@@ -258,6 +266,7 @@ static gl_message_definition_t g_message_unrok = {
     .identifier = "UNROK",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_M,
         GL_MESSAGE_PARAMETER_TYPE_COUNT
@@ -268,6 +277,7 @@ static gl_message_definition_t g_message_dunno = {
     .identifier = "DUNNO",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_COUNT
     }
@@ -277,6 +287,7 @@ static gl_message_definition_t g_message_size_req = {
     .identifier = "SIZE?",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_M,
         GL_MESSAGE_PARAMETER_TYPE_COUNT
@@ -287,6 +298,7 @@ static gl_message_definition_t g_message_size_res = {
     .identifier = "SIZE!",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_M,
         GL_MESSAGE_PARAMETER_TYPE_H,
@@ -299,6 +311,7 @@ static gl_message_definition_t g_message_list_req = {
     .identifier = "LIST?",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_M,
         GL_MESSAGE_PARAMETER_TYPE_COUNT
@@ -309,6 +322,7 @@ static gl_message_definition_t g_message_list_res = {
     .identifier = "LIST!",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_M,
         GL_MESSAGE_PARAMETER_TYPE_S,
@@ -320,6 +334,7 @@ static gl_message_definition_t g_message_playr = {
     .identifier = "PLAYR",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_ID,
         GL_MESSAGE_PARAMETER_TYPE_COUNT
@@ -330,6 +345,7 @@ static gl_message_definition_t g_message_game_req = {
     .identifier = "GAME?",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_COUNT
     }
@@ -339,6 +355,7 @@ static gl_message_definition_t g_message_welco = {
     .identifier = "WELCO",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_M,
         GL_MESSAGE_PARAMETER_TYPE_H,
@@ -354,6 +371,7 @@ static gl_message_definition_t g_message_posit = {
     .identifier = "POSIT",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_ID,
         GL_MESSAGE_PARAMETER_TYPE_X,
@@ -366,6 +384,7 @@ static gl_message_definition_t g_message_upmov = {
     .identifier = "UPMOV",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_D,
         GL_MESSAGE_PARAMETER_TYPE_COUNT
@@ -376,6 +395,7 @@ static gl_message_definition_t g_message_domov = {
     .identifier = "DOMOV",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_D,
         GL_MESSAGE_PARAMETER_TYPE_COUNT
@@ -386,6 +406,7 @@ static gl_message_definition_t g_message_lemov = {
     .identifier = "LEMOV",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_D,
         GL_MESSAGE_PARAMETER_TYPE_COUNT
@@ -396,6 +417,7 @@ static gl_message_definition_t g_message_rimov = {
     .identifier = "RIMOV",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_D,
         GL_MESSAGE_PARAMETER_TYPE_COUNT
@@ -406,6 +428,7 @@ static gl_message_definition_t g_message_move_res = {
     .identifier = "MOVE!",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_X,
         GL_MESSAGE_PARAMETER_TYPE_Y,
@@ -417,6 +440,7 @@ static gl_message_definition_t g_message_movef = {
     .identifier = "MOVEF",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_X,
         GL_MESSAGE_PARAMETER_TYPE_Y,
@@ -429,6 +453,7 @@ static gl_message_definition_t g_message_iquit = {
     .identifier = "IQUIT",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_COUNT
     }
@@ -438,6 +463,7 @@ static gl_message_definition_t g_message_gobye = {
     .identifier = "GOBYE",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_COUNT
     }
@@ -447,6 +473,7 @@ static gl_message_definition_t g_message_glis_req = {
     .identifier = "GLIS?",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_COUNT
     }
@@ -456,6 +483,7 @@ static gl_message_definition_t g_message_glis_res = {
     .identifier = "GLIS!",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_S,
         GL_MESSAGE_PARAMETER_TYPE_COUNT
@@ -466,6 +494,7 @@ static gl_message_definition_t g_message_gplyr = {
     .identifier = "GPLYR",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_ID,
         GL_MESSAGE_PARAMETER_TYPE_X,
@@ -479,6 +508,7 @@ static gl_message_definition_t g_message_mall_req = {
     .identifier = "MALL?",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_MESS,
         GL_MESSAGE_PARAMETER_TYPE_COUNT
@@ -489,6 +519,7 @@ static gl_message_definition_t g_message_mall_res = {
     .identifier = "MALL!",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_COUNT
     }
@@ -498,6 +529,7 @@ static gl_message_definition_t g_message_send_req = {
     .identifier = "SEND?",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_ID,
         GL_MESSAGE_PARAMETER_TYPE_MESS,
@@ -509,6 +541,7 @@ static gl_message_definition_t g_message_send_res = {
     .identifier = "SEND!",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_COUNT
     }
@@ -518,6 +551,7 @@ static gl_message_definition_t g_message_nsend = {
     .identifier = "NSEND",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_COUNT
     }
@@ -527,6 +561,7 @@ static gl_message_definition_t g_message_multi = {
     .identifier = "MULTI",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_IP,
         GL_MESSAGE_PARAMETER_TYPE_PORT,
@@ -538,6 +573,7 @@ static gl_message_definition_t g_message_ghost = {
     .identifier = "GHOST",
     .protocol = GL_MESSAGE_PROTOCOL_UDP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_X,
         GL_MESSAGE_PARAMETER_TYPE_Y,
@@ -549,6 +585,7 @@ static gl_message_definition_t g_message_score = {
     .identifier = "SCORE",
     .protocol = GL_MESSAGE_PROTOCOL_UDP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_ID,
         GL_MESSAGE_PARAMETER_TYPE_P,
@@ -562,6 +599,7 @@ static gl_message_definition_t g_message_messa = {
     .identifier = "MESSA",
     .protocol = GL_MESSAGE_PROTOCOL_UDP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_ID,
         GL_MESSAGE_PARAMETER_TYPE_MESS,
@@ -573,6 +611,7 @@ static gl_message_definition_t g_message_endga = {
     .identifier = "ENDGA",
     .protocol = GL_MESSAGE_PROTOCOL_UDP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_ID,
         GL_MESSAGE_PARAMETER_TYPE_P,
@@ -584,6 +623,7 @@ static gl_message_definition_t g_message_messp = {
     .identifier = "MESSP",
     .protocol = GL_MESSAGE_PROTOCOL_UDP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_ID,
         GL_MESSAGE_PARAMETER_TYPE_MESS,
@@ -595,6 +635,7 @@ static gl_message_definition_t g_message_shutd = {
     .identifier = "SHUTD",
     .protocol = GL_MESSAGE_PROTOCOL_UDP,
     .function = 0,
+    .hide_when_received = false,
     .parameters = {
         GL_MESSAGE_PARAMETER_TYPE_COUNT
     }
@@ -865,13 +906,15 @@ int32_t gl_message_recv(int32_t fd, struct gl_message_t *dst, gl_message_protoco
     }
     total_size += 2;
     
-    if (protocol == GL_MESSAGE_PROTOCOL_UDP) {
-        gl_log_push("udp: received from %d: ", fd);
-    } else {
-        gl_log_push("tcp: received from %d: ", fd);
-    }
+    if (!msg_def->hide_when_received) {
+        if (protocol == GL_MESSAGE_PROTOCOL_UDP) {
+            gl_log_push("udp: received from %d: ", fd);
+        } else {
+            gl_log_push("tcp: received from %d: ", fd);
+        }
     
-    gl_message_printf(dst);
+        gl_message_printf(dst);
+    }
     
     return total_size;
 }

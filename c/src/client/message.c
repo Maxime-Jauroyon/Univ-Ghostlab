@@ -267,6 +267,10 @@ static void message_send_res(gl_message_t *msg, int32_t socket_id, void *user_da
     gl_log_push_info("[you] whispered: %s\n", g_last_sent_message);
 }
 
+static void message_ghost(gl_message_t *msg, int32_t socket_id, void *user_data) {
+    gl_log_push_info("[server] says: a ghost just moved!\n");
+}
+
 static void message_multi(gl_message_t *msg, int32_t socket_id, void *user_data) {
     if (!g_multicast_ip && !g_multicast_port) {
         g_multicast_ip = gl_cstring_create_from_ip(msg->parameters_value[0].string_value);
@@ -301,6 +305,8 @@ void gl_client_message_add_functions() {
     gl_message_definitions()[GL_MESSAGE_TYPE_MESSP]->function = message_messp;
     gl_message_definitions()[GL_MESSAGE_TYPE_MESSA]->function = message_messa;
     gl_message_definitions()[GL_MESSAGE_TYPE_SEND_RES]->function = message_send_res;
+    gl_message_definitions()[GL_MESSAGE_TYPE_GHOST]->function = message_ghost;
+    gl_message_definitions()[GL_MESSAGE_TYPE_GHOST]->hide_when_received = true;
     gl_message_definitions()[GL_MESSAGE_TYPE_MULTI]->function = message_multi;
     gl_message_definitions()[GL_MESSAGE_TYPE_SHUTD]->function = message_shutd;
 }

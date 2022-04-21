@@ -101,6 +101,7 @@ typedef struct gl_message_definition_t {
     const char *identifier;
     const gl_message_protocol_t protocol;
     void (*function)(struct gl_message_t*, int32_t, void*);
+    bool hide_when_received;
     const gl_message_parameter_type_t parameters[];
 } gl_message_definition_t;
 
