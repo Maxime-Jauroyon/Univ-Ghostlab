@@ -78,7 +78,6 @@ For the C projects:
 - [cimgui](https://github.com/cimgui/cimgui)
 - [ImTui](https://github.com/ggerganov/imtui)
 - [cimtui](https://github.com/hugokindel/school-uni-pr6/tree/main/c/deps/cimtui) (made especially for this project)
-- [cimgui](https://github.com/cimgui/cimgui)
 - [ncurses](https://invisible-island.net/ncurses)
 - [SDL](https://www.libsdl.org/index.php)
 - [OpenGL](https://www.opengl.org)
