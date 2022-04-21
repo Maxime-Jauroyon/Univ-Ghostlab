@@ -359,7 +359,6 @@ void gl_client_create_game_popup_draw() {
         
         if (g_error) {
             igText("Error(s):");
-            // TODO: Separate these two errors
             igText("- This name is already used or the game is unavailable!");
         }
         
@@ -405,7 +404,6 @@ void gl_client_join_game_popup_draw() {
         
         if (g_error) {
             igText("Error(s):");
-            // TODO: Separate these two errors
             igText("- This name is already used or the game is unavailable!");
         }
         

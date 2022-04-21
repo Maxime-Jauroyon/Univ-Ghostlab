@@ -103,7 +103,6 @@ gl_player_t *gl_client_add_player(struct gl_game_t *game, const char *id) {
     return &gl_array_get_last(game->players);
 }
 
-// TODO: Cache variable
 gl_game_t *gl_client_get_game() {
     if (g_game_id == -1) {
         return 0;
@@ -122,7 +121,6 @@ struct gl_game_t *gl_client_get_game_with_id(uint32_t id) {
     return 0;
 }
 
-// TODO: Cache variable
 gl_player_t *gl_client_get_player() {
     gl_game_t *game = gl_client_get_game();
     
