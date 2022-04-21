@@ -16,34 +16,86 @@ Ghostlab is an online matchmaking based game where you take upon yourself to bec
 
 ## Features
 
+- Chase ghosts through perfect mazes.
+- Interactive console.
 - Advanced graphical user interface.
 - Terminal user interface for maximum compatibility.
 - Robust network architecture.
+- Works on Linux (Ubuntu), macOS and Windows (WSL).
 
-## How to use
+## How To Use
 
-### Compile C sources
+### Compile And Launch (C Sources)
 
-Paquets à installer pour Ubuntu/Debian: `sudo apt-get install libncurses5-dev libsdl2-dev`
+The C sources uses CMake as a cross-platform build system, be sure to have it installed.
+
+#### Install Dependencies
+
+##### Linux (Ubuntu/Debian)
+
+- Run `sudo apt-get install libncurses5-dev libsdl2-dev`.
+
+##### macOS
+
+- Run `brew install sdl2`.
+
+#### Compile
+
+- Open a terminal in the project's root directory.
+- Run `mkdir ./c/build && cd ./c/build && cmake ./.. && make && cd ./../..` to generate the build configuration and compile.
+
+#### Launch Server
+
+- Run `./c/build/server_gui` to launch the server in GUI mode.
+- Alternatively, run `./c/build/server_tui` to launch th server in TUI mode.
+
+#### Launch Client
+
+- Run `./c/build/client_gui` to launch the client in GUI mode.
+- Alternatively, run `./c/build/client_tui` to launch the client in TUI mode.
+
+You should always run the server before the client. 
+The recommended user interface is the GUI.
+
+### Compile And Launch (Java Sources)
+
+The Java sources uses Gradle as a cross-platform build system. It should install itself automatically when compiling the project.
+
+#### Compile
+
+- Open a terminal in the project's root directory.
+- Run `./java/gradlew build` to compile the code.
+
+#### Launch Client
+
+- Run `./java/gradlew run` to run the Java version of the client.
 
 ## Dependencies
 
-- [LWJGL](https://www.glfw.org/)  
-  Gives access to other low level libraries (GLFW, OpenGL, OpenAL).
-- [GLFW](https://www.lwjgl.org/)  
-  Handles the window and the input.
-- [OpenGL](https://www.opengl.org/)  
-  Creates the rendering context, and a way to communicate with the GPU.
-- [OpenAL](https://www.openal.org/)  
-  Handles the audio system.
-- [ImGui](https://github.com/ocornut/imgui) (with [imgui-java](https://github.com/SpaiR/imgui-java) as a binding)  
-  Permits to rapidly develop usable GUI in a game.
+For the C projects:
+
+- [ImGui](https://github.com/ocornut/imgui)
+- [cimgui](https://github.com/cimgui/cimgui)
+- [ImTui](https://github.com/ggerganov/imtui)
+- [cimtui](https://github.com/hugokindel/school-uni-pr6/tree/main/c/deps/cimtui) (made especially for this project)
+- [cimgui](https://github.com/cimgui/cimgui)
+- [ncurses](https://invisible-island.net/ncurses)
+- [SDL](https://www.libsdl.org/index.php)
+- [OpenGL](https://www.opengl.org)
+
+For the Java projects:
+
+- [ImGui](https://github.com/ocornut/imgui)
+- [imgui-java](https://github.com/SpaiR/imgui-java)
+- [LWJGL](https://www.glfw.org/)
+- [GLFW](https://www.lwjgl.org/)
+- [OpenGL](https://www.opengl.org/)
 
 ## Contributors
 
-- [LE CORRE Léo](https://gaufre.informatique.univ-paris-diderot.fr/lecorre)
-- [JAUROYON Maxime](https://gaufre.informatique.univ-paris-diderot.fr/jauroyon)
-- [KINDEL Hugo](https://gaufre.informatique.univ-paris-diderot.fr/hugokindel)
+- [LE CORRE Léo](https://github.com/KarmaEssence)
+- [JAUROYON Maxime](https://github.com/Maxime-Jauroyon)
+- [KINDEL Hugo](https://github.com/hugokindel)
 
 ## License
 
