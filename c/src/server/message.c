@@ -17,8 +17,10 @@ void message_newpl(gl_message_t *msg, int32_t socket_id, void *user_data) {
         return;
     }
     
-    char *player_id = (char *)msg->parameters_value[0].string_value;
-    char *player_port = (char *)msg->parameters_value[1].string_value;
+    char player_id[9] = { 0 };
+    memcpy(player_id, msg->parameters_value[0].string_value, 8);
+    char player_port[5] = { 0 };
+    memcpy(player_port, msg->parameters_value[1].string_value, 4);
     
     gl_server_add_game(g_game_id);
     gl_server_add_player(&gl_array_get_last(g_games), player_id, player_port, socket_id);
@@ -227,6 +229,91 @@ void message_glis_req(gl_message_t *msg, int32_t socket_id, void *user_data) {
     }
 }
 
+void message_mall_req(gl_message_t *msg, int32_t socket_id, void *user_data) {
+    gl_game_t *game = gl_server_get_game_with_socket(socket_id);
+    
+    if (!game) {
+        return;
+    }
+    
+    gl_player_t *player = 0;
+    
+    for (uint32_t i = 0; i < gl_array_get_size(game->players); i++) {
+        if (game->players[i].socket_id == socket_id) {
+            player = &game->players[i];
+            break;
+        }
+    }
+    
+    if (!player) {
+        return;
+    }
+    
+    
+    
+    gl_message_t response = {.type = GL_MESSAGE_TYPE_MESSA, 0};
+    gl_message_push_parameter(&response, (gl_message_parameter_t) { .string_value = gl_string_create_from_cstring(player->id) });
+    gl_message_push_parameter(&response, (gl_message_parameter_t) { .string_value = gl_string_copy(msg->parameters_value[0].string_value) });
+    gl_message_send_multicast(game->multicast_ip, game->multicast_port, &response);
+    
+    response = (gl_message_t) { .type = GL_MESSAGE_TYPE_MALL_RES, 0 };
+    gl_message_send_tcp(socket_id, &response);
+}
+
+void message_send_req(gl_message_t *msg, int32_t socket_id, void *user_data) {
+    gl_game_t *game = gl_server_get_game_with_socket(socket_id);
+    
+    if (!game) {
+        gl_message_t response = { .type = GL_MESSAGE_TYPE_NSEND, 0 };
+        gl_message_send_tcp(socket_id, &response);
+        return;
+    }
+    
+    gl_player_t *player = 0;
+    
+    for (uint32_t i = 0; i < gl_array_get_size(game->players); i++) {
+        if (game->players[i].socket_id == socket_id) {
+            player = &game->players[i];
+            break;
+        }
+    }
+    
+    if (!player) {
+        gl_message_t response = { .type = GL_MESSAGE_TYPE_NSEND, 0 };
+        gl_message_send_tcp(socket_id, &response);
+        return;
+    }
+    
+    char player_id[9] = { 0 };
+    memcpy(player_id, msg->parameters_value[0].string_value, 8);
+    
+    bool found = false;
+    for (uint32_t i = 0; i < gl_array_get_size(game->players); i++) {
+        if (strcmp(player_id, game->players[i].id) == 0 && strlen(game->players[i].udp_port)) {
+            for (uint32_t j = 0; j < gl_array_get_size(g_ip_sockets); j++) {
+                if (g_ip_sockets[j].socket_id == game->players[i].socket_id) {
+                    found = true;
+    
+                    gl_message_t response = {.type = GL_MESSAGE_TYPE_MESSP, 0};
+                    gl_message_push_parameter(&response, (gl_message_parameter_t) { .string_value = gl_string_create_from_cstring(player->id) });
+                    gl_message_push_parameter(&response, (gl_message_parameter_t) { .string_value = gl_string_copy(msg->parameters_value[1].string_value) });
+                    gl_message_send_udp(GHOSTLAB_DEFAULT_UDP_IP, game->players[i].udp_port, &response); // TODO: Use g_ip_sockets[j].ip
+                    
+                    break;
+                }
+            }
+            if (found) {
+                break;
+            }
+        }
+    }
+    
+    if (!found) {
+        gl_message_t response = { .type = GL_MESSAGE_TYPE_NSEND, 0 };
+        gl_message_send_tcp(socket_id, &response);
+    }
+}
+
 void gl_server_message_add_functions() {
     gl_message_definitions()[GL_MESSAGE_TYPE_NEWPL]->function = message_newpl;
     gl_message_definitions()[GL_MESSAGE_TYPE_REGIS]->function = message_regis;
@@ -241,4 +328,6 @@ void gl_server_message_add_functions() {
     gl_message_definitions()[GL_MESSAGE_TYPE_LEMOV]->function = message_lemov;
     gl_message_definitions()[GL_MESSAGE_TYPE_RIMOV]->function = message_rimov;
     gl_message_definitions()[GL_MESSAGE_TYPE_GLIS_REQ]->function = message_glis_req;
+    gl_message_definitions()[GL_MESSAGE_TYPE_MALL_REQ]->function = message_mall_req;
+    gl_message_definitions()[GL_MESSAGE_TYPE_SEND_REQ]->function = message_send_req;
 }

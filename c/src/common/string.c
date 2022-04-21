@@ -85,6 +85,16 @@ uint8_t *gl_string_create_from_ip(const char *src) {
     return dst;
 }
 
+uint8_t *gl_string_copy(const uint8_t *src) {
+    uint8_t *dst = 0;
+    
+    for (uint32_t i = 0; i < gl_array_get_size(src); i++) {
+        gl_array_push(dst, src[i]);
+    }
+    
+    return dst;
+}
+
 char *gl_cstring_create_from_string(const uint8_t *src) {
     if (!src) {
         return 0;

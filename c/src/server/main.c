@@ -145,6 +145,7 @@ static void gl_server_free() {
         gl_free(g_tcp_acceptor_thread);
     }
     
+    gl_array_free(g_ip_sockets);
     gl_game_free_all(g_games);
     gl_array_free(g_games);
     gl_free(g_server_ip);

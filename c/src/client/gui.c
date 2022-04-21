@@ -150,7 +150,18 @@ void gl_client_main_window_draw() {
                     igComboStr_arr("###Targets", &g_main_window_message_target, (const char *const *)g_players_message_list, gl_array_get_size(g_players_message_list), -1);
             
                     if (igButton("Send", (ImVec2) { 0, 0 })) {
-                
+                        if (g_main_window_message_target == 0) {
+                            gl_message_t msg = { .type = GL_MESSAGE_TYPE_MALL_REQ, .parameters_value = 0 };
+                            gl_message_push_parameter(&msg, (gl_message_parameter_t) { .string_value = gl_string_create_from_cstring(g_main_window_message) });
+                            gl_message_send_tcp(g_tcp_listener_socket, &msg);
+                        } else {
+                            gl_message_t msg = { .type = GL_MESSAGE_TYPE_SEND_REQ, .parameters_value = 0 };
+                            gl_message_push_parameter(&msg, (gl_message_parameter_t) { .string_value = gl_string_create_from_cstring(g_players_message_list[g_main_window_message_target]) });
+                            gl_message_push_parameter(&msg, (gl_message_parameter_t) { .string_value = gl_string_create_from_cstring(g_main_window_message) });
+                            gl_message_send_tcp(g_tcp_listener_socket, &msg);
+                        }
+    
+                        bzero(g_main_window_message, 201);
                     }
                 } else {
                     igText("Not enough players.");

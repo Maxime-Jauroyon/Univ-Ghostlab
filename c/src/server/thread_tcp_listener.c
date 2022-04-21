@@ -5,6 +5,7 @@
 #include <common/message.h>
 #include <common/network.h>
 #include <server/shared.h>
+#include "common/array.h"
 
 void *gl_thread_tcp_listener_main(void *user_data) {
     uint32_t id = *(uint32_t *)user_data;
@@ -31,6 +32,13 @@ void *gl_thread_tcp_listener_main(void *user_data) {
     pthread_mutex_lock(g_main_mutex);
     gl_server_remove_player_with_socket(socket_id, 0);
     pthread_mutex_unlock(g_main_mutex);
+    
+    for (uint32_t i = 0; i < gl_array_get_size(g_ip_sockets); i++) {
+        if (g_ip_sockets[i].socket_id == socket_id_copy) {
+            gl_array_remove(g_ip_sockets, i);
+            break;
+        }
+    }
     
     gl_socket_close(&socket_id);
     

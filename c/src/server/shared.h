@@ -6,6 +6,7 @@
 struct gl_game_t;
 struct gl_player_t;
 struct gl_message_t;
+struct gl_ip_socket_t;
 enum gl_movement_t;
 
 extern const char g_help[];
@@ -15,6 +16,7 @@ extern char *g_server_ip;
 extern char *g_server_port;
 extern char *g_multicast_ip;
 extern char *g_multicast_port;
+extern struct gl_ip_socket_t *g_ip_sockets;
 extern int32_t g_tcp_acceptor_socket;
 extern int32_t *g_tcp_listener_sockets;
 extern void *g_tcp_acceptor_thread;

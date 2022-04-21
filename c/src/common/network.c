@@ -128,8 +128,12 @@ int32_t gl_socket_close(int32_t *fd) {
     return 0;
 }
 
-int32_t gl_tcp_accept(int32_t server_fd) {
+int32_t gl_tcp_accept(int32_t server_fd, struct sockaddr_in *addr) {
     struct sockaddr_in address;
     socklen_t size_client = sizeof(address);
-    return accept(server_fd, (struct sockaddr *)&address, &size_client);
+    int32_t r = accept(server_fd, (struct sockaddr *)&address, &size_client);
+    if (addr) {
+        *addr = address;
+    }
+    return r;
 }

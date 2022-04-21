@@ -12,6 +12,7 @@
 #include "gui.h"
 #include "common/array.h"
 #include "thread_multicast_game_listener.h"
+#include "common/log.h"
 
 static uint32_t g_message_list_res_game_id = 0;
 
@@ -235,6 +236,28 @@ static void message_endga(gl_message_t *msg, int32_t socket_id, void *user_data)
     gl_client_game_over_popup_show();
 }
 
+static void message_messp(gl_message_t *msg, int32_t socket_id, void *user_data) {
+    char player_id[9] = { 0 };
+    memcpy(player_id, msg->parameters_value[0].string_value, 8);
+    
+    char *buf = gl_cstring_create_from_ip(msg->parameters_value[1].string_value);
+    
+    if (strcmp(g_player_id, player_id) != 0) {
+        gl_log_push_info("[%s] %s\n", player_id, buf);
+    }
+}
+
+static void message_messa(gl_message_t *msg, int32_t socket_id, void *user_data) {
+    char player_id[9] = { 0 };
+    memcpy(player_id, msg->parameters_value[0].string_value, 8);
+    
+    char *buf = gl_cstring_create_from_ip(msg->parameters_value[1].string_value);
+    
+    if (strcmp(g_player_id, player_id) != 0) {
+        gl_log_push_info("[%s] %s\n", player_id, buf);
+    }
+}
+
 static void message_multi(gl_message_t *msg, int32_t socket_id, void *user_data) {
     if (!g_multicast_ip && !g_multicast_port) {
         g_multicast_ip = gl_cstring_create_from_ip(msg->parameters_value[0].string_value);
@@ -266,6 +289,8 @@ void gl_client_message_add_functions() {
     gl_message_definitions()[GL_MESSAGE_TYPE_MOVEF]->function = message_movef;
     gl_message_definitions()[GL_MESSAGE_TYPE_SCORE]->function = message_score;
     gl_message_definitions()[GL_MESSAGE_TYPE_ENDGA]->function = message_endga;
+    gl_message_definitions()[GL_MESSAGE_TYPE_MESSP]->function = message_messp;
+    gl_message_definitions()[GL_MESSAGE_TYPE_MESSA]->function = message_messa;
     gl_message_definitions()[GL_MESSAGE_TYPE_MULTI]->function = message_multi;
     gl_message_definitions()[GL_MESSAGE_TYPE_SHUTD]->function = message_shutd;
 }
