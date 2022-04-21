@@ -150,7 +150,7 @@ void gl_igBegin(const char *title, float height) {
     
     igSetNextWindowPos((ImVec2) { 0, io->DisplaySize.y * g_current_pos_y }, ImGuiCond_Always, (ImVec2) { 0 });
 #if GHOSTLAB_TUI
-    igSetNextWindowSize((ImVec2) { io->DisplaySize.x, io->DisplaySize.y * height + ((int)io->DisplaySize.y % 5 != 0 ? 1.0f : 0.0f) }, ImGuiCond_Always);
+    igSetNextWindowSize((ImVec2) { io->DisplaySize.x, io->DisplaySize.y * height + (g_current_pos_y > 0.f ? 1.f : 0.f) }, ImGuiCond_Always);
 #elif GHOSTLAB_GUI
     igSetNextWindowSize((ImVec2) { io->DisplaySize.x, io->DisplaySize.y * height + 1 }, ImGuiCond_Always);
 #endif
