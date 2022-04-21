@@ -28,10 +28,8 @@ void *gl_thread_tcp_acceptor_main(void *user_data) {
             continue;
         }
     
-        char ip[INET_ADDRSTRLEN];
-        inet_ntop(AF_INET, &address, ip, INET_ADDRSTRLEN);
         gl_ip_socket_t ip_socket = { 0 };
-        memcpy(ip_socket.ip, ip, 15);
+        memcpy(ip_socket.ip, inet_ntoa(address.sin_addr), 15);
         ip_socket.socket_id = client_socket;
         gl_array_push(g_ip_sockets, ip_socket);
         gl_array_push(g_tcp_listener_sockets, client_socket);

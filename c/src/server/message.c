@@ -297,7 +297,7 @@ void message_send_req(gl_message_t *msg, int32_t socket_id, void *user_data) {
                     gl_message_t response = {.type = GL_MESSAGE_TYPE_MESSP, 0};
                     gl_message_push_parameter(&response, (gl_message_parameter_t) { .string_value = gl_string_create_from_cstring(player->id) });
                     gl_message_push_parameter(&response, (gl_message_parameter_t) { .string_value = gl_string_copy(msg->parameters_value[1].string_value) });
-                    gl_message_send_udp(GHOSTLAB_DEFAULT_UDP_IP, game->players[i].udp_port, &response); // TODO: Use g_ip_sockets[j].ip
+                    gl_message_send_udp(g_ip_sockets[j].ip, game->players[i].udp_port, &response);
                     
                     break;
                 }

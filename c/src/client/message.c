@@ -244,6 +244,8 @@ static void message_messp(gl_message_t *msg, int32_t socket_id, void *user_data)
     
     if (strcmp(g_player_id, player_id) != 0) {
         gl_log_push_info("[%s] %s\n", player_id, buf);
+    } else {
+        gl_log_push_info("[you] %s\n", player_id, buf);
     }
 }
 
@@ -255,6 +257,8 @@ static void message_messa(gl_message_t *msg, int32_t socket_id, void *user_data)
     
     if (strcmp(g_player_id, player_id) != 0) {
         gl_log_push_info("[%s] %s\n", player_id, buf);
+    } else {
+        gl_log_push_info("[you] %s\n", player_id, buf);
     }
 }
 
