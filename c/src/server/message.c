@@ -279,6 +279,9 @@ void message_send_req(gl_message_t *msg, int32_t socket_id, void *user_data) {
                     gl_message_push_parameter(&response, (gl_message_parameter_t) { .string_value = gl_string_create_from_cstring(player->id) });
                     gl_message_push_parameter(&response, (gl_message_parameter_t) { .string_value = gl_string_copy(msg->parameters_value[1].string_value) });
                     gl_message_send_udp(g_ip_sockets[j].ip, game->players[i].udp_port, &response);
+    
+                    response = (gl_message_t) { .type = GL_MESSAGE_TYPE_SEND_RES, 0 };
+                    gl_message_send_tcp(socket_id, &response);
                     
                     return;
                 }

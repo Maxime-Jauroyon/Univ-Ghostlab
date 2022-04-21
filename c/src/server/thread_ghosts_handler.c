@@ -7,6 +7,8 @@
 #include <common/utils.h>
 #include <server/shared.h>
 
+static uint32_t *g_ghosts_pos = 0;
+
 void sleep_worker(pthread_mutex_t *lock, pthread_cond_t *cond) {
     uint32_t time_to_wait = gl_rand(30, 90);
     
@@ -23,6 +25,8 @@ void cleanup_worker(void *cleanup_handle_ptr) {
     pthread_mutex_t *mutex = cleanup_handle_ptr;
     pthread_mutex_unlock(mutex);
     
+    gl_array_free(g_ghosts_pos);
+    
     gl_log_push("ghosts handler thread stopped.\n");
 }
 
@@ -35,42 +39,43 @@ void *gl_thread_ghosts_handler_main(void *user_data) {
     gl_log_push("ghosts handler thread started.\n");
     
     while (!g_should_quit) {
+        sleep_worker(&lock, &cond);
+        
         pthread_mutex_lock(g_main_mutex);
         
         for (uint32_t i = 0; i < gl_array_get_size(g_games); i++) {
             uint32_t num_to_move = (rand() % 2 == 0 ? 1 : 0) + rand() % (gl_array_get_size(g_games[i].ghosts) + 1);
-            uint32_t *ghosts_pos = 0;
             
             uint32_t k = 0;
-            while (gl_array_get_size(ghosts_pos) != num_to_move && k < 10) {
+            while (gl_array_get_size(g_ghosts_pos) != num_to_move && k < 10) {
                 uint32_t pos = rand() % gl_array_get_size(g_games[i].ghosts);
                 
                 bool exists = false;
-                for (uint32_t j = 0; j < gl_array_get_size(ghosts_pos); j++) {
-                    if (ghosts_pos[j] == pos) {
+                for (uint32_t j = 0; j < gl_array_get_size(g_ghosts_pos); j++) {
+                    if (g_ghosts_pos[j] == pos) {
                         exists = true;
                         break;
                     }
                 }
                 
                 if (!exists) {
-                    gl_array_push(ghosts_pos, pos);
+                    gl_array_push(g_ghosts_pos, pos);
                 }
                 
                 k++;
             }
     
-            for (uint32_t j = 0; j < gl_array_get_size(ghosts_pos); j++) {
+            for (uint32_t j = 0; j < gl_array_get_size(g_ghosts_pos); j++) {
                 gl_game_move_ghost(&g_games[i], j);
             }
     
-            gl_array_free(ghosts_pos);
+            gl_array_free(g_ghosts_pos);
         }
         
         pthread_mutex_unlock(g_main_mutex);
-    
-        sleep_worker(&lock, &cond);
     }
     
     pthread_cleanup_pop(1); // NOLINT
+    
+    return 0;
 }

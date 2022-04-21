@@ -30,6 +30,7 @@ extern char g_player_id[9];
 extern char g_temp_player_id[9];
 extern char **g_players_message_list;
 extern char g_everyone[];
+extern char g_last_sent_message[201];
 
 int32_t gl_client_connect();
 

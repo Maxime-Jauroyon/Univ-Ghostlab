@@ -176,5 +176,9 @@ int32_t gl_uint8_array_recv_until_separator(int32_t fd, uint8_t **dst, uint8_t *
 }
 
 uint32_t gl_rand(uint32_t min, uint32_t max) {
+    if (max + 1 - min == 0) {
+        return 0;
+    }
+    
     return min + rand() % (max + 1 - min);
 }

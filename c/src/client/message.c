@@ -4,6 +4,7 @@
 #include <common/log.h>
 #include <common/game.h>
 #include <common/array.h>
+#include <common/memory.h>
 #include <common/string.h>
 #include <common/message.h>
 #include <common/network.h>
@@ -242,9 +243,9 @@ static void message_messp(gl_message_t *msg, int32_t socket_id, void *user_data)
     
     if (strcmp(g_player_id, player_id) != 0) {
         gl_log_push_info("[%s] whispers: %s\n", player_id, buf);
-    } else {
-        gl_log_push_info("[you] whispers: %s\n", buf);
     }
+    
+    gl_free(buf);
 }
 
 static void message_messa(gl_message_t *msg, int32_t socket_id, void *user_data) {
@@ -256,8 +257,14 @@ static void message_messa(gl_message_t *msg, int32_t socket_id, void *user_data)
     if (strcmp(g_player_id, player_id) != 0) {
         gl_log_push_info("[%s] says: %s\n", player_id, buf);
     } else {
-        gl_log_push_info("[you] says: %s\n", buf);
+        gl_log_push_info("[you] said: %s\n", buf);
     }
+    
+    gl_free(buf);
+}
+
+static void message_send_res(gl_message_t *msg, int32_t socket_id, void *user_data) {
+    gl_log_push_info("[you] whispered: %s\n", g_last_sent_message);
 }
 
 static void message_multi(gl_message_t *msg, int32_t socket_id, void *user_data) {
@@ -293,6 +300,7 @@ void gl_client_message_add_functions() {
     gl_message_definitions()[GL_MESSAGE_TYPE_ENDGA]->function = message_endga;
     gl_message_definitions()[GL_MESSAGE_TYPE_MESSP]->function = message_messp;
     gl_message_definitions()[GL_MESSAGE_TYPE_MESSA]->function = message_messa;
+    gl_message_definitions()[GL_MESSAGE_TYPE_SEND_RES]->function = message_send_res;
     gl_message_definitions()[GL_MESSAGE_TYPE_MULTI]->function = message_multi;
     gl_message_definitions()[GL_MESSAGE_TYPE_SHUTD]->function = message_shutd;
 }

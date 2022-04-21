@@ -159,6 +159,7 @@ void gl_client_main_window_draw() {
                             gl_message_push_parameter(&msg, (gl_message_parameter_t) { .string_value = gl_string_create_from_cstring(g_players_message_list[g_main_window_message_target]) });
                             gl_message_push_parameter(&msg, (gl_message_parameter_t) { .string_value = gl_string_create_from_cstring(g_main_window_message) });
                             gl_message_send_tcp(g_tcp_listener_socket, &msg);
+                            memcpy(g_last_sent_message, g_main_window_message, 201);
                         }
     
                         bzero(g_main_window_message, 201);
