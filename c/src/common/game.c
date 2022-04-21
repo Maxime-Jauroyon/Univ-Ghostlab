@@ -187,3 +187,31 @@ uint32_t gl_game_move_player(gl_game_t *game, gl_player_t *player, uint32_t quan
     
     return removed;
 }
+
+bool gl_game_move_ghost(gl_game_t *game, uint32_t ghost_id) {
+    gl_pos_t pos;
+    
+    uint32_t j = 0;
+    do {
+        pos.x = rand() % gl_array_get_size(game->maze->grid[0]);
+        pos.y = rand() % gl_array_get_size(game->maze->grid);
+        
+        if (j++ >= 100) {
+            break;
+        }
+    } while (game->maze->grid[pos.y][pos.x] != GL_MAZE_ELEMENT_ROOM || gl_game_is_ghost_at_pos(game->ghosts, pos) || gl_game_is_player_at_pos(game->players, pos));
+    
+    if (j >= 100) {
+        return false;
+    }
+    
+    game->ghosts[ghost_id].pos.x = pos.x;
+    game->ghosts[ghost_id].pos.y = pos.y;
+    
+    gl_message_t response = { .type = GL_MESSAGE_TYPE_GHOST, 0 };
+    gl_message_push_parameter(&response, (gl_message_parameter_t) { .string_value = gl_string_create_from_uint32(game->ghosts[ghost_id].pos.x, 3) });
+    gl_message_push_parameter(&response, (gl_message_parameter_t) { .string_value = gl_string_create_from_uint32(game->ghosts[ghost_id].pos.y, 3) });
+    gl_message_send_multicast(game->multicast_ip, game->multicast_port, &response);
+    
+    return true;
+}

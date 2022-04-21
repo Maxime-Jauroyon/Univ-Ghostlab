@@ -65,4 +65,6 @@ gl_pos_t gl_game_get_maze_size(gl_game_t *game);
 
 uint32_t gl_game_move_player(gl_game_t *game, gl_player_t *player, uint32_t quantity, gl_movement_t movement);
 
+bool gl_game_move_ghost(gl_game_t *game, uint32_t ghost_id);
+
 #endif /* GHOSTLAB_GAME_H */

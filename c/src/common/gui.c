@@ -44,14 +44,12 @@ int32_t gl_gui_create(const char *gui_title) {
     gl_assert(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) == 0);
 
 #ifdef __APPLE__
-    // GL 3.2 Core + GLSL 150
     const char* glsl_version = "#version 150";
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG); // Always required on Mac
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 #else
-    // GL 3.0 + GLSL 130
     const char* glsl_version = "#version 130";
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -91,14 +89,11 @@ void gl_gui_start_render(bool *quit) {
     igTuiNewFrame();
 #elif GHOSTLAB_GUI
     SDL_Event event;
-    while (SDL_PollEvent(&event))
-    {
+    while (SDL_PollEvent(&event)) {
         ImGui_ImplSDL2_ProcessEvent(&event);
-        
         if (event.type == SDL_QUIT) {
             *quit = true;
         }
-        
         if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(g_window)) {
             *quit = true;
         }

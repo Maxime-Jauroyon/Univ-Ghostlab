@@ -27,4 +27,6 @@ int32_t gl_uint8_recv(int32_t fd, uint8_t *n);
 
 int32_t gl_uint8_array_recv_until_separator(int32_t fd, uint8_t **dst, uint8_t *last_c, uint16_t max_size, bool precise_size, bool allow_spaces, const uint8_t *buf, uint32_t *i);
 
+uint32_t gl_rand(uint32_t min, uint32_t max);
+
 #endif /* GHOSTLAB_UTILS_H */

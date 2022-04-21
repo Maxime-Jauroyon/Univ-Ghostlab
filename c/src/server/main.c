@@ -14,6 +14,7 @@
 #include <server/shared.h>
 #include <server/message.h>
 #include <server/thread_tcp_acceptor.h>
+#include "thread_ghosts_handler.h"
 
 static int32_t g_exit_code = EXIT_SUCCESS;
 
@@ -70,6 +71,9 @@ static int32_t gl_server_init(int argc, char **argv) {
     
     g_tcp_acceptor_thread = gl_malloc(sizeof(pthread_t));
     pthread_create(g_tcp_acceptor_thread, 0, gl_thread_tcp_acceptor_main, 0);
+    
+    g_ghost_handler_thread = gl_malloc(sizeof(pthread_t));
+    pthread_create(g_ghost_handler_thread, 0, gl_thread_ghosts_handler_main, 0);
     
     return 0;
 }
@@ -145,9 +149,18 @@ static void gl_server_free() {
         gl_free(g_tcp_acceptor_thread);
     }
     
-    gl_array_free(g_ip_sockets);
+    pthread_mutex_lock(g_main_mutex);
     gl_game_free_all(g_games);
     gl_array_free(g_games);
+    pthread_mutex_unlock(g_main_mutex);
+    
+    if (g_ghost_handler_thread) {
+        pthread_cancel(*(pthread_t *)g_ghost_handler_thread);
+        pthread_join(*(pthread_t *)g_ghost_handler_thread, 0);
+        gl_free(g_ghost_handler_thread);
+    }
+    
+    gl_array_free(g_ip_sockets);
     gl_free(g_server_ip);
     gl_free(g_server_port);
     gl_free(g_multicast_ip);

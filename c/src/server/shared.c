@@ -35,6 +35,7 @@ char *g_multicast_port = 0;
 int32_t g_tcp_acceptor_socket = -1;
 int32_t *g_tcp_listener_sockets = 0;
 gl_ip_socket_t *g_ip_sockets = 0;
+void *g_ghost_handler_thread = 0;
 void *g_tcp_acceptor_thread = 0;
 void **g_tcp_listener_threads = 0;
 void *g_main_mutex = &internal_g_main_mutex;

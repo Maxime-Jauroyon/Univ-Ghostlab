@@ -19,6 +19,7 @@ extern char *g_multicast_port;
 extern struct gl_ip_socket_t *g_ip_sockets;
 extern int32_t g_tcp_acceptor_socket;
 extern int32_t *g_tcp_listener_sockets;
+extern void *g_ghost_handler_thread;
 extern void *g_tcp_acceptor_thread;
 extern void **g_tcp_listener_threads;
 extern void *g_main_mutex;
