@@ -3,10 +3,10 @@
 #include <common/game.h>
 #include <common/maze.h>
 #include <common/array.h>
+#include <common/string.h>
 #include <common/message.h>
 #include <common/network.h>
 #include <server/shared.h>
-#include "common/string.h"
 
 void message_newpl(gl_message_t *msg, int32_t socket_id, void *user_data) {
     gl_server_remove_player_with_socket(socket_id, 0);
@@ -236,20 +236,11 @@ void message_mall_req(gl_message_t *msg, int32_t socket_id, void *user_data) {
         return;
     }
     
-    gl_player_t *player = 0;
-    
-    for (uint32_t i = 0; i < gl_array_get_size(game->players); i++) {
-        if (game->players[i].socket_id == socket_id) {
-            player = &game->players[i];
-            break;
-        }
-    }
+    gl_player_t *player = gl_server_get_player_with_socket(socket_id);
     
     if (!player) {
         return;
     }
-    
-    
     
     gl_message_t response = {.type = GL_MESSAGE_TYPE_MESSA, 0};
     gl_message_push_parameter(&response, (gl_message_parameter_t) { .string_value = gl_string_create_from_cstring(player->id) });
@@ -269,14 +260,7 @@ void message_send_req(gl_message_t *msg, int32_t socket_id, void *user_data) {
         return;
     }
     
-    gl_player_t *player = 0;
-    
-    for (uint32_t i = 0; i < gl_array_get_size(game->players); i++) {
-        if (game->players[i].socket_id == socket_id) {
-            player = &game->players[i];
-            break;
-        }
-    }
+    gl_player_t *player = gl_server_get_player_with_socket(socket_id);
     
     if (!player) {
         gl_message_t response = { .type = GL_MESSAGE_TYPE_NSEND, 0 };
@@ -287,31 +271,23 @@ void message_send_req(gl_message_t *msg, int32_t socket_id, void *user_data) {
     char player_id[9] = { 0 };
     memcpy(player_id, msg->parameters_value[0].string_value, 8);
     
-    bool found = false;
     for (uint32_t i = 0; i < gl_array_get_size(game->players); i++) {
         if (strcmp(player_id, game->players[i].id) == 0 && strlen(game->players[i].udp_port) == 4) {
             for (uint32_t j = 0; j < gl_array_get_size(g_ip_sockets); j++) {
                 if (g_ip_sockets[j].socket_id == game->players[i].socket_id) {
-                    found = true;
-    
                     gl_message_t response = {.type = GL_MESSAGE_TYPE_MESSP, 0};
                     gl_message_push_parameter(&response, (gl_message_parameter_t) { .string_value = gl_string_create_from_cstring(player->id) });
                     gl_message_push_parameter(&response, (gl_message_parameter_t) { .string_value = gl_string_copy(msg->parameters_value[1].string_value) });
                     gl_message_send_udp(g_ip_sockets[j].ip, game->players[i].udp_port, &response);
                     
-                    break;
+                    return;
                 }
-            }
-            if (found) {
-                break;
             }
         }
     }
     
-    if (!found) {
-        gl_message_t response = { .type = GL_MESSAGE_TYPE_NSEND, 0 };
-        gl_message_send_tcp(socket_id, &response);
-    }
+    gl_message_t response = { .type = GL_MESSAGE_TYPE_NSEND, 0 };
+    gl_message_send_tcp(socket_id, &response);
 }
 
 void gl_server_message_add_functions() {

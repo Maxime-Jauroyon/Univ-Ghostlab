@@ -1,12 +1,12 @@
 #include <common/string.h>
 #include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <common/log.h>
 #include <common/array.h>
 #include <common/utils.h>
 #include <common/memory.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 uint8_t *gl_string_create_from_cstring(const char *src) {
     uint8_t *dst = 0;

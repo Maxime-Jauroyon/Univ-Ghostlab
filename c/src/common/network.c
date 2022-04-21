@@ -1,8 +1,8 @@
 #include <common/network.h>
 #include <netdb.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
+#include <unistd.h>
 #include <pthread.h>
 #include <arpa/inet.h>
 #include <common/message.h>

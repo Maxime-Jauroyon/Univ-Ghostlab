@@ -3,11 +3,9 @@
 #include <stdlib.h>
 #if GHOSTLAB_TUI || GHOSTLAB_GUI
 #include <cimgui/cimgui.h>
-#endif
-#include <common/log.h>
-#if GHOSTLAB_TUI || GHOSTLAB_GUI
 #include <common/gui.h>
 #endif
+#include <common/log.h>
 
 static uint64_t g_allocated_ptrs = 0;
 

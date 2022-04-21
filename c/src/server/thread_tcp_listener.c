@@ -1,11 +1,11 @@
 #include <server/thread_tcp_listener.h>
 #include <pthread.h>
 #include <common/log.h>
+#include <common/array.h>
 #include <common/string.h>
 #include <common/message.h>
 #include <common/network.h>
 #include <server/shared.h>
-#include "common/array.h"
 
 void *gl_thread_tcp_listener_main(void *user_data) {
     uint32_t id = *(uint32_t *)user_data;

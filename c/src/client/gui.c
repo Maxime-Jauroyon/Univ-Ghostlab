@@ -1,4 +1,5 @@
 #include <client/gui.h>
+#include <string.h>
 #include <cimgui/cimgui.h>
 #include <common/gui.h>
 #include <common/game.h>
@@ -7,7 +8,6 @@
 #include <common/message.h>
 #include <client/shared.h>
 #include <client/command.h>
-#include <string.h>
 
 static bool g_main_window_reload_games = true;
 static bool g_console_window_visible = true;

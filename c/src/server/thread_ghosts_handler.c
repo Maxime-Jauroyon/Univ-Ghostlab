@@ -1,11 +1,11 @@
 #include <server/thread_ghosts_handler.h>
-#include <pthread.h>
 #include <stdlib.h>
-#include "shared.h"
-#include "common/log.h"
-#include "common/game.h"
-#include "common/array.h"
-#include "common/utils.h"
+#include <pthread.h>
+#include <common/log.h>
+#include <common/game.h>
+#include <common/array.h>
+#include <common/utils.h>
+#include <server/shared.h>
 
 void sleep_worker(pthread_mutex_t *lock, pthread_cond_t *cond) {
     uint32_t time_to_wait = gl_rand(30, 90);

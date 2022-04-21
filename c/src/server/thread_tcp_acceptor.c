@@ -1,15 +1,14 @@
 #include <server/thread_tcp_acceptor.h>
+#include <string.h>
 #include <pthread.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
 #include <common/log.h>
 #include <common/array.h>
 #include <common/memory.h>
 #include <common/network.h>
-#include <common/message.h>
 #include <server/shared.h>
 #include <server/thread_tcp_listener.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <string.h>
 
 void *gl_thread_tcp_acceptor_main(void *user_data) {
     gl_log_push("tcp acceptor thread started.\n");

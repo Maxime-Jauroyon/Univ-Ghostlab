@@ -1,10 +1,10 @@
 #include <common/game.h>
 #include <stdlib.h>
-#include <common/array.h>
 #include <common/maze.h>
-#include "memory.h"
-#include "message.h"
-#include "string.h"
+#include <common/array.h>
+#include <common/memory.h>
+#include <common/string.h>
+#include <common/message.h>
 
 gl_ghost_t *gl_game_generate_ghosts(gl_maze_t *maze, uint8_t num_ghosts) {
     gl_ghost_t *ghosts = 0;

@@ -1,10 +1,10 @@
 #include <common/types.h>
 #include <errno.h>
-#include <stdlib.h>
 #include <getopt.h>
+#include <stdlib.h>
 #include <pthread.h>
-#include <common/log.h>
 #include <common/gui.h>
+#include <common/log.h>
 #include <common/game.h>
 #include <common/array.h>
 #include <common/memory.h>
@@ -15,7 +15,6 @@
 #include <client/message.h>
 #include <client/thread_tcp_listener.h>
 #include <client/thread_udp_listener.h>
-#include <client/thread_multicast_general_listener.h>
 
 static int32_t g_exit_code = EXIT_SUCCESS;
 

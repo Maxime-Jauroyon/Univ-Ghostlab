@@ -1,6 +1,6 @@
 #include <common/array.h>
-#include <common/memory.h>
 #include <string.h>
+#include <common/memory.h>
 
 void *internal_gl_array_set_capacity(void *array, uint64_t capacity, uint64_t item_size) {
     uint8_t *header = array ? (uint8_t *)gl_array_get_header(array) : 0;

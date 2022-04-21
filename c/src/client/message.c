@@ -1,18 +1,16 @@
 #include <client/message.h>
-#include <common/game.h>
-#include <common/string.h>
-#include <common/network.h>
-#include <common/message.h>
-#include <client/shared.h>
-#include <pthread.h>
-#include <common/memory.h>
-#include <client/thread_multicast_general_listener.h>
 #include <string.h>
-#include <stdlib.h>
-#include "gui.h"
-#include "common/array.h"
-#include "thread_multicast_game_listener.h"
-#include "common/log.h"
+#include <pthread.h>
+#include <common/log.h>
+#include <common/game.h>
+#include <common/array.h>
+#include <common/string.h>
+#include <common/message.h>
+#include <common/network.h>
+#include <client/gui.h>
+#include <client/shared.h>
+#include <client/thread_multicast_game_listener.h>
+#include <client/thread_multicast_general_listener.h>
 
 static uint32_t g_message_list_res_game_id = 0;
 
@@ -243,9 +241,9 @@ static void message_messp(gl_message_t *msg, int32_t socket_id, void *user_data)
     char *buf = gl_cstring_create_from_ip(msg->parameters_value[1].string_value);
     
     if (strcmp(g_player_id, player_id) != 0) {
-        gl_log_push_info("[%s] %s\n", player_id, buf);
+        gl_log_push_info("[%s] whispers: %s\n", player_id, buf);
     } else {
-        gl_log_push_info("[you] %s\n", player_id, buf);
+        gl_log_push_info("[you] whispers: %s\n", buf);
     }
 }
 
@@ -256,9 +254,9 @@ static void message_messa(gl_message_t *msg, int32_t socket_id, void *user_data)
     char *buf = gl_cstring_create_from_ip(msg->parameters_value[1].string_value);
     
     if (strcmp(g_player_id, player_id) != 0) {
-        gl_log_push_info("[%s] %s\n", player_id, buf);
+        gl_log_push_info("[%s] says: %s\n", player_id, buf);
     } else {
-        gl_log_push_info("[you] %s\n", player_id, buf);
+        gl_log_push_info("[you] says: %s\n", buf);
     }
 }
 

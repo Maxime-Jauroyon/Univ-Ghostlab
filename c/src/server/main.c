@@ -14,7 +14,7 @@
 #include <server/shared.h>
 #include <server/message.h>
 #include <server/thread_tcp_acceptor.h>
-#include "thread_ghosts_handler.h"
+#include <server/thread_ghosts_handler.h>
 
 static int32_t g_exit_code = EXIT_SUCCESS;
 
