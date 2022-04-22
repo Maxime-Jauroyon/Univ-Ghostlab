@@ -59,7 +59,7 @@ The recommended user interface to launch with is the GUI mode.
 
 ### Compile And Launch (Java Sources)
 
-The Java sources uses Gradle as a cross-platform build system. It should install itself automatically when compiling the project.
+The Java sources uses Gradle as a cross-platform build system, it should install itself automatically when compiling the project.
 
 #### Compile
 
