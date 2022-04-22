@@ -54,7 +54,7 @@ The C sources uses CMake as a cross-platform build system, be sure to have it in
 - Run `./c/build/client_gui` to launch the client in GUI mode.
 - Alternatively, run `./c/build/client_tui` to launch the client in TUI mode.
 
-You should always run the server before the client. 
+You should always run the server before the client.  
 The recommended user interface to launch with is the GUI mode.
 
 ### Compile And Launch (Java Sources)
