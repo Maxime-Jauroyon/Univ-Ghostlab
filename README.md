@@ -72,7 +72,7 @@ The Java sources uses Gradle as a cross-platform build system, it should install
 
 ## Dependencies
 
-For the C projects:
+### C Sources
 
 - [ImGui](https://github.com/ocornut/imgui)
 - [cimgui](https://github.com/cimgui/cimgui)
@@ -82,7 +82,7 @@ For the C projects:
 - [SDL](https://www.libsdl.org/index.php)
 - [OpenGL](https://www.opengl.org)
 
-For the Java projects:
+### Java Sources
 
 - [ImGui](https://github.com/ocornut/imgui)
 - [imgui-java](https://github.com/SpaiR/imgui-java)
