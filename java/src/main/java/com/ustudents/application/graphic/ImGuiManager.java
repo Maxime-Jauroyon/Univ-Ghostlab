@@ -1,7 +1,7 @@
 package com.ustudents.application.graphic;
 
-import imgui.ImGui;
-import imgui.ImGuiIO;
+import com.ustudents.common.utils.Resources;
+import imgui.*;
 import imgui.flag.ImGuiConfigFlags;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
@@ -16,16 +16,38 @@ public class ImGuiManager {
     /** The ImGui OpenGL 3.X implementation. */
     private final ImGuiImplGl3 imGuiGl3 = new ImGuiImplGl3();
 
+    public static ImFont sourceSansPro;
+
+    public static ImFont firaCode;
+
     public void initialize(long windowHandle, String glslVersion, boolean enableDocking) {
         ImGui.createContext();
 
         final ImGuiIO io = ImGui.getIO();
         io.setIniFilename(null);
-        io.addConfigFlags(ImGuiConfigFlags.NavEnableKeyboard);
 
         if (enableDocking) {
             io.addConfigFlags(ImGuiConfigFlags.DockingEnable);
         }
+
+        io.getFonts().addFontDefault();
+
+        final ImFontConfig fontConfig = new ImFontConfig();
+        fontConfig.setRasterizerMultiply(1.5f);
+        fontConfig.setOversampleH(4);
+        fontConfig.setOversampleV(4);
+
+        final ImFontGlyphRangesBuilder rangesBuilder = new ImFontGlyphRangesBuilder(); // Glyphs ranges provide
+        rangesBuilder.addRanges(io.getFonts().getGlyphRangesDefault());
+
+        final short[] glyphRanges = rangesBuilder.buildRanges();
+        sourceSansPro = io.getFonts().addFontFromMemoryTTF(Resources.load("/fonts/SourceSansPro/SourceSansPro-Regular.ttf"), 16.0f, fontConfig, glyphRanges);
+        firaCode = io.getFonts().addFontFromMemoryTTF(Resources.load("/fonts/FiraCode/FiraCode-Regular.ttf"), 16.0f, fontConfig, glyphRanges);
+        io.getFonts().build();
+
+        io.setFontDefault(sourceSansPro);
+
+        fontConfig.destroy();
 
         //io.addConfigFlags(ImGuiConfigFlags.ViewportsEnable);
         io.setConfigViewportsNoTaskBarIcon(true);

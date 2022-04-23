@@ -1,24 +1,34 @@
 package com.ustudents.ghostlab.client;
 
 import com.ustudents.application.Application;
+import com.ustudents.application.graphic.ImGuiManager;
 import com.ustudents.application.window.WindowInfo;
 import com.ustudents.common.command.Command;
+import com.ustudents.common.log.Out;
+import com.ustudents.common.utils.Resources;
 import com.ustudents.ghostlab.interaction.InteractionIntroductionPhase;
 import com.ustudents.ghostlab.runnable.TCPRunnable;
 import com.ustudents.ghostlab.runnable.UDPMulticastRunnable;
 import com.ustudents.ghostlab.runnable.UDPRunnable;
-import imgui.ImGui;
+import imgui.*;
+import imgui.callback.ImListClipperCallback;
+import imgui.flag.ImGuiInputTextFlags;
+import imgui.flag.ImGuiWindowFlags;
+import imgui.type.ImBoolean;
+import imgui.type.ImString;
 
 import java.io.*;
 import java.net.DatagramSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 @Command(name = "client", version = "1.0.0", description = "ghostlab is an online matchmaking based game where you take upon yourself to become the best ghost hunter!")
 @WindowInfo(title = "Ghostlab Client", width = 1280, height = 720)
 public class Client extends Application {
-    private final Socket socket;
-    private final DatagramSocket datagramSocket;
+    private Socket socket;
+    private DatagramSocket datagramSocket;
     private String username;
     private int gameRegistered;
     private int heigthMaze;
@@ -27,17 +37,17 @@ public class Client extends Application {
     private String multicastAddr;
     private int multicastPort;
     private String idPlayer;
-    private final int[] startedPos;
-    private final int[] currentPos;
+    private int[] startedPos;
+    private int[] currentPos;
     private int score;
 
     public Client(String ipv4, int tcpPort, String username, int udpPort) throws IOException {
-        socket = new Socket(ipv4, tcpPort);
-        this.username = username;
-        datagramSocket = new DatagramSocket(udpPort);
-        startedPos = new int[2];
-        currentPos = new int[2];
-        score = 0;
+        //socket = new Socket(ipv4, tcpPort);
+        //this.username = username;
+        //datagramSocket = new DatagramSocket(udpPort);
+        //startedPos = new int[2];
+        //currentPos = new int[2];
+        //score = 0;
     }
 
     public Socket getSocket() {
@@ -146,15 +156,115 @@ public class Client extends Application {
         }
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
+
     @Override
     protected void initialize() {
 
     }
 
+    List<String> logs = new ArrayList<>() {
+        {
+            add("Hello World!");
+            add("Hello World!");
+            add("Hello World!");
+            add("Hello World!");
+            add("Hello World!");
+            add("Hello World!");
+            add("Hello World!");
+            add("Hello World!");
+            add("Hello World!");
+            add("Hello World!");
+            add("Hello World!");
+            add("Hello World!");
+            add("Hello World!");
+            add("Hello World!");
+            add("Hello World!");
+            add("Hello World!");
+        }
+    };
+
+    private ImBoolean consoleShowInfo = new ImBoolean(true);
+    private ImBoolean consoleShowWarning = new ImBoolean(true);
+    private ImBoolean consoleShowError = new ImBoolean(true);
+    private ImString consoleCommand = new ImString();
+
     @Override
     protected void renderImGui() {
-        ImGui.text("Hello, World!");
-        ImGui.showDemoWindow();
+        ImGui.setNextWindowPos(0, 0);
+        ImGui.setNextWindowSize(ImGui.getIO().getDisplaySizeX(), ImGui.getIO().getDisplaySizeY() * 0.6f);
+        ImGui.begin("Ghostlab Client", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.MenuBar);
+
+        if (ImGui.beginMenuBar()) {
+            if (ImGui.beginMenu("File")) {
+                if (ImGui.menuItem("Quit")) {
+                    quit();
+                }
+
+                ImGui.endMenu();
+            }
+
+            ImGui.endMenuBar();
+        }
+
+        ImGui.end();
+
+        ImGui.setNextWindowPos(0, ImGui.getIO().getDisplaySizeY() * 0.6f);
+        ImGui.setNextWindowSize(ImGui.getIO().getDisplaySizeX(), ImGui.getIO().getDisplaySizeY() * 0.4f);
+        ImGui.begin("Console", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.MenuBar);
+
+        if (ImGui.beginMenuBar()) {
+            if (ImGui.beginMenu("View")) {
+                if (ImGui.menuItem("Clear Logs")) {
+                    Out.println("Clear logs clicked");
+                }
+
+                ImGui.separator();
+
+                ImGui.menuItem("Show Info", null, consoleShowInfo);
+                ImGui.menuItem("Show Warning", null, consoleShowWarning);
+                ImGui.menuItem("Show Error", null, consoleShowError);
+
+                ImGui.endMenu();
+            }
+
+            ImGui.endMenuBar();
+        }
+
+        ImGui.text("Enter a command:");
+        ImGui.sameLine();
+
+        if (ImGui.inputText("##Command", consoleCommand, ImGuiInputTextFlags.EnterReturnsTrue)) {
+            // TODO: Execute command
+        }
+
+        ImGui.sameLine();
+
+        if (ImGui.button("Send")) {
+            // TODO: Execute command
+        }
+
+        ImGui.beginChild("##Logs", 0, 0, true, ImGuiWindowFlags.HorizontalScrollbar);
+        ImGui.pushFont(ImGuiManager.firaCode);
+
+        ImGuiListClipper.forEach(logs.size(), new ImListClipperCallback() {
+            public void accept(int i) {
+                ImGui.textUnformatted(logs.get(i));
+            }
+        });
+
+        // TODO: Scroll quand tu rajoute un element dans logs
+        //if (consoleShouldScroll) {
+        //    ImGui.setScrollHereX(1.0f);
+        //    ImGui.setScrollHereY(1.0f);
+        //}
+
+        ImGui.popFont();
+        ImGui.endChild();
+
+        ImGui.end();
+
+        //ImGui.showDemoWindow();
     }
 
     @Override
