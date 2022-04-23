@@ -37,12 +37,8 @@ public class ImGuiManager {
         fontConfig.setOversampleH(4);
         fontConfig.setOversampleV(4);
 
-        final ImFontGlyphRangesBuilder rangesBuilder = new ImFontGlyphRangesBuilder(); // Glyphs ranges provide
-        rangesBuilder.addRanges(io.getFonts().getGlyphRangesDefault());
-
-        final short[] glyphRanges = rangesBuilder.buildRanges();
-        sourceSansPro = io.getFonts().addFontFromMemoryTTF(Resources.load("/fonts/SourceSansPro/SourceSansPro-Regular.ttf"), 16.0f, fontConfig, glyphRanges);
-        firaCode = io.getFonts().addFontFromMemoryTTF(Resources.load("/fonts/FiraCode/FiraCode-Regular.ttf"), 16.0f, fontConfig, glyphRanges);
+        sourceSansPro = io.getFonts().addFontFromMemoryTTF(Resources.load("/fonts/SourceSansPro/SourceSansPro-Regular.ttf"), 16.0f, fontConfig);
+        firaCode = io.getFonts().addFontFromMemoryTTF(Resources.load("/fonts/FiraCode/FiraCode-Regular.ttf"), 16.0f, fontConfig);
         io.getFonts().build();
 
         io.setFontDefault(sourceSansPro);
