@@ -4,6 +4,9 @@ import com.ustudents.application.Application;
 import com.ustudents.application.graphic.ImGuiManager;
 import com.ustudents.application.window.WindowInfo;
 import com.ustudents.common.command.Command;
+import com.ustudents.ghostlab.menu.MainScene;
+import com.ustudents.ghostlab.menu.SceneData;
+import com.ustudents.ghostlab.menu.UsernameChoiceScene;
 import com.ustudents.ghostlab.runnable.TCPRunnable;
 import com.ustudents.ghostlab.runnable.UDPRunnable;
 
@@ -67,13 +70,13 @@ public class Client extends Application {
         return datagramSocket.getLocalPort();
     }
 
-    /*public String getUsername() {
-        return username;
+    public String getUsername() {
+        return tcpRunnable.getUsername();
     }
 
     public void setUsername(String username) {
-        this.username = username;
-    }*/
+        tcpRunnable.setUsername(username);
+    }
 
     /*public void setGameRegister(int gameRegister) {
         this.gameRegistered = gameRegister;
@@ -166,23 +169,26 @@ public class Client extends Application {
     }*/
 
     // -----------------------------------------------------------------------------------------------------------------
-    
-    private int currentMenu = 0;
+    private int currentScene;
     private final List<String> logs = new ArrayList<>();
     private final List<String> archiveLogs = new ArrayList<>();
 
-    private ImBoolean consoleShowInfo = new ImBoolean(true);
-    private ImBoolean consoleShowWarning = new ImBoolean(true);
-    private ImBoolean consoleShowError = new ImBoolean(true);
-    private ImString consoleCommand = new ImString();
+
+    public List<String> getLogs(){
+        return logs;
+    }
 
     public void addContentTologs(String separator, String content){
         content = separator + " " + content;
         logs.add(content);
         archiveLogs.add(content);
-    }   
+    }
     
-    private void helpcommand(){
+    public void setScene(int scene){
+        currentScene = scene;
+    }
+    
+    public void helpcommand(){
         addContentTologs("client:", "commands:");
         addContentTologs("client:", "\tq, e, quit, exit   terminates the program.");
         addContentTologs("client:", "\th, help            displays this help message.");
@@ -196,7 +202,7 @@ public class Client extends Application {
         helpcommand();
     }
 
-    private void lobbyMenu(){
+    /*private void lobbyMenu(){
         ImGui.setNextWindowPos(0, 0);
         ImGui.setNextWindowSize(ImGui.getIO().getDisplaySizeX(), ImGui.getIO().getDisplaySizeY() * 0.6f);
         ImGui.begin("Ghostlab Client", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.MenuBar);
@@ -320,7 +326,7 @@ public class Client extends Application {
             ImGui.endMenuBar();
         }
 
-        
+
 
         ImGui.end();
 
@@ -402,15 +408,15 @@ public class Client extends Application {
         ImGui.end();
 
         //ImGui.showDemoWindow();;
-    }
+    }*/
 
     @Override
     protected void renderImGui() {
-        if(currentMenu == 0){
-            lobbyMenu();
-        }else if(currentMenu == 1){
-            usernameChoiceMenu();
-        }else if(currentMenu == 2){
+        if(currentScene == SceneData.MAIN){
+            new MainScene(this).display();
+        }else if(currentScene == SceneData.USERNAMECHOICE){
+            new UsernameChoiceScene(this).display();
+        }else if(currentScene == SceneData.GAMELOBBY){
 
         }
     }
