@@ -5,3 +5,12 @@ out
 school-uni-pr6.iml
 .gradle/
 build/
+bin/
+CMakeCache.txt
+CMakeFiles
+Makefile
+client_gui
+client_tui
+cmake_install.cmake
+server_gui
+server_tui

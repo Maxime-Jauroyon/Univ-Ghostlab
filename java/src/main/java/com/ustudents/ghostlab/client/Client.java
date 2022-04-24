@@ -10,9 +10,13 @@ import com.ustudents.ghostlab.interaction.InteractionIntroductionPhase;
 import com.ustudents.ghostlab.runnable.TCPRunnable;
 import com.ustudents.ghostlab.runnable.UDPMulticastRunnable;
 import com.ustudents.ghostlab.runnable.UDPRunnable;
+
+import org.lwjgl.glfw.GLFW;
+
 import imgui.*;
 import imgui.callback.ImListClipperCallback;
 import imgui.flag.ImGuiInputTextFlags;
+import imgui.flag.ImGuiKey;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.type.ImBoolean;
 import imgui.type.ImString;
@@ -157,37 +161,29 @@ public class Client extends Application {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-
-    @Override
-    protected void initialize() {
-
-    }
-
-    List<String> logs = new ArrayList<>() {
-        {
-            add("Hello World!");
-            add("Hello World!");
-            add("Hello World!");
-            add("Hello World!");
-            add("Hello World!");
-            add("Hello World!");
-            add("Hello World!");
-            add("Hello World!");
-            add("Hello World!");
-            add("Hello World!");
-            add("Hello World!");
-            add("Hello World!");
-            add("Hello World!");
-            add("Hello World!");
-            add("Hello World!");
-            add("Hello World!");
-        }
-    };
+    
+    private final List<String> logs = new ArrayList<>();
+    private final List<String> archiveLogs = new ArrayList<>();
 
     private ImBoolean consoleShowInfo = new ImBoolean(true);
     private ImBoolean consoleShowWarning = new ImBoolean(true);
     private ImBoolean consoleShowError = new ImBoolean(true);
     private ImString consoleCommand = new ImString();
+
+    private void addContentTologs(String content){
+        content = "client: " + content;
+        logs.add(content);
+        archiveLogs.add(content);
+    }    
+
+    @Override
+    protected void initialize() {
+        //addContentTologs("connection to server established.");
+        /*addContentTologs("udp listener thread started.");
+        addContentTologs("tcp listener thread started.");*/
+    }
+
+    
 
     @Override
     protected void renderImGui() {
@@ -233,15 +229,16 @@ public class Client extends Application {
 
         ImGui.text("Enter a command:");
         ImGui.sameLine();
-
-        if (ImGui.inputText("##Command", consoleCommand, ImGuiInputTextFlags.EnterReturnsTrue)) {
-            // TODO: Execute command
-        }
-
+        ImGui.inputText("##Command", consoleCommand);
         ImGui.sameLine();
 
-        if (ImGui.button("Send")) {
+        if (ImGui.button("Send") || ImGui.isKeyPressed(GLFW.GLFW_KEY_ENTER)) {
             // TODO: Execute command
+
+            String command = consoleCommand.get();
+            addContentTologs(command);
+            consoleCommand.clear();
+            
         }
 
         ImGui.beginChild("##Logs", 0, 0, true, ImGuiWindowFlags.HorizontalScrollbar);
