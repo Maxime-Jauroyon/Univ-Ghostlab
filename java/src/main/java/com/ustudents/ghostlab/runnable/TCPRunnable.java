@@ -25,6 +25,14 @@ public class TCPRunnable implements Runnable{
         this.username = username;
     }
 
+    public String getUsername(){
+        return username;
+    }
+
+    public void setUsername(String username){
+        this.username = username;
+    }
+
     @Override
     public void run() {
         Reader reader = new Reader(client);

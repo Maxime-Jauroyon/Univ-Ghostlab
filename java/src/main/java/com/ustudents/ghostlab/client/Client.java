@@ -25,10 +25,11 @@ import static java.lang.System.exit;
 @Command(name = "client", version = "1.0.0", description = "ghostlab is an online matchmaking based game where you take upon yourself to become the best ghost hunter!")
 @WindowInfo(title = "Ghostlab Client", width = 1280, height = 720)
 public class Client extends Application {
-    private Socket socket;
-    private DatagramSocket datagramSocket;
-    private final Thread tcpThread;
-    private final Thread udpThread;
+    private final Socket socket;
+    private final DatagramSocket datagramSocket;
+    private final TCPRunnable tcpRunnable;
+    /*private final Thread tcpThread;
+    private final Thread udpThread;*/
     //private String username;
     /*private int gameRegistered;
     private int heigthMaze;
@@ -45,8 +46,9 @@ public class Client extends Application {
         addContentTologs("client:", "connection to server established.");
         socket = new Socket(ipv4, tcpPort);
         datagramSocket = new DatagramSocket(udpPort);
-        tcpThread = new Thread(new TCPRunnable(this, username));
-        udpThread = new Thread(new UDPRunnable(this, datagramSocket));
+        tcpRunnable = new TCPRunnable(this, username);
+        Thread tcpThread = new Thread(tcpRunnable);
+        Thread udpThread = new Thread(new UDPRunnable(this, datagramSocket));
         tcpThread.start();
         udpThread.start();
         addContentTologs("client:", "udp listener thread started.");
@@ -165,6 +167,7 @@ public class Client extends Application {
 
     // -----------------------------------------------------------------------------------------------------------------
     
+    private int currentMenu = 0;
     private final List<String> logs = new ArrayList<>();
     private final List<String> archiveLogs = new ArrayList<>();
 
@@ -193,10 +196,7 @@ public class Client extends Application {
         helpcommand();
     }
 
-    
-
-    @Override
-    protected void renderImGui() {
+    private void lobbyMenu(){
         ImGui.setNextWindowPos(0, 0);
         ImGui.setNextWindowSize(ImGui.getIO().getDisplaySizeX(), ImGui.getIO().getDisplaySizeY() * 0.6f);
         ImGui.begin("Ghostlab Client", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.MenuBar);
@@ -213,7 +213,17 @@ public class Client extends Application {
             ImGui.endMenuBar();
         }
 
+        if(ImGui.button("Create Game")){
+            if(tcpRunnable.getUsername() == null){
+                currentMenu = 1;
+            }else{
+                currentMenu = 2;
+            }
+        }
+
         ImGui.end();
+
+        
 
         ImGui.setNextWindowPos(0, ImGui.getIO().getDisplaySizeY() * 0.6f);
         ImGui.setNextWindowSize(ImGui.getIO().getDisplaySizeX(), ImGui.getIO().getDisplaySizeY() * 0.4f);
@@ -291,6 +301,118 @@ public class Client extends Application {
         ImGui.end();
 
         //ImGui.showDemoWindow();
+    }
+
+    private void usernameChoiceMenu(){
+        ImGui.setNextWindowPos(0, 0);
+        ImGui.setNextWindowSize(ImGui.getIO().getDisplaySizeX(), ImGui.getIO().getDisplaySizeY() * 0.6f);
+        ImGui.begin("Ghostlab Client", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.MenuBar);
+
+        if (ImGui.beginMenuBar()) {
+            if (ImGui.beginMenu("File")) {
+                if (ImGui.menuItem("Quit")) {
+                    quit();
+                }
+
+                ImGui.endMenu();
+            }
+
+            ImGui.endMenuBar();
+        }
+
+        
+
+        ImGui.end();
+
+        
+
+        ImGui.setNextWindowPos(0, ImGui.getIO().getDisplaySizeY() * 0.6f);
+        ImGui.setNextWindowSize(ImGui.getIO().getDisplaySizeX(), ImGui.getIO().getDisplaySizeY() * 0.4f);
+        ImGui.begin("Console", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.MenuBar);
+
+        if (ImGui.beginMenuBar()) {
+            if (ImGui.beginMenu("View")) {
+                if (ImGui.menuItem("Clear Logs")) {
+                    logs.clear();
+                }
+
+                ImGui.separator();
+
+                ImGui.menuItem("Show Info", null, consoleShowInfo);
+                ImGui.menuItem("Show Warning", null, consoleShowWarning);
+                ImGui.menuItem("Show Error", null, consoleShowError);
+
+                ImGui.endMenu();
+            }
+
+            ImGui.endMenuBar();
+        }
+
+        ImGui.text("Enter a command:");
+        ImGui.sameLine();
+        ImGui.inputText("##Command", consoleCommand);
+        ImGui.sameLine();
+
+        if (ImGui.button("Send") || ImGui.isKeyPressed(GLFW.GLFW_KEY_ENTER)) {
+            // TODO: Execute command
+
+            String command = consoleCommand.get();
+            addContentTologs("$", command);
+            consoleCommand.clear();
+            if(command.equals("q") || command.equals("e") ||
+               command.equals("quit") || command.equals("exit")){
+                exit(0);
+            }else if(command.equals("h") || command.equals("help")){
+                helpcommand();
+            }else if(command.equals("v") || command.equals("version")){
+                addContentTologs("client:", "version : 1.0.0");
+            }else{
+                addContentTologs("client: warning:", "invalid option `" + command + "`!");
+                addContentTologs("client: warning:", "use `h` for more informations.");
+            }
+            
+        }
+
+        ImGui.beginChild("##Logs", 0, 0, true, ImGuiWindowFlags.HorizontalScrollbar);
+        ImGui.pushFont(ImGuiManager.firaCode);
+
+        ImGuiListClipper.forEach(logs.size(), new ImListClipperCallback() {
+            public void accept(int i) {
+                String command = logs.get(i);
+                if(command.startsWith("client: warning:")) 
+                    ImGui.textColored(215, 215, 0, 255, command);
+                else if(command.startsWith("client: error:"))
+                    ImGui.textColored(255, 0, 0, 255, command);   
+                else if(command.startsWith("$"))
+                    ImGui.textColored(57, 255, 20, 255, command); 
+                else
+                    ImGui.textUnformatted(command);
+            }
+        });
+
+        // TODO: Scroll quand tu rajoute un element dans logs
+        //if (consoleShouldScroll) {
+        //    ImGui.setScrollHereX(1.0f);
+        //    ImGui.setScrollHereY(1.0f);
+        //}
+
+        ImGui.popFont();
+        ImGui.endChild();
+
+        ImGui.end();
+
+        //ImGui.showDemoWindow();;
+    }
+
+    @Override
+    protected void renderImGui() {
+        if(currentMenu == 0){
+            lobbyMenu();
+        }else if(currentMenu == 1){
+            usernameChoiceMenu();
+        }else if(currentMenu == 2){
+
+        }
     }
 
     @Override
