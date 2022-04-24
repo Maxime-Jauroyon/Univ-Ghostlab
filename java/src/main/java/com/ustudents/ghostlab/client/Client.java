@@ -4,19 +4,13 @@ import com.ustudents.application.Application;
 import com.ustudents.application.graphic.ImGuiManager;
 import com.ustudents.application.window.WindowInfo;
 import com.ustudents.common.command.Command;
-import com.ustudents.common.log.Out;
-import com.ustudents.common.utils.Resources;
-import com.ustudents.ghostlab.interaction.InteractionIntroductionPhase;
 import com.ustudents.ghostlab.runnable.TCPRunnable;
-import com.ustudents.ghostlab.runnable.UDPMulticastRunnable;
 import com.ustudents.ghostlab.runnable.UDPRunnable;
 
 import org.lwjgl.glfw.GLFW;
 
 import imgui.*;
 import imgui.callback.ImListClipperCallback;
-import imgui.flag.ImGuiInputTextFlags;
-import imgui.flag.ImGuiKey;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.type.ImBoolean;
 import imgui.type.ImString;
@@ -26,15 +20,17 @@ import java.net.DatagramSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
+import static java.lang.System.exit;
 
 @Command(name = "client", version = "1.0.0", description = "ghostlab is an online matchmaking based game where you take upon yourself to become the best ghost hunter!")
 @WindowInfo(title = "Ghostlab Client", width = 1280, height = 720)
 public class Client extends Application {
     private Socket socket;
     private DatagramSocket datagramSocket;
-    private String username;
-    private int gameRegistered;
+    private final Thread tcpThread;
+    private final Thread udpThread;
+    //private String username;
+    /*private int gameRegistered;
     private int heigthMaze;
     private int widthMaze;
     private int numberOfghost;
@@ -43,15 +39,22 @@ public class Client extends Application {
     private String idPlayer;
     private int[] startedPos;
     private int[] currentPos;
-    private int score;
+    private int score;*/
 
     public Client(String ipv4, int tcpPort, String username, int udpPort) throws IOException {
-        //socket = new Socket(ipv4, tcpPort);
+        addContentTologs("client:", "connection to server established.");
+        socket = new Socket(ipv4, tcpPort);
+        datagramSocket = new DatagramSocket(udpPort);
+        tcpThread = new Thread(new TCPRunnable(this, username));
+        udpThread = new Thread(new UDPRunnable(this, datagramSocket));
+        tcpThread.start();
+        udpThread.start();
+        addContentTologs("client:", "udp listener thread started.");
+        addContentTologs("client:", "tcp listener thread started.");
         //this.username = username;
-        //datagramSocket = new DatagramSocket(udpPort);
-        //startedPos = new int[2];
-        //currentPos = new int[2];
-        //score = 0;
+        /*startedPos = new int[2];
+        currentPos = new int[2];
+        score = 0;*/
     }
 
     public Socket getSocket() {
@@ -62,15 +65,15 @@ public class Client extends Application {
         return datagramSocket.getLocalPort();
     }
 
-    public String getUsername() {
+    /*public String getUsername() {
         return username;
     }
 
     public void setUsername(String username) {
         this.username = username;
-    }
+    }*/
 
-    public void setGameRegister(int gameRegister) {
+    /*public void setGameRegister(int gameRegister) {
         this.gameRegistered = gameRegister;
     }
 
@@ -113,13 +116,13 @@ public class Client extends Application {
     public void setScore(int score) {
         System.out.println("Your score are : " + score);
         this.score = score;
-    }
+    }*/
 
-    public void launchGame() throws IOException, InterruptedException {
+    /*public void launchGame() throws IOException, InterruptedException {
         Scanner sc = new Scanner(System.in);
         BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         PrintWriter pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
-
+        addContentTologs("client:", "leo is here !");
         while(true){
             InteractionIntroductionPhase iip = new InteractionIntroductionPhase(this);
             iip.getQuestionInIntroductionPhase(br, "");
@@ -158,7 +161,7 @@ public class Client extends Application {
             udpMulticastThread.join();
             udpTread.join();
         }
-    }
+    }*/
 
     // -----------------------------------------------------------------------------------------------------------------
     
@@ -170,17 +173,24 @@ public class Client extends Application {
     private ImBoolean consoleShowError = new ImBoolean(true);
     private ImString consoleCommand = new ImString();
 
-    private void addContentTologs(String content){
-        content = "client: " + content;
+    public void addContentTologs(String separator, String content){
+        content = separator + " " + content;
         logs.add(content);
         archiveLogs.add(content);
-    }    
+    }   
+    
+    private void helpcommand(){
+        addContentTologs("client:", "commands:");
+        addContentTologs("client:", "\tq, e, quit, exit   terminates the program.");
+        addContentTologs("client:", "\th, help            displays this help message.");
+        addContentTologs("client:", "\tv, version         display the program's version.");
+
+    }
 
     @Override
     protected void initialize() {
-        //addContentTologs("connection to server established.");
-        /*addContentTologs("udp listener thread started.");
-        addContentTologs("tcp listener thread started.");*/
+        addContentTologs("client:", "you can now enter commands.");
+        helpcommand();
     }
 
     
@@ -212,7 +222,7 @@ public class Client extends Application {
         if (ImGui.beginMenuBar()) {
             if (ImGui.beginMenu("View")) {
                 if (ImGui.menuItem("Clear Logs")) {
-                    Out.println("Clear logs clicked");
+                    logs.clear();
                 }
 
                 ImGui.separator();
@@ -236,8 +246,19 @@ public class Client extends Application {
             // TODO: Execute command
 
             String command = consoleCommand.get();
-            addContentTologs(command);
+            addContentTologs("$", command);
             consoleCommand.clear();
+            if(command.equals("q") || command.equals("e") ||
+               command.equals("quit") || command.equals("exit")){
+                exit(0);
+            }else if(command.equals("h") || command.equals("help")){
+                helpcommand();
+            }else if(command.equals("v") || command.equals("version")){
+                addContentTologs("client:", "version : 1.0.0");
+            }else{
+                addContentTologs("client: warning:", "invalid option `" + command + "`!");
+                addContentTologs("client: warning:", "use `h` for more informations.");
+            }
             
         }
 
@@ -246,7 +267,15 @@ public class Client extends Application {
 
         ImGuiListClipper.forEach(logs.size(), new ImListClipperCallback() {
             public void accept(int i) {
-                ImGui.textUnformatted(logs.get(i));
+                String command = logs.get(i);
+                if(command.startsWith("client: warning:")) 
+                    ImGui.textColored(215, 215, 0, 255, command);
+                else if(command.startsWith("client: error:"))
+                    ImGui.textColored(255, 0, 0, 255, command);   
+                else if(command.startsWith("$"))
+                    ImGui.textColored(57, 255, 20, 255, command); 
+                else
+                    ImGui.textUnformatted(command);
             }
         });
 
@@ -266,6 +295,6 @@ public class Client extends Application {
 
     @Override
     protected void destroy() {
-
+        exit(0);
     }
 }

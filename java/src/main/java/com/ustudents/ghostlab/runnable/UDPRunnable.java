@@ -1,25 +1,25 @@
 package com.ustudents.ghostlab.runnable;
 
+import com.ustudents.ghostlab.client.Client;
 import com.ustudents.ghostlab.client.Utils;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.Socket;
 
 public class UDPRunnable implements Runnable{
-    private final Socket socket;
+    private final Client client;
     private final DatagramSocket datagramSocket;
 
-    public UDPRunnable(Socket socket, DatagramSocket datagramSocket){
-        this.socket = socket;
+    public UDPRunnable(Client client, DatagramSocket datagramSocket){
+        this.client = client;
         this.datagramSocket = datagramSocket;
     }
 
     @Override
     public void run() {
         try {
-            while(!socket.isClosed()) {
+            while(!client.getSocket().isClosed()) {
                 byte[] data = new byte[200];
                 DatagramPacket packet = new DatagramPacket(data, data.length);
                 datagramSocket.receive(packet);

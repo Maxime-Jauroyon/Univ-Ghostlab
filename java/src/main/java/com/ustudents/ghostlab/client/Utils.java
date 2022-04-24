@@ -110,7 +110,7 @@ public class Utils {
     public static String read(BufferedReader br) throws IOException {
         String read = "";
         while(!checkThreeNextChar(read)){
-            read += (char) br.read();
+            read += String.valueOf(br.read());
         }
         return read;
     }

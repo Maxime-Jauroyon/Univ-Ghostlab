@@ -89,11 +89,11 @@ public class InteractionInGamePhase extends InteractionPerPhase {
         String message = Utils.read(br);
         String[] list = message.split(" ");
         if(list[0].equals("MOVE!")) {
-            client.setCurrentPos(Integer.parseInt(list[1]), Integer.parseInt(list[2].substring(0, list[2].length()-3)));
+            //client.setCurrentPos(Integer.parseInt(list[1]), Integer.parseInt(list[2].substring(0, list[2].length()-3)));
         }else if(list[0].equals("MOVEF")) {
+            /*client.setCurrentPos(Integer.parseInt(list[1]), Integer.parseInt(list[2]));
             client.setCurrentPos(Integer.parseInt(list[1]), Integer.parseInt(list[2]));
-            client.setCurrentPos(Integer.parseInt(list[1]), Integer.parseInt(list[2]));
-            client.setScore(Integer.parseInt(list[3].substring(0, list[3].length() - 3)));
+            client.setScore(Integer.parseInt(list[3].substring(0, list[3].length() - 3)));*/
 
         }else if(list[0].equals("GLIS!")) {
             getListOfPlayersInGame(br, Integer.parseInt(list[1].substring(0, list[1].length() - 3)));
