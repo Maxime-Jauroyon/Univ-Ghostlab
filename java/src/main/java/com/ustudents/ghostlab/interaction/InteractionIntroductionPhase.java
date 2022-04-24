@@ -1,4 +1,4 @@
-package com.ustudents.ghostlab.interaction;
+/*package com.ustudents.ghostlab.interaction;
 
 import com.ustudents.ghostlab.client.Client;
 import com.ustudents.ghostlab.client.Utils;
@@ -25,10 +25,10 @@ public class InteractionIntroductionPhase extends InteractionPerPhase {
                     client.setUsername(Utils.getInput("Now choose your username : ", sc, 0));
                 String gameId = Utils.getInput("Now choose your game id number : ", sc, 1);
                 clientSender = "REGIS " + client.getUsername() + " " + client.getUdpPort() + " " + gameId + "***";
-            */}else if(choice.equals("new")){
+            }else if(choice.equals("new")){
                 /*if(client.getUsername() == null)
                     client.setUsername(Utils.getInput("Now choose your username : ", sc, 0));
-                clientSender = "NEWPL " + client.getUsername() + " " + client.getUdpPort() + "***";*/
+                clientSender = "NEWPL " + client.getUsername() + " " + client.getUdpPort() + "***";
             }else if(choice.equals("unregister")){
                 clientSender = "UNREG***";
             }else if(choice.equals("size")){
@@ -72,12 +72,12 @@ public class InteractionIntroductionPhase extends InteractionPerPhase {
             client.setWidthMaze(Integer.parseInt(list[3]));
             client.setNumberOfghost(Integer.parseInt(list[4]));
             client.setMulticastAddr(list[5].substring(0, list[5].length()-3));
-            client.setMulticastPort(Integer.parseInt(list[6].substring(0, list[6].length()-3)));*/
+            client.setMulticastPort(Integer.parseInt(list[6].substring(0, list[6].length()-3)));
             return 1;
         }else if(list[0].equals("POSIT")){
             /*client.setIdPlayer(list[1]);
             client.setStartedPos(Integer.parseInt(list[2]), Integer.parseInt(list[3].substring(0, list[3].length()-3)));
-        */}else if(list[0].equals("LIST!") || list[0].equals("GAMES")) {
+        }else if(list[0].equals("LIST!") || list[0].equals("GAMES")) {
             String gameId = "";
             boolean startWithList = message.startsWith("LIST!");
             if (startWithList) {
@@ -129,4 +129,4 @@ public class InteractionIntroductionPhase extends InteractionPerPhase {
 
         return 0;
     }
-}
+}*/

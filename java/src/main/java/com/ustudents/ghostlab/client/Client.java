@@ -173,6 +173,31 @@ public class Client extends Application {
     private final List<String> logs = new ArrayList<>();
     private final List<String> archiveLogs = new ArrayList<>();
 
+    private ImBoolean consoleShowInfo = new ImBoolean(true);
+    private ImBoolean consoleShowWarning = new ImBoolean(true);
+    private ImBoolean consoleShowError = new ImBoolean(true);
+    private ImString consoleCommand = new ImString();
+    private ImString usernameChoiceContent = new ImString();
+    
+    public ImBoolean getConsoleShowInfo(){
+        return consoleShowInfo;
+    }
+
+    public ImBoolean getConsoleShowWarning(){
+        return consoleShowWarning;
+    }
+    
+    public ImBoolean getConsoleShowError(){
+        return consoleShowError;
+    }
+
+    public ImString getConsoleCommand(){
+        return consoleCommand;
+    }
+
+    public ImString getUsernameChoiceContent(){
+        return usernameChoiceContent;
+    }
 
     public List<String> getLogs(){
         return logs;
@@ -201,214 +226,6 @@ public class Client extends Application {
         addContentTologs("client:", "you can now enter commands.");
         helpcommand();
     }
-
-    /*private void lobbyMenu(){
-        ImGui.setNextWindowPos(0, 0);
-        ImGui.setNextWindowSize(ImGui.getIO().getDisplaySizeX(), ImGui.getIO().getDisplaySizeY() * 0.6f);
-        ImGui.begin("Ghostlab Client", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.MenuBar);
-
-        if (ImGui.beginMenuBar()) {
-            if (ImGui.beginMenu("File")) {
-                if (ImGui.menuItem("Quit")) {
-                    quit();
-                }
-
-                ImGui.endMenu();
-            }
-
-            ImGui.endMenuBar();
-        }
-
-        if(ImGui.button("Create Game")){
-            if(tcpRunnable.getUsername() == null){
-                currentMenu = 1;
-            }else{
-                currentMenu = 2;
-            }
-        }
-
-        ImGui.end();
-
-        
-
-        ImGui.setNextWindowPos(0, ImGui.getIO().getDisplaySizeY() * 0.6f);
-        ImGui.setNextWindowSize(ImGui.getIO().getDisplaySizeX(), ImGui.getIO().getDisplaySizeY() * 0.4f);
-        ImGui.begin("Console", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.MenuBar);
-
-        if (ImGui.beginMenuBar()) {
-            if (ImGui.beginMenu("View")) {
-                if (ImGui.menuItem("Clear Logs")) {
-                    logs.clear();
-                }
-
-                ImGui.separator();
-
-                ImGui.menuItem("Show Info", null, consoleShowInfo);
-                ImGui.menuItem("Show Warning", null, consoleShowWarning);
-                ImGui.menuItem("Show Error", null, consoleShowError);
-
-                ImGui.endMenu();
-            }
-
-            ImGui.endMenuBar();
-        }
-
-        ImGui.text("Enter a command:");
-        ImGui.sameLine();
-        ImGui.inputText("##Command", consoleCommand);
-        ImGui.sameLine();
-
-        if (ImGui.button("Send") || ImGui.isKeyPressed(GLFW.GLFW_KEY_ENTER)) {
-            // TODO: Execute command
-
-            String command = consoleCommand.get();
-            addContentTologs("$", command);
-            consoleCommand.clear();
-            if(command.equals("q") || command.equals("e") ||
-               command.equals("quit") || command.equals("exit")){
-                exit(0);
-            }else if(command.equals("h") || command.equals("help")){
-                helpcommand();
-            }else if(command.equals("v") || command.equals("version")){
-                addContentTologs("client:", "version : 1.0.0");
-            }else{
-                addContentTologs("client: warning:", "invalid option `" + command + "`!");
-                addContentTologs("client: warning:", "use `h` for more informations.");
-            }
-            
-        }
-
-        ImGui.beginChild("##Logs", 0, 0, true, ImGuiWindowFlags.HorizontalScrollbar);
-        ImGui.pushFont(ImGuiManager.firaCode);
-
-        ImGuiListClipper.forEach(logs.size(), new ImListClipperCallback() {
-            public void accept(int i) {
-                String command = logs.get(i);
-                if(command.startsWith("client: warning:")) 
-                    ImGui.textColored(215, 215, 0, 255, command);
-                else if(command.startsWith("client: error:"))
-                    ImGui.textColored(255, 0, 0, 255, command);   
-                else if(command.startsWith("$"))
-                    ImGui.textColored(57, 255, 20, 255, command); 
-                else
-                    ImGui.textUnformatted(command);
-            }
-        });
-
-        // TODO: Scroll quand tu rajoute un element dans logs
-        //if (consoleShouldScroll) {
-        //    ImGui.setScrollHereX(1.0f);
-        //    ImGui.setScrollHereY(1.0f);
-        //}
-
-        ImGui.popFont();
-        ImGui.endChild();
-
-        ImGui.end();
-
-        //ImGui.showDemoWindow();
-    }
-
-    private void usernameChoiceMenu(){
-        ImGui.setNextWindowPos(0, 0);
-        ImGui.setNextWindowSize(ImGui.getIO().getDisplaySizeX(), ImGui.getIO().getDisplaySizeY() * 0.6f);
-        ImGui.begin("Ghostlab Client", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.MenuBar);
-
-        if (ImGui.beginMenuBar()) {
-            if (ImGui.beginMenu("File")) {
-                if (ImGui.menuItem("Quit")) {
-                    quit();
-                }
-
-                ImGui.endMenu();
-            }
-
-            ImGui.endMenuBar();
-        }
-
-
-
-        ImGui.end();
-
-        
-
-        ImGui.setNextWindowPos(0, ImGui.getIO().getDisplaySizeY() * 0.6f);
-        ImGui.setNextWindowSize(ImGui.getIO().getDisplaySizeX(), ImGui.getIO().getDisplaySizeY() * 0.4f);
-        ImGui.begin("Console", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.MenuBar);
-
-        if (ImGui.beginMenuBar()) {
-            if (ImGui.beginMenu("View")) {
-                if (ImGui.menuItem("Clear Logs")) {
-                    logs.clear();
-                }
-
-                ImGui.separator();
-
-                ImGui.menuItem("Show Info", null, consoleShowInfo);
-                ImGui.menuItem("Show Warning", null, consoleShowWarning);
-                ImGui.menuItem("Show Error", null, consoleShowError);
-
-                ImGui.endMenu();
-            }
-
-            ImGui.endMenuBar();
-        }
-
-        ImGui.text("Enter a command:");
-        ImGui.sameLine();
-        ImGui.inputText("##Command", consoleCommand);
-        ImGui.sameLine();
-
-        if (ImGui.button("Send") || ImGui.isKeyPressed(GLFW.GLFW_KEY_ENTER)) {
-            // TODO: Execute command
-
-            String command = consoleCommand.get();
-            addContentTologs("$", command);
-            consoleCommand.clear();
-            if(command.equals("q") || command.equals("e") ||
-               command.equals("quit") || command.equals("exit")){
-                exit(0);
-            }else if(command.equals("h") || command.equals("help")){
-                helpcommand();
-            }else if(command.equals("v") || command.equals("version")){
-                addContentTologs("client:", "version : 1.0.0");
-            }else{
-                addContentTologs("client: warning:", "invalid option `" + command + "`!");
-                addContentTologs("client: warning:", "use `h` for more informations.");
-            }
-            
-        }
-
-        ImGui.beginChild("##Logs", 0, 0, true, ImGuiWindowFlags.HorizontalScrollbar);
-        ImGui.pushFont(ImGuiManager.firaCode);
-
-        ImGuiListClipper.forEach(logs.size(), new ImListClipperCallback() {
-            public void accept(int i) {
-                String command = logs.get(i);
-                if(command.startsWith("client: warning:")) 
-                    ImGui.textColored(215, 215, 0, 255, command);
-                else if(command.startsWith("client: error:"))
-                    ImGui.textColored(255, 0, 0, 255, command);   
-                else if(command.startsWith("$"))
-                    ImGui.textColored(57, 255, 20, 255, command); 
-                else
-                    ImGui.textUnformatted(command);
-            }
-        });
-
-        // TODO: Scroll quand tu rajoute un element dans logs
-        //if (consoleShouldScroll) {
-        //    ImGui.setScrollHereX(1.0f);
-        //    ImGui.setScrollHereY(1.0f);
-        //}
-
-        ImGui.popFont();
-        ImGui.endChild();
-
-        ImGui.end();
-
-        //ImGui.showDemoWindow();;
-    }*/
 
     @Override
     protected void renderImGui() {

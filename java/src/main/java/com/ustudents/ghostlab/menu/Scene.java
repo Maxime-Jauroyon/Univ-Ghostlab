@@ -9,22 +9,15 @@ import imgui.ImGui;
 import imgui.ImGuiListClipper;
 import imgui.callback.ImListClipperCallback;
 import imgui.flag.ImGuiWindowFlags;
-import imgui.type.ImBoolean;
-import imgui.type.ImString;
 import static java.lang.System.exit;
 
 public abstract class Scene {
 
-    private final Client client;
+    protected final Client client;
 
     public Scene(Client client){
         this.client = client;
     }
-
-    private ImBoolean consoleShowInfo = new ImBoolean(true);
-    private ImBoolean consoleShowWarning = new ImBoolean(true);
-    private ImBoolean consoleShowError = new ImBoolean(true);
-    private ImString consoleCommand = new ImString();
 
     protected void header(){
         ImGui.setNextWindowPos(0, 0);
@@ -43,18 +36,32 @@ public abstract class Scene {
             ImGui.endMenuBar();
         }
 
-        if(ImGui.button("Create Game")){
-            if(client.getUsername() == null){
-                client.setScene(1);
-            }else{
-                client.setScene(2);
-            }
-        }
-
         ImGui.end();
     }
 
     protected void footer(){
+        ImGui.setNextWindowPos(0, 0);
+        ImGui.setNextWindowSize(ImGui.getIO().getDisplaySizeX(), ImGui.getIO().getDisplaySizeY() * 0.6f);
+        ImGui.begin("Ghostlab Client", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.MenuBar);
+
+        if (ImGui.beginMenuBar()) {
+            if (ImGui.beginMenu("File")) {
+                if (ImGui.menuItem("Quit")) {
+                    client.quit();
+                }
+
+                ImGui.endMenu();
+            }
+
+            ImGui.endMenuBar();
+        }
+
+
+
+        ImGui.end();
+
+        
+
         ImGui.setNextWindowPos(0, ImGui.getIO().getDisplaySizeY() * 0.6f);
         ImGui.setNextWindowSize(ImGui.getIO().getDisplaySizeX(), ImGui.getIO().getDisplaySizeY() * 0.4f);
         ImGui.begin("Console", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.MenuBar);
@@ -67,27 +74,26 @@ public abstract class Scene {
 
                 ImGui.separator();
 
-                ImGui.menuItem("Show Info", null, consoleShowInfo);
-                ImGui.menuItem("Show Warning", null, consoleShowWarning);
-                ImGui.menuItem("Show Error", null, consoleShowError);
+                ImGui.menuItem("Show Info", null, client.getConsoleShowInfo());
+                ImGui.menuItem("Show Warning", null, client.getConsoleShowWarning());
+                ImGui.menuItem("Show Error", null, client.getConsoleShowError());
 
                 ImGui.endMenu();
             }
 
             ImGui.endMenuBar();
         }
-        
+
         ImGui.text("Enter a command:");
         ImGui.sameLine();
-        ImGui.inputText("##Command", consoleCommand);
+        ImGui.inputText("##Command", client.getConsoleCommand());
         ImGui.sameLine();
 
-        if (ImGui.button("Send") || ImGui.isKeyPressed(GLFW.GLFW_KEY_ENTER)) {
+        if ((ImGui.button("Send")) || ImGui.isKeyPressed(GLFW.GLFW_KEY_ENTER)) {
             // TODO: Execute command
-
-            String command = consoleCommand.get();
+            
+            String command = client.getConsoleCommand().get();
             client.addContentTologs("$", command);
-            consoleCommand.clear();
             if(command.equals("q") || command.equals("e") ||
                command.equals("quit") || command.equals("exit")){
                 exit(0);
@@ -99,7 +105,7 @@ public abstract class Scene {
                 client.addContentTologs("client: warning:", "invalid option `" + command + "`!");
                 client.addContentTologs("client: warning:", "use `h` for more informations.");
             }
-            
+            client.getConsoleCommand().clear();
         }
 
         ImGui.beginChild("##Logs", 0, 0, true, ImGuiWindowFlags.HorizontalScrollbar);
@@ -130,7 +136,7 @@ public abstract class Scene {
 
         ImGui.end();
 
-        //ImGui.showDemoWindow();
+        //ImGui.showDemoWindow();;
     }
     
 }

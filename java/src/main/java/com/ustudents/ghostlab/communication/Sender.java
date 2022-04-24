@@ -1,13 +1,13 @@
 package com.ustudents.ghostlab.communication;
 
-import com.ustudents.ghostlab.client.Client;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 public class Sender {
 
-    private final Client client;
-
-    public Sender(Client client){
-        this.client = client;
-    }
+    public static void sender(PrintWriter pw, String action) throws IOException{
+        pw.print(action);
+        pw.flush();
+    }    
     
 }

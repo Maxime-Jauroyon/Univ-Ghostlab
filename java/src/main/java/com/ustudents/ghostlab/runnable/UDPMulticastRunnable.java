@@ -48,7 +48,7 @@ public class UDPMulticastRunnable implements Runnable{
                     String score = list[2].substring(0, list[2].length() - 3);
                     System.out.println("[Winner] : " + username + " with " + score + " points");
                 }else if(list[0].equals("MESSA")){
-                    Utils.printAllMessage(receivedMessage, "Global Message From");
+                    //Utils.printAllMessage(receivedMessage, "Global Message From");
                 }
             }
 

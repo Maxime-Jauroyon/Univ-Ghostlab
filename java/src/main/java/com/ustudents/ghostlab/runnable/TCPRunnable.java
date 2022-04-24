@@ -2,7 +2,7 @@ package com.ustudents.ghostlab.runnable;
 
 import com.ustudents.ghostlab.client.Client;
 import com.ustudents.ghostlab.communication.Reader;
-import com.ustudents.ghostlab.interaction.InteractionIntroductionPhase;
+import com.ustudents.ghostlab.communication.Sender;
 
 import java.io.BufferedReader;
 import java.io.IOException;

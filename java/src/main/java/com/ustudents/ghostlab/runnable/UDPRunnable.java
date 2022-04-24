@@ -24,7 +24,7 @@ public class UDPRunnable implements Runnable{
                 DatagramPacket packet = new DatagramPacket(data, data.length);
                 datagramSocket.receive(packet);
                 String receivedMessage = new String(packet.getData(), 0, packet.getLength());
-                Utils.printAllMessage(receivedMessage, "Private Message From");
+                //Utils.printAllMessage(receivedMessage, "Private Message From");
             }
 
         } catch (IOException e) {

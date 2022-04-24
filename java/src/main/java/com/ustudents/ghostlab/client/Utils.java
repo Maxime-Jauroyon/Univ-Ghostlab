@@ -15,7 +15,7 @@ public class Utils {
         return startIndex;
     }
 
-    private static boolean answerIsCorrect(String[] correctAnswers, String userAnswer){
+    /*private static boolean answerIsCorrect(String[] correctAnswers, String userAnswer){
         for (String correctAnswer : correctAnswers) {
             if (userAnswer.equals(correctAnswer))
                 return true;
@@ -42,7 +42,7 @@ public class Utils {
                 printCorrectAnswer(correctAnswers);
             }
         }
-    }
+    }*/
 
     public static boolean answerIsCorrectInput(String answer, int flag){
         if((flag == 0 && answer.length() != 8) || (flag == 1 && (answer.length() > 3 || answer.length() < 1))
@@ -56,7 +56,7 @@ public class Utils {
         return true;
     }
 
-    public static String getInput(String question, Scanner sc, int flag){
+    /*public static String getInput(String question, Scanner sc, int flag){
         while(true){
             System.out.println(question);
             Scanner sc1 = new Scanner(System.in);
@@ -93,7 +93,7 @@ public class Utils {
             }
         }
         System.out.println();
-    }
+    }*/
 
     private static boolean checkThreeNextChar(String read){
         if(read.length() < 3)
