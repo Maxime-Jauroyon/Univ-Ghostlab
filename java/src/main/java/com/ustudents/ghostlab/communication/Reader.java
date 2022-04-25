@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 import com.ustudents.ghostlab.client.Client;
+import com.ustudents.ghostlab.client.Utils;
 import com.ustudents.ghostlab.scene.SceneData;
 
 public class Reader {
@@ -21,8 +22,7 @@ public class Reader {
     }
 
     private void readGAMES(BufferedReader br) throws IOException{
-        int nbGame = br.read();
-        nbGame = br.read();
+        int nbGame = Utils.readOctets(br, 1);
         readThreeEndSeparator(br);
         client.addContentTologs("client: received from server:" ,
          "GAMES " + nbGame + "***", 0);
@@ -33,22 +33,20 @@ public class Reader {
     }
 
     private void readOGAMES(BufferedReader br) throws IOException{
-        int idGame = br.read();
-        idGame = br.read();
+        int gameId = Utils.readOctets(br, 1);
         int nbPlayer = br.read();
         nbPlayer = br.read();
         readThreeEndSeparator(br);
         client.addContentTologs("client: received from server:",
-         "OGAME " + idGame + " " + nbPlayer + "***", 0);
+         "OGAME " + gameId + " " + nbPlayer + "***", 0);
     
     }
     
     private void readREGOK(BufferedReader br) throws IOException{
-        int idGame = br.read();
-        idGame = br.read();
+        int gameId = Utils.readOctets(br, 1);
         readThreeEndSeparator(br);
         client.addContentTologs("client: received from server:",
-         "REGOK " + idGame + "***", 0);
+         "REGOK " + gameId + "***", 0);
         client.setCurrentScene(SceneData.SCENE_GAMELOBBY);
         
     }
@@ -63,11 +61,10 @@ public class Reader {
     }
     
     private void readUNROK(BufferedReader br) throws IOException{
-        int idGame = br.read();
-        idGame = br.read();
+        int gameId = Utils.readOctets(br, 1);
         readThreeEndSeparator(br);
         client.addContentTologs("client: received from server:",
-         "UNROK " + idGame + "***", 0);
+         "UNROK " + gameId + "***", 0);
         client.setGameRegister("-1"); 
         client.setCurrentScene(SceneData.SCENE_MAIN);
         
@@ -80,25 +77,18 @@ public class Reader {
     }
     
     private void readSIZE(BufferedReader br) throws IOException{
-        br.read();
-        int idGame = br.read();
-        br.read();
-        int mazeHeight = br.read();
-        mazeHeight += br.read();
-        br.read();
-        int mazeWidth = br.read();
-        mazeWidth += br.read();
+        int gameId = Utils.readOctets(br, 1);
+        int mazeHeight = Utils.readOctets(br, 2);
+        int mazeWidth = Utils.readOctets(br, 2);
         readThreeEndSeparator(br);
         client.addContentTologs("client: received from server:",
-         "SIZE! " + idGame + " " + mazeHeight + " " + mazeWidth + "***", 0);
+         "SIZE! " + gameId + " " + mazeHeight + " " + mazeWidth + "***", 0);
         client.backToPreviousScene(); 
     }
     
     private void readLIST(BufferedReader br) throws IOException{
-        int gameId = br.read();
-        gameId = br.read();
-        int nbPlayer = br.read();
-        nbPlayer = br.read();
+        int gameId = Utils.readOctets(br, 1);
+        int nbPlayer = Utils.readOctets(br, 1);
         readThreeEndSeparator(br);
         client.addContentTologs("client: received from server:" ,
          "LIST! " + gameId + " " + nbPlayer + "***", 0);
@@ -110,16 +100,17 @@ public class Reader {
     }
 
     private void readPLAYR(BufferedReader br) throws IOException{
-        br.read();
-        String username = "";
-        for(int i = 0; i < 8; i++){
-            username += (char) br.read();
-        }
+        String username = Utils.readOctetToMakeString(br, 8);
         readThreeEndSeparator(br);
         client.addContentTologs("client: received from server:",
          "PLAYR " + username + "***", 0);
     
     }
+
+    private void readWELCO(BufferedReader br) throws IOException{
+        br.read();
+
+    }    
 
     public void read(BufferedReader br) throws IOException {
         String read = "";
@@ -148,7 +139,7 @@ public class Reader {
         }else if(read.equals("PLAYR")){
             readPLAYR(br);
         }else if(read.equals("WELCO")){
-            
+            readWELCO(br);
         }else if(read.equals("POSIT")){
             
         }else if(read.equals("MOVE")){

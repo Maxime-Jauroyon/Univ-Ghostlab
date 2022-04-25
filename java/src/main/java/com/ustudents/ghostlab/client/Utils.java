@@ -96,7 +96,7 @@ public class Utils {
         System.out.println();
     }*/
 
-    private static boolean checkThreeNextChar(String read){
+    /*private static boolean checkThreeNextChar(String read){
         if(read.length() < 3)
             return false;
 
@@ -114,7 +114,27 @@ public class Utils {
             read += String.valueOf(br.read());
         }
         return read;
+    }*/
+
+    public static int readOctets(BufferedReader br, int num) throws IOException{
+        br.read();
+        int res = 0;
+        for(int i = 0; i < num; i++){
+            res += br.read();
+        }
+        
+        return res;
     }
+
+    public static String readOctetToMakeString(BufferedReader br, int num) throws IOException{
+        br.read();
+        String res = "";
+        for(int i = 0; i < num; i++){
+            res += (char) br.read();
+        }
+        
+        return res;
+    }    
 
     public static char tranformdigitTochar(String string){
         return (char) Integer.parseInt(string);

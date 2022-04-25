@@ -13,14 +13,14 @@ public class GameLobbyScene extends Scene{
         super(client);
     }
 
-    public void mainSceneOption() throws IOException{
+    public void gameLobbyOption() throws IOException{
         ImGui.setNextWindowPos(0, 0);
         ImGui.setNextWindowSize(ImGui.getIO().getDisplaySizeX(), ImGui.getIO().getDisplaySizeY() * 0.6f);
         ImGui.begin("Ghostlab Client", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.MenuBar);
 
 
         if(ImGui.button("Start")){
-            
+            client.SendRequest("START***");
         }
 
         ImGui.sameLine();
@@ -53,7 +53,7 @@ public class GameLobbyScene extends Scene{
     }
 
     public void display() throws IOException{
-        mainSceneOption();  
+        gameLobbyOption();  
         mainContainer();
     }
     
