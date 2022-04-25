@@ -1,13 +1,13 @@
-package com.ustudents.ghostlab.menu;
+package com.ustudents.ghostlab.scene;
 
 import com.ustudents.ghostlab.client.Client;
 
 import imgui.ImGui;
 import imgui.flag.ImGuiWindowFlags;
 
-public class MainScene extends Scene{
+public class GameLobbyScene extends Scene{
 
-    public MainScene(Client client){
+    public GameLobbyScene(Client client){
         super(client);
     }
 
@@ -19,9 +19,9 @@ public class MainScene extends Scene{
 
         if(ImGui.button("Create Game")){
             if(client.getUsername() == null){
-                client.setScene(SceneData.USERNAMECHOICE);
+                client.setScene(SceneData.SCENE_USERNAMECHOICE);
             }else{
-                client.setScene(SceneData.GAMELOBBY);
+                client.setScene(SceneData.SCENE_GAMELOBBY);
             }
         } 
 

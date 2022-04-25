@@ -1,4 +1,6 @@
-package com.ustudents.ghostlab.menu;
+package com.ustudents.ghostlab.scene;
+
+import java.io.IOException;
 
 import com.ustudents.ghostlab.client.Client;
 import com.ustudents.ghostlab.client.Utils;
@@ -16,7 +18,7 @@ public class UsernameChoiceScene extends Scene {
         super(client);
     }
 
-    public void usernameChoice(){
+    public void usernameChoice() throws IOException{
         ImGui.setNextWindowPos(0, 0);
         ImGui.setNextWindowSize(ImGui.getIO().getDisplaySizeX(), ImGui.getIO().getDisplaySizeY() * 0.6f);
         ImGui.begin("Ghostlab Client", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove |
@@ -28,31 +30,33 @@ public class UsernameChoiceScene extends Scene {
         ImGui.inputText("##UsernameChoice", client.getUsernameChoiceContent());
         ImGui.sameLine();
 
-        if (ImGui.button("Use it") || ImGui.isKeyPressed(GLFW.GLFW_KEY_ENTER)) {
+        if (ImGui.button("Use it")) {
 
             String username = client.getUsernameChoiceContent().get();
-
+            client.getUsernameChoiceContent().clear();
             if(Utils.answerIsCorrectInput(username, 0)){
                 client.setUsername(username);
-                client.addContentTologs("client:", "your username are : " + username);
-                client.setScene(SceneData.GAMELOBBY);
+                client.addContentTologs("client:", "your username are : " + username, 1);
+                //client.setScene(SceneData.GAMELOBBY);
+                client.SendRequest("NEWPL " + client.getUsername() + " " + client.getUdpPort() + "***");
             }else{
-                client.addContentTologs("client: warning:", username);
-                client.addContentTologs("client: warning:", "your username does'nt respect the format (8 characters)");
+                client.addContentTologs("client: warning:", username, 1);
+                client.addContentTologs("client: warning:",
+                 "your username does'nt respect the format (8 characters)", 1);
             }
-            
+
         }
 
         ImGui.sameLine();
 
         if (ImGui.button("Back") || ImGui.isKeyPressed(GLFW.GLFW_KEY_ESCAPE)) {
-            client.setScene(SceneData.MAIN);
+            client.setScene(SceneData.SCENE_MAIN);
         }
 
         ImGui.end();
     }
 
-    public void display(){
+    public void display() throws IOException{
         header();
         usernameChoice();
         footer();

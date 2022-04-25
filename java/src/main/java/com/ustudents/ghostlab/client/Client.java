@@ -1,20 +1,16 @@
 package com.ustudents.ghostlab.client;
 
 import com.ustudents.application.Application;
-import com.ustudents.application.graphic.ImGuiManager;
 import com.ustudents.application.window.WindowInfo;
 import com.ustudents.common.command.Command;
-import com.ustudents.ghostlab.menu.MainScene;
-import com.ustudents.ghostlab.menu.SceneData;
-import com.ustudents.ghostlab.menu.UsernameChoiceScene;
-import com.ustudents.ghostlab.runnable.TCPRunnable;
-import com.ustudents.ghostlab.runnable.UDPRunnable;
+import com.ustudents.ghostlab.communication.Sender;
+import com.ustudents.ghostlab.listener.TCPRunnable;
+import com.ustudents.ghostlab.listener.UDPRunnable;
+import com.ustudents.ghostlab.scene.GameLobbyScene;
+import com.ustudents.ghostlab.scene.MainScene;
+import com.ustudents.ghostlab.scene.SceneData;
+import com.ustudents.ghostlab.scene.UsernameChoiceScene;
 
-import org.lwjgl.glfw.GLFW;
-
-import imgui.*;
-import imgui.callback.ImListClipperCallback;
-import imgui.flag.ImGuiWindowFlags;
 import imgui.type.ImBoolean;
 import imgui.type.ImString;
 
@@ -31,6 +27,8 @@ public class Client extends Application {
     private final Socket socket;
     private final DatagramSocket datagramSocket;
     private final TCPRunnable tcpRunnable;
+    private final PrintWriter pw;
+    private String username;
     /*private final Thread tcpThread;
     private final Thread udpThread;*/
     //private String username;
@@ -46,17 +44,18 @@ public class Client extends Application {
     private int score;*/
 
     public Client(String ipv4, int tcpPort, String username, int udpPort) throws IOException {
-        addContentTologs("client:", "connection to server established.");
+        addContentTologs("client:", "connection to server established.",1);
         socket = new Socket(ipv4, tcpPort);
         datagramSocket = new DatagramSocket(udpPort);
-        tcpRunnable = new TCPRunnable(this, username);
+        tcpRunnable = new TCPRunnable(this);
         Thread tcpThread = new Thread(tcpRunnable);
         Thread udpThread = new Thread(new UDPRunnable(this, datagramSocket));
         tcpThread.start();
         udpThread.start();
-        addContentTologs("client:", "udp listener thread started.");
-        addContentTologs("client:", "tcp listener thread started.");
-        //this.username = username;
+        addContentTologs("client:", "udp listener thread started.",1);
+        addContentTologs("client:", "tcp listener thread started.",1);
+        this.pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
+        this.username = username;
         /*startedPos = new int[2];
         currentPos = new int[2];
         score = 0;*/
@@ -71,11 +70,15 @@ public class Client extends Application {
     }
 
     public String getUsername() {
-        return tcpRunnable.getUsername();
+        return username;
     }
 
     public void setUsername(String username) {
-        tcpRunnable.setUsername(username);
+        this.username = username;
+    }
+
+    public void SendRequest(String action) throws IOException{
+        Sender.send(pw, action);
     }
 
     /*public void setGameRegister(int gameRegister) {
@@ -171,13 +174,14 @@ public class Client extends Application {
     // -----------------------------------------------------------------------------------------------------------------
     private int currentScene;
     private final List<String> logs = new ArrayList<>();
-    private final List<String> archiveLogs = new ArrayList<>();
+    private final List<String> serverAnswers = new ArrayList<>();
 
     private ImBoolean consoleShowInfo = new ImBoolean(true);
     private ImBoolean consoleShowWarning = new ImBoolean(true);
     private ImBoolean consoleShowError = new ImBoolean(true);
     private ImString consoleCommand = new ImString();
     private ImString usernameChoiceContent = new ImString();
+    private int lastPressedButton = -1;
     
     public ImBoolean getConsoleShowInfo(){
         return consoleShowInfo;
@@ -199,14 +203,28 @@ public class Client extends Application {
         return usernameChoiceContent;
     }
 
+    public int getLastPressedButton(){
+        return lastPressedButton;
+    }
+
+    public void setLastPressedButton(int button){
+        lastPressedButton = button;
+    }
+
     public List<String> getLogs(){
         return logs;
     }
 
-    public void addContentTologs(String separator, String content){
+    public String getLastServerAnswer(){
+        return serverAnswers.get(serverAnswers.size() - 1);
+    }
+
+    public void addContentTologs(String separator, String content, int flag){
+        if(flag == 0){
+            serverAnswers.add(content);
+        }
         content = separator + " " + content;
         logs.add(content);
-        archiveLogs.add(content);
     }
     
     public void setScene(int scene){
@@ -214,28 +232,34 @@ public class Client extends Application {
     }
     
     public void helpcommand(){
-        addContentTologs("client:", "commands:");
-        addContentTologs("client:", "\tq, e, quit, exit   terminates the program.");
-        addContentTologs("client:", "\th, help            displays this help message.");
-        addContentTologs("client:", "\tv, version         display the program's version.");
+        addContentTologs("client:", "commands:", 1);
+        addContentTologs("client:", "\tq, e, quit, exit   terminates the program.", 1);
+        addContentTologs("client:", "\th, help            displays this help message.", 1);
+        addContentTologs("client:", "\tv, version         display the program's version.", 1);
 
     }
 
     @Override
     protected void initialize() {
-        addContentTologs("client:", "you can now enter commands.");
+        addContentTologs("client:", "you can now enter commands.",1);
         helpcommand();
     }
 
     @Override
     protected void renderImGui() {
-        if(currentScene == SceneData.MAIN){
-            new MainScene(this).display();
-        }else if(currentScene == SceneData.USERNAMECHOICE){
-            new UsernameChoiceScene(this).display();
-        }else if(currentScene == SceneData.GAMELOBBY){
-
+        try{
+            if(currentScene == SceneData.SCENE_MAIN){
+                new MainScene(this).display();
+            }else if(currentScene == SceneData.SCENE_USERNAMECHOICE){
+                new UsernameChoiceScene(this).display();
+            }else if(currentScene == SceneData.SCENE_GAMELOBBY){
+                new GameLobbyScene(this).display();
+            }
+            
+        }catch(IOException e){
+            e.printStackTrace();
         }
+        
     }
 
     @Override

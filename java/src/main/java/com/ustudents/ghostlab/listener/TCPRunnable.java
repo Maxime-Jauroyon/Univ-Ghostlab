@@ -1,4 +1,4 @@
-package com.ustudents.ghostlab.runnable;
+package com.ustudents.ghostlab.listener;
 
 import com.ustudents.ghostlab.client.Client;
 import com.ustudents.ghostlab.communication.Reader;
@@ -14,18 +14,18 @@ public class TCPRunnable implements Runnable{
 
     private final Client client;
     private final BufferedReader br;
-    private final PrintWriter pw;
-    private String username;
+    //private final PrintWriter pw;
+    //private String username;
 
 
-    public TCPRunnable(Client client, String username) throws IOException{
+    public TCPRunnable(Client client/*, String username*/) throws IOException{
         this.client = client;
         this.br = new BufferedReader(new InputStreamReader(client.getSocket().getInputStream()));
-        this.pw = new PrintWriter(new OutputStreamWriter(client.getSocket().getOutputStream()));
-        this.username = username;
+        //this.pw = new PrintWriter(new OutputStreamWriter(client.getSocket().getOutputStream()));
+        //this.username = username;
     }
 
-    public String getUsername(){
+    /*public String getUsername(){
         return username;
     }
 
@@ -33,11 +33,18 @@ public class TCPRunnable implements Runnable{
         this.username = username;
     }
 
+    public void send(String action) throws IOException{
+        Sender.send(pw, action);
+    }*/
+
     @Override
     public void run() {
         Reader reader = new Reader(client);
         try {
-            reader.read(br);
+            while(client.getSocket().isConnected()){
+                reader.read(br);
+            }
+            
         } catch (IOException e) {
             e.printStackTrace();
         }

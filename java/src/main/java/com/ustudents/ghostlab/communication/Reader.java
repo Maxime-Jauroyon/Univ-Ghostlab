@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 import com.ustudents.ghostlab.client.Client;
+import com.ustudents.ghostlab.scene.SceneData;
 
 public class Reader {
 
@@ -13,11 +14,18 @@ public class Reader {
         this.client = client;
     }
 
+    public void readThreeEndSeparator(BufferedReader br) throws IOException{
+        for(int i = 0; i < 3; i++){
+            br.read();
+        }
+    }
+
     private void readGAMES(BufferedReader br) throws IOException{
         int nbGame = br.read();
         nbGame = br.read();
+        readThreeEndSeparator(br);
         client.addContentTologs("client: received from server:" ,
-         "GAMES " + nbGame + "***");
+         "GAMES " + nbGame + "***", 0);
 
         for(int i = 0; i < nbGame; i++){
             read(br);
@@ -29,10 +37,30 @@ public class Reader {
         idGame = br.read();
         int nbPlayer = br.read();
         idGame = br.read();
+        readThreeEndSeparator(br);
         client.addContentTologs("client: received from server:",
-         "OGAME " + idGame + " " + nbPlayer + "***");
+         "OGAME " + idGame + " " + nbPlayer + "***", 0);
     
-    }   
+    }
+    
+    private void readREGOK(BufferedReader br) throws IOException{
+        int idGame = br.read();
+        idGame = br.read();
+        readThreeEndSeparator(br);
+        client.addContentTologs("client: received from server:",
+         "REGOK " + idGame + "***", 0);
+        client.setScene(SceneData.SCENE_GAMELOBBY);
+        
+    }
+    
+    private void readREGNO(BufferedReader br) throws IOException{
+        readThreeEndSeparator(br);
+        client.addContentTologs("client: warning: received from server:",
+         "REGNO***", 0);
+        client.setUsername(null);
+        client.setScene(SceneData.SCENE_MAIN);
+        
+    } 
 
     public void read(BufferedReader br) throws IOException {
         String read = "";
@@ -40,16 +68,16 @@ public class Reader {
             read += (char) br.read();
         }
         
-        client.addContentTologs("$", read);
+        client.addContentTologs("$", read, 1);
 
         if(read.equals("GAMES")){
             readGAMES(br);
         }else if(read.equals("OGAME")){
             readOGAMES(br);
         }else if(read.equals("REGOK")){
-
+            readREGOK(br);
         }else if(read.equals("REGNO")){
-
+            readREGNO(br);
         }else if(read.equals("UNROK")){
 
         }else if(read.equals("DUNNO")){
@@ -72,8 +100,8 @@ public class Reader {
             
         }else if(read.equals("SEND!")){
             
-        }else{
-            client.addContentTologs("client: error:", "unknow message");
+        }else if(read.length() > 0){
+            client.addContentTologs("client: error:", "unknow message", 1);
         }
     }
 }

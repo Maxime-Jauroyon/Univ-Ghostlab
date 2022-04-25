@@ -1,4 +1,4 @@
-package com.ustudents.ghostlab.menu;
+package com.ustudents.ghostlab.scene;
 
 import com.ustudents.application.graphic.ImGuiManager;
 import com.ustudents.ghostlab.client.Client;
@@ -93,19 +93,19 @@ public abstract class Scene {
             // TODO: Execute command
             
             String command = client.getConsoleCommand().get();
-            client.addContentTologs("$", command);
+            client.addContentTologs("$", command, 1);
+            client.getConsoleCommand().clear();
             if(command.equals("q") || command.equals("e") ||
                command.equals("quit") || command.equals("exit")){
                 exit(0);
             }else if(command.equals("h") || command.equals("help")){
                 client.helpcommand();
             }else if(command.equals("v") || command.equals("version")){
-                client.addContentTologs("client:", "version : 1.0.0");
+                client.addContentTologs("client:", "version : 1.0.0", 1);
             }else{
-                client.addContentTologs("client: warning:", "invalid option `" + command + "`!");
-                client.addContentTologs("client: warning:", "use `h` for more informations.");
+                client.addContentTologs("client: warning:", "invalid option `" + command + "`!", 1);
+                client.addContentTologs("client: warning:", "use `h` for more informations.", 1);
             }
-            client.getConsoleCommand().clear();
         }
 
         ImGui.beginChild("##Logs", 0, 0, true, ImGuiWindowFlags.HorizontalScrollbar);
