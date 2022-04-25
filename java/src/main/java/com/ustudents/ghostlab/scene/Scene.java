@@ -19,7 +19,7 @@ public abstract class Scene {
         this.client = client;
     }
 
-    protected void header(){
+    protected void mainContainer(){
         ImGui.setNextWindowPos(0, 0);
         ImGui.setNextWindowSize(ImGui.getIO().getDisplaySizeX(), ImGui.getIO().getDisplaySizeY() * 0.6f);
         ImGui.begin("Ghostlab Client", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.MenuBar);
@@ -29,38 +29,12 @@ public abstract class Scene {
                 if (ImGui.menuItem("Quit")) {
                     client.quit();
                 }
-
                 ImGui.endMenu();
             }
-
             ImGui.endMenuBar();
         }
 
         ImGui.end();
-    }
-
-    protected void footer(){
-        ImGui.setNextWindowPos(0, 0);
-        ImGui.setNextWindowSize(ImGui.getIO().getDisplaySizeX(), ImGui.getIO().getDisplaySizeY() * 0.6f);
-        ImGui.begin("Ghostlab Client", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.MenuBar);
-
-        if (ImGui.beginMenuBar()) {
-            if (ImGui.beginMenu("File")) {
-                if (ImGui.menuItem("Quit")) {
-                    client.quit();
-                }
-
-                ImGui.endMenu();
-            }
-
-            ImGui.endMenuBar();
-        }
-
-
-
-        ImGui.end();
-
-        
 
         ImGui.setNextWindowPos(0, ImGui.getIO().getDisplaySizeY() * 0.6f);
         ImGui.setNextWindowSize(ImGui.getIO().getDisplaySizeX(), ImGui.getIO().getDisplaySizeY() * 0.4f);
@@ -90,8 +64,6 @@ public abstract class Scene {
         ImGui.sameLine();
 
         if ((ImGui.button("Send")) || ImGui.isKeyPressed(GLFW.GLFW_KEY_ENTER)) {
-            // TODO: Execute command
-            
             String command = client.getConsoleCommand().get();
             client.addContentTologs("$", command, 1);
             client.getConsoleCommand().clear();
@@ -125,18 +97,16 @@ public abstract class Scene {
             }
         });
 
-        // TODO: Scroll quand tu rajoute un element dans logs
-        //if (consoleShouldScroll) {
-        //    ImGui.setScrollHereX(1.0f);
-        //    ImGui.setScrollHereY(1.0f);
-        //}
+        //TODO: Scroll quand tu rajoute un element dans logs
+        /*if (client.consoleShouldScroll) {
+           ImGui.setScrollHereX(1.0f);
+            ImGui.setScrollHereY(1.0f);
+        }*/
 
         ImGui.popFont();
         ImGui.endChild();
-
         ImGui.end();
 
-        //ImGui.showDemoWindow();;
     }
     
 }

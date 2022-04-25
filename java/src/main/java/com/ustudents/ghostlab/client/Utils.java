@@ -44,14 +44,16 @@ public class Utils {
     }*/
 
     public static boolean answerIsCorrectInput(String answer, int flag){
-        if((flag == 0 && answer.length() != 8) || (flag == 1 && (answer.length() > 3 || answer.length() < 1))
-                || (flag == 2 && (answer.length() > 5 || answer.length() < 1)))
+        if((flag == 0 && answer.length() != 8) || (flag == 1 && (answer.length() > 3 || answer.length() < 1) 
+            && (Integer.parseInt(answer) > 255 || Integer.parseInt(answer) < 0)) 
+            || (flag == 2 && (answer.length() > 5 || answer.length() < 1)))
             return false;
 
         for(char c: answer.toCharArray()){
             if((flag == 0 && (c < 33 || c > 126)) || (flag == 1 && (c < 48 || c > 57)))
                 return false;
         }
+
         return true;
     }
 
@@ -112,6 +114,10 @@ public class Utils {
             read += String.valueOf(br.read());
         }
         return read;
+    }
+
+    public static char tranformdigitTochar(String string){
+        return (char) Integer.parseInt(string);
     }
 
     private static boolean checkServerIp(String[] args){

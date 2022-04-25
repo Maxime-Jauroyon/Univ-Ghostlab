@@ -25,17 +25,22 @@ public class MainScene extends Scene{
                 client.setScene(SceneData.SCENE_USERNAMECHOICE);
             }else{
                 client.SendRequest("NEWPL " + client.getUsername() + " " + client.getUdpPort() + "***");
-                //client.setScene(SceneData.SCENE_GAMELOBBY);
             }
-        } 
+        }
+        
+        ImGui.sameLine();
+        
+        if(ImGui.button("Join Game")){
+            client.setLastPressedButton(SceneData.BUTTON_JOINGAME);
+            client.setScene(SceneData.SCENE_USERNAMECHOICE);
+        }
 
         ImGui.end();
     }
 
-    public void display() throws IOException{
-        header(); 
+    public void display() throws IOException{ 
         mainSceneOption();  
-        footer();
+        mainContainer();
     }
     
 }

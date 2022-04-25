@@ -55,12 +55,25 @@ public class Reader {
     
     private void readREGNO(BufferedReader br) throws IOException{
         readThreeEndSeparator(br);
-        client.addContentTologs("client: warning: received from server:",
+        client.addContentTologs("client: error: received from server:",
          "REGNO***", 0);
         client.setUsername(null);
         client.setScene(SceneData.SCENE_MAIN);
         
+    }
+    
+    private void readUNROK(BufferedReader br) throws IOException{
+        int idGame = br.read();
+        idGame = br.read();
+        readThreeEndSeparator(br);
+        client.addContentTologs("client: received from server:",
+         "UNROK " + idGame + "***", 0);
+        client.setGameRegister("-1"); 
+        client.setScene(SceneData.SCENE_MAIN);
+        
     } 
+
+    
 
     public void read(BufferedReader br) throws IOException {
         String read = "";
@@ -79,7 +92,7 @@ public class Reader {
         }else if(read.equals("REGNO")){
             readREGNO(br);
         }else if(read.equals("UNROK")){
-
+            readUNROK(br);
         }else if(read.equals("DUNNO")){
             
         }else if(read.equals("SIZE!")){

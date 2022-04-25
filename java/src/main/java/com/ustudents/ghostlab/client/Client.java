@@ -29,6 +29,7 @@ public class Client extends Application {
     private final TCPRunnable tcpRunnable;
     private final PrintWriter pw;
     private String username;
+    private String gameRegistered;
     /*private final Thread tcpThread;
     private final Thread udpThread;*/
     //private String username;
@@ -56,6 +57,7 @@ public class Client extends Application {
         addContentTologs("client:", "tcp listener thread started.",1);
         this.pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
         this.username = username;
+        gameRegistered = "-1";
         /*startedPos = new int[2];
         currentPos = new int[2];
         score = 0;*/
@@ -81,11 +83,15 @@ public class Client extends Application {
         Sender.send(pw, action);
     }
 
-    /*public void setGameRegister(int gameRegister) {
+    public String getGameRegister(){
+        return gameRegistered;
+    }
+
+    public void setGameRegister(String gameRegister) {
         this.gameRegistered = gameRegister;
     }
 
-    public void setHeigthMaze(int heigthMaze) {
+    /*public void setHeigthMaze(int heigthMaze) {
         this.heigthMaze = heigthMaze;
     }
 
@@ -181,6 +187,7 @@ public class Client extends Application {
     private ImBoolean consoleShowError = new ImBoolean(true);
     private ImString consoleCommand = new ImString();
     private ImString usernameChoiceContent = new ImString();
+    private ImString gameChoiceContent = new ImString();
     private int lastPressedButton = -1;
     
     public ImBoolean getConsoleShowInfo(){
@@ -201,6 +208,10 @@ public class Client extends Application {
 
     public ImString getUsernameChoiceContent(){
         return usernameChoiceContent;
+    }
+
+    public ImString getGameChoiceContent(){
+        return gameChoiceContent;
     }
 
     public int getLastPressedButton(){
