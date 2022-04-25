@@ -27,7 +27,21 @@ public class GameLobbyScene extends Scene{
         
         if(ImGui.button("Unregister")){
             client.SendRequest("UNREG***");
-        } 
+        }
+
+        ImGui.sameLine();
+        
+        if(ImGui.button("Maze info")){
+            client.setLastPressedButton(SceneData.BUTTON_MAZEINFO);
+            client.setCurrentScene(SceneData.SCENE_USERNAMECHOICE);
+        }
+
+        ImGui.sameLine();
+
+        if(ImGui.button("List player")){
+            client.setLastPressedButton(SceneData.BUTTON_LISTPLAYER);
+            client.setCurrentScene(SceneData.SCENE_USERNAMECHOICE);
+        }
 
         ImGui.sameLine();
 

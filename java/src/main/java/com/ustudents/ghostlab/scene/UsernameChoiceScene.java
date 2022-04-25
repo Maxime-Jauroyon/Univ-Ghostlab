@@ -45,7 +45,7 @@ public class UsernameChoiceScene extends Scene {
 
         if (ImGui.button("Back") || ImGui.isKeyPressed(GLFW.GLFW_KEY_ESCAPE)) {
             client.getUsernameChoiceContent().clear();
-            client.setScene(SceneData.SCENE_MAIN);
+            client.backToPreviousScene();
         }
     }
 
@@ -66,12 +66,13 @@ public class UsernameChoiceScene extends Scene {
             String gameId = client.getGameChoiceContent().get();
             username = (client.getUsername() == null)? username: client.getUsername();
             client.getUsernameChoiceContent().clear();
+            client.getGameChoiceContent().clear();
             if(Utils.answerIsCorrectInput(username, 0)){
                 client.setUsername(username);
                 client.addContentTologs("client:", "your username are : " + username, 1);
                 if(gameId.length() > 0 && Utils.answerIsCorrectInput(gameId, 1)){
                     client.setGameRegister(gameId);
-                    client.addContentTologs("client:", "choose game : " + gameId, 1);
+                    client.addContentTologs("client:", "choosed game : " + gameId, 1);
                     client.SendRequest("REGIS " + username + " " + client.getUdpPort()
                      + " " + Utils.tranformdigitTochar(gameId) + "***");
                 }else{
@@ -93,7 +94,39 @@ public class UsernameChoiceScene extends Scene {
         if (ImGui.button("Back") || ImGui.isKeyPressed(GLFW.GLFW_KEY_ESCAPE)) {
             client.getUsernameChoiceContent().clear();
             client.getGameChoiceContent().clear();
-            client.setScene(SceneData.SCENE_MAIN);
+            client.backToPreviousScene();
+        }
+    }
+
+    private void specificGameInfoSection(int flag) throws IOException{
+        ImGui.text("Enter a game id:");
+        ImGui.sameLine();
+        ImGui.inputText("##GameChoice", client.getGameChoiceContent());
+
+        if (ImGui.button("Use it")) {
+            String gameId = client.getGameChoiceContent().get();
+            client.getGameChoiceContent().clear();
+            if(gameId.length() > 0 && Utils.answerIsCorrectInput(gameId, 1)){
+                client.setGameRegister(gameId);
+                client.addContentTologs("client:", "choosed game : " + gameId, 1);
+                if(flag == 0){
+                    client.SendRequest("SIZE? " + Utils.tranformdigitTochar(gameId) + "***");
+                }else{
+                    client.SendRequest("LIST? " + Utils.tranformdigitTochar(gameId) + "***");
+                }
+            }else{
+                client.addContentTologs("client: warning:", gameId, 1);
+                client.addContentTologs("client: warning:",
+             "your game choice does'nt respect the format (between 0 to 255)", 1);
+            }
+        }
+
+        ImGui.sameLine();
+
+        if (ImGui.button("Back") || ImGui.isKeyPressed(GLFW.GLFW_KEY_ESCAPE)) {
+            client.getUsernameChoiceContent().clear();
+            client.getGameChoiceContent().clear();
+            client.backToPreviousScene();
         }
     }
 
@@ -107,6 +140,10 @@ public class UsernameChoiceScene extends Scene {
             createGameSection();
         }else if(client.getLastPressedButton() == SceneData.BUTTON_JOINGAME){
             joinGameSection();
+        }else if(client.getLastPressedButton() == SceneData.BUTTON_MAZEINFO){
+            specificGameInfoSection(0);
+        }else if(client.getLastPressedButton() == SceneData.BUTTON_LISTPLAYER){
+            specificGameInfoSection(1);
         }
         ImGui.end();
     }

@@ -8,4 +8,6 @@ public class SceneData {
 
     public static final int BUTTON_CREATEGAME = 0;
     public static final int BUTTON_JOINGAME = 1;
+    public static final int BUTTON_MAZEINFO = 2;
+    public static final int BUTTON_LISTPLAYER = 3;
 }

@@ -178,7 +178,7 @@ public class Client extends Application {
     }*/
 
     // -----------------------------------------------------------------------------------------------------------------
-    private int currentScene;
+    private List<Integer> scene = new ArrayList<>();
     private final List<String> logs = new ArrayList<>();
     private final List<String> serverAnswers = new ArrayList<>();
 
@@ -237,9 +237,17 @@ public class Client extends Application {
         content = separator + " " + content;
         logs.add(content);
     }
+
+    public void backToPreviousScene(){
+        scene.remove(scene.size()-1);
+    }
+
+    public int getCurrentScene(){
+        return scene.get(scene.size()-1);
+    }
     
-    public void setScene(int scene){
-        currentScene = scene;
+    public void setCurrentScene(int scene){
+        this.scene.add(scene);
     }
     
     public void helpcommand(){
@@ -254,16 +262,17 @@ public class Client extends Application {
     protected void initialize() {
         addContentTologs("client:", "you can now enter commands.",1);
         helpcommand();
+        scene.add(SceneData.SCENE_MAIN);
     }
 
     @Override
     protected void renderImGui() {
         try{
-            if(currentScene == SceneData.SCENE_MAIN){
+            if(getCurrentScene() == SceneData.SCENE_MAIN){
                 new MainScene(this).display();
-            }else if(currentScene == SceneData.SCENE_USERNAMECHOICE){
+            }else if(getCurrentScene() == SceneData.SCENE_USERNAMECHOICE){
                 new UsernameChoiceScene(this).display();
-            }else if(currentScene == SceneData.SCENE_GAMELOBBY){
+            }else if(getCurrentScene() == SceneData.SCENE_GAMELOBBY){
                 new GameLobbyScene(this).display();
             }
             
