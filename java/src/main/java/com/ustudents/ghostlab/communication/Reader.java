@@ -35,8 +35,9 @@ public class Reader {
     private void readOGAMES(BufferedReader br) throws IOException{
         int idGame = br.read();
         idGame = br.read();
-        int nbPlayer = br.read();
         idGame = br.read();
+        int nbPlayer = br.read();
+        nbPlayer = br.read();
         readThreeEndSeparator(br);
         client.addContentTologs("client: received from server:",
          "OGAME " + idGame + " " + nbPlayer + "***", 0);

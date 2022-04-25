@@ -27,6 +27,12 @@ public class GameLobbyScene extends Scene{
         
         if(ImGui.button("Unregister")){
             client.SendRequest("UNREG***");
+        } 
+
+        ImGui.sameLine();
+
+        if(ImGui.button("Game Info")){
+            client.SendRequest("GAME?***");
         }
 
         ImGui.end();

@@ -35,6 +35,12 @@ public class MainScene extends Scene{
             client.setScene(SceneData.SCENE_USERNAMECHOICE);
         }
 
+        ImGui.sameLine();
+
+        if(ImGui.button("Game Info")){
+            client.SendRequest("GAME?***");
+        }
+
         ImGui.end();
     }
 
