@@ -26,13 +26,16 @@ import static java.lang.System.exit;
 @Command(name = "client", version = "1.0.0", description = "ghostlab is an online matchmaking based game where you take upon yourself to become the best ghost hunter!")
 @WindowInfo(title = "Ghostlab Client", width = 1280, height = 720)
 public class Client extends Application {
-    private final Socket socket;
-    private final DatagramSocket datagramSocket;
-    private final TCPRunnable tcpRunnable;
-    private final PrintWriter pw;
+    private Socket socket;
+    private DatagramSocket datagramSocket;
+    private TCPRunnable tcpRunnable;
+    private PrintWriter pw;
+    private String ipv4_addr;
+    private int tcpPort;
     private String username;
+    private int udpPort;
     private String gameRegistered;
-    private final GameModel gameModel;
+    private GameModel gameModel;
     /*private int mazeHeight;
     private int mazeWidth;
     private int[][] playerWay;*/
@@ -50,7 +53,7 @@ public class Client extends Application {
     private int[] currentPos;
     private int score;*/
 
-    public Client(String ipv4, int tcpPort, String username, int udpPort) throws IOException {
+    /*public Client(String ipv4, int tcpPort, String username, int udpPort) throws IOException {
         addContentTologs("client:", "connection to server established.",1);
         socket = new Socket(ipv4, tcpPort);
         datagramSocket = new DatagramSocket(udpPort);
@@ -65,10 +68,30 @@ public class Client extends Application {
         this.username = username;
         gameRegistered = "-1";
         gameModel = new GameModel();
-        /*startedPos = new int[2];
-        currentPos = new int[2];
-        score = 0;*/
+    }*/
+
+    public void launch(int flag) throws IOException {
+        addContentTologs("client:", "connection to server established.",1);
+        socket = new Socket(ipv4_addr, tcpPort);
+        if(flag == 0){
+            datagramSocket = new DatagramSocket(udpPort);
+        }
+        tcpRunnable = new TCPRunnable(this);
+        Thread tcpThread = new Thread(tcpRunnable);
+        Thread udpThread = new Thread(new UDPRunnable(this, datagramSocket));
+        tcpThread.start();
+        udpThread.start();
+        addContentTologs("client:", "udp listener thread started.",1);
+        addContentTologs("client:", "tcp listener thread started.",1);
+        this.pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
+        gameRegistered = "-1";
+        gameModel = new GameModel();
     }
+
+    /*public void close(BufferedReader br) throws IOException{
+        datagramSocket.close();
+        datagramSocket = new DatagramSocket(udpPort);
+    }*/
 
     public Socket getSocket() {
         return socket;
@@ -86,19 +109,23 @@ public class Client extends Application {
         return gameModel;
     }
 
-    /*public char[][] getMaze(){
-        return gameModel.getMaze();
-    }*/
+    public void setIPv4Addr(String ipv4_addr) {
+        this.ipv4_addr = ipv4_addr;
+    }
+
+    public void settcpPort(int tcpPort) {
+        this.tcpPort = tcpPort;
+    }
 
     public void setUsername(String username) {
         this.username = username;
     }
 
-    /*public void setMaze(int height, int width){
-        gameModel.setMaze(height, width);
-    }*/
+    public void setudpPort(int udpPort) {
+        this.udpPort = udpPort;
+    }
 
-    public void SendRequest(String action) throws IOException{
+    public void sendRequest(String action) throws IOException{
         Sender.send(pw, action);
     }
 
@@ -110,27 +137,8 @@ public class Client extends Application {
         this.gameRegistered = gameRegister;
     }
 
-    /*public void setScore(int score){
-        gameModel.setScore(score);
-    }
 
-    public void setWantedPos(int toward, int value){
-        gameModel.setWantedPos(toward, value);
-    }
-
-    public void updateMaze(int[] newPos){
-        gameModel.updateMaze(newPos);
-    }*/
-
-    /*public void setHeigthMaze(int heigthMaze) {
-        this.heigthMaze = heigthMaze;
-    }
-
-    public void setWidthMaze(int widthMaze) {
-        this.widthMaze = widthMaze;
-    }
-
-    public void setNumberOfghost(int numberOfghost) {
+    /*public void setNumberOfghost(int numberOfghost) {
         this.numberOfghost = numberOfghost;
     }
 

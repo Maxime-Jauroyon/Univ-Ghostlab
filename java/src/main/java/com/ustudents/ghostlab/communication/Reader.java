@@ -4,15 +4,19 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 import com.ustudents.ghostlab.client.Client;
+import com.ustudents.ghostlab.listener.TCPRunnable;
 import com.ustudents.ghostlab.other.Utils;
 import com.ustudents.ghostlab.scene.SceneData;
+import static java.lang.System.exit;
 
 public class Reader {
 
     private final Client client;
+    private final TCPRunnable tcpRunnable;
 
-    public Reader(Client client){
+    public Reader(Client client, TCPRunnable tcpRunnable){
         this.client = client;
+        this.tcpRunnable = tcpRunnable;
     }
 
     public void readThreeEndSeparator(BufferedReader br) throws IOException{
@@ -152,6 +156,16 @@ public class Reader {
 
     }
 
+    private void readGOBYE(BufferedReader br) throws IOException{
+        readThreeEndSeparator(br);
+        client.addContentTologs("client: received from server:",
+            "GOBYE***", 0);
+        client.getSocket().close();
+        client.launch(1);
+        client.setCurrentScene(SceneData.SCENE_MAIN);
+        tcpRunnable.wantExit();
+    }    
+
     public void read(BufferedReader br) throws IOException {
         String read = "";
         for(int i = 0; i < 5; i++){
@@ -187,7 +201,7 @@ public class Reader {
         }else if(read.equals("MOVEF")){
             readMOVE(br, 1);
         }else if(read.equals("GOBYE")){
-            client.quit();
+            readGOBYE(br);
         }else if(read.equals("GLIS")){
             
         }else if(read.equals("MALL!")){

@@ -62,7 +62,13 @@ public class Main {
                 }
             }
 
-            Client c = new Client(ipv4Addr, tcpPort, username, udpPort);
+            //Client c = new Client(ipv4Addr, tcpPort, username, udpPort);
+            Client c = new Client();
+            c.setIPv4Addr(ipv4Addr);
+            c.settcpPort(tcpPort);
+            c.setUsername(username);
+            c.setudpPort(udpPort);
+            c.launch(0);
             c.run(args);
 
         }catch (Exception e){

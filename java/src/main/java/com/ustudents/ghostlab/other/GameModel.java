@@ -19,20 +19,20 @@ public class GameModel {
     public static final int TOWARD_RIGHT = 3;
     
     
-    private int mazeHeight;
-    private int mazeWidth;
+    /*private int mazeHeight;
+    private int mazeWidth;*/
     private int playerScore;
     private int[] wantedPos;
     private final List<int[]> pos = new ArrayList<>();
     private char[][] maze;
     
-    public int getMazeHeight(){
+    /*public int getMazeHeight(){
         return mazeHeight;
     }
 
     public int getMazeWidth(){
         return mazeWidth;
-    }
+    }*/
 
     public int[] getLastPos(){
         return pos.get(pos.size() - 1);
@@ -42,13 +42,13 @@ public class GameModel {
         return maze;
     }
 
-    public void setMazeHeight(int mazeHeight){
+    /*public void setMazeHeight(int mazeHeight){
         this.mazeHeight = mazeHeight;
     }
 
     public void setMazeWidth(int mazeWidth){
         this.mazeWidth = mazeWidth;
-    }
+    }*/
 
     public void setScore(int score){
         this.playerScore = score;
@@ -73,6 +73,7 @@ public class GameModel {
     }
 
     public void setMaze(int height, int width){
+        pos.clear();
         maze = new char[height][width];
         for(int i = 0; i < maze.length; i++){
             for(int j = 0; j < maze[i].length; j++){

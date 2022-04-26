@@ -55,6 +55,12 @@ public class InGameScene extends Scene{
             
         }
 
+        ImGui.sameLine();
+
+        if(ImGui.button("Quit Game")){
+            client.sendRequest("IQUIT***");
+        }
+
         ImGui.end();
     
     }    

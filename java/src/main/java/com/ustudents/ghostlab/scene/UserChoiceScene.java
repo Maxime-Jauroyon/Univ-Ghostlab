@@ -33,7 +33,7 @@ public class UserChoiceScene extends Scene {
                 client.setUsername(username);
                 client.addContentTologs("client:", "your username are : " + username, 1);
                 //client.setScene(SceneData.GAMELOBBY);
-                client.SendRequest("NEWPL " + username + " " + client.getUdpPort() + "***");
+                client.sendRequest("NEWPL " + username + " " + client.getUdpPort() + "***");
             }else{
                 client.addContentTologs("client: warning:", username, 1);
                 client.addContentTologs("client: warning:",
@@ -74,7 +74,7 @@ public class UserChoiceScene extends Scene {
                 if(gameId.length() > 0 && Utils.answerIsCorrectInput(gameId, 1)){
                     client.setGameRegister(gameId);
                     client.addContentTologs("client:", "choosed game : " + gameId, 1);
-                    client.SendRequest("REGIS " + username + " " + client.getUdpPort()
+                    client.sendRequest("REGIS " + username + " " + client.getUdpPort()
                      + " " + Utils.tranformdigitTochar(gameId) + "***");
                 }else{
                     client.addContentTologs("client: warning:", gameId, 1);
@@ -111,9 +111,9 @@ public class UserChoiceScene extends Scene {
                 client.setGameRegister(gameId);
                 client.addContentTologs("client:", "choosed game : " + gameId, 1);
                 if(flag == 0){
-                    client.SendRequest("SIZE? " + Utils.tranformdigitTochar(gameId) + "***");
+                    client.sendRequest("SIZE? " + Utils.tranformdigitTochar(gameId) + "***");
                 }else{
-                    client.SendRequest("LIST? " + Utils.tranformdigitTochar(gameId) + "***");
+                    client.sendRequest("LIST? " + Utils.tranformdigitTochar(gameId) + "***");
                 }
             }else{
                 client.addContentTologs("client: warning:", gameId, 1);
@@ -143,28 +143,28 @@ public class UserChoiceScene extends Scene {
         if (ImGui.button("Up") && Utils.answerIsCorrectInput(mazeMoveChoice, 1)) {
             client.addContentTologs("client:", mazeMoveChoice, 1);
             client.getGameModel().setWantedPos(GameModel.TOWARD_UP, Integer.parseInt(mazeMoveChoice));
-            client.SendRequest("UPMOV " + mazeMoveChoice + "***");
+            client.sendRequest("UPMOV " + mazeMoveChoice + "***");
         }
 
         ImGui.sameLine();
 
         if (ImGui.button("Down") && Utils.answerIsCorrectInput(mazeMoveChoice, 1)) {
             client.getGameModel().setWantedPos(GameModel.TOWARD_DOWN, Integer.parseInt(mazeMoveChoice));
-            client.SendRequest("DOMOV " + mazeMoveChoice + "***");
+            client.sendRequest("DOMOV " + mazeMoveChoice + "***");
         }
 
         ImGui.sameLine();
 
         if (ImGui.button("Left") && Utils.answerIsCorrectInput(mazeMoveChoice, 1)) {
             client.getGameModel().setWantedPos(GameModel.TOWARD_LEFT, Integer.parseInt(mazeMoveChoice));
-            client.SendRequest("LEMOV " + mazeMoveChoice + "***");
+            client.sendRequest("LEMOV " + mazeMoveChoice + "***");
         }
 
         ImGui.sameLine();
 
         if (ImGui.button("Right") && Utils.answerIsCorrectInput(mazeMoveChoice, 1)) {
             client.getGameModel().setWantedPos(GameModel.TOWARD_RIGHT, Integer.parseInt(mazeMoveChoice));
-            client.SendRequest("RIMOV " + mazeMoveChoice + "***");
+            client.sendRequest("RIMOV " + mazeMoveChoice + "***");
         }
 
         ImGui.sameLine();

@@ -14,6 +14,7 @@ public class TCPRunnable implements Runnable{
 
     private final Client client;
     private final BufferedReader br;
+    private volatile boolean exit;
     //private final PrintWriter pw;
     //private String username;
 
@@ -21,8 +22,13 @@ public class TCPRunnable implements Runnable{
     public TCPRunnable(Client client/*, String username*/) throws IOException{
         this.client = client;
         this.br = new BufferedReader(new InputStreamReader(client.getSocket().getInputStream()));
+        exit = false;
         //this.pw = new PrintWriter(new OutputStreamWriter(client.getSocket().getOutputStream()));
         //this.username = username;
+    }
+
+    public void wantExit(){
+        this.exit = true;
     }
 
     /*public String getUsername(){
@@ -39,13 +45,14 @@ public class TCPRunnable implements Runnable{
 
     @Override
     public void run() {
-        Reader reader = new Reader(client);
+        Reader reader = new Reader(client, this);
         try {
-            while(client.getSocket().isConnected()){
+            while(!exit && !client.getSocket().isClosed()){
                 reader.read(br);
             }
             
         } catch (IOException e) {
+            client.addContentTologs("warning:", "Exception", 1);
             e.printStackTrace();
         }
 

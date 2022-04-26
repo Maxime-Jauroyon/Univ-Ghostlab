@@ -185,7 +185,7 @@ static gl_message_definition_t g_message_game = {
 };
 
 static gl_message_definition_t g_message_ogame = {
-    .identifier = "OGAMES",
+    .identifier = "OGAME",
     .protocol = GL_MESSAGE_PROTOCOL_TCP,
     .function = 0,
     .hide_when_received = false,

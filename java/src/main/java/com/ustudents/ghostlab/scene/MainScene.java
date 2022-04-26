@@ -24,7 +24,7 @@ public class MainScene extends Scene{
             if(client.getUsername() == null){
                 client.setCurrentScene(SceneData.SCENE_USERCHOICE);
             }else{
-                client.SendRequest("NEWPL " + client.getUsername() + " " + client.getUdpPort() + "***");
+                client.sendRequest("NEWPL " + client.getUsername() + " " + client.getUdpPort() + "***");
             }
         }
         
@@ -52,7 +52,7 @@ public class MainScene extends Scene{
         ImGui.sameLine();
 
         if(ImGui.button("Game Info")){
-            client.SendRequest("GAME?***");
+            client.sendRequest("GAME?***");
         }
 
         ImGui.end();
