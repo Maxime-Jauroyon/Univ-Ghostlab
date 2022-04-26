@@ -33,14 +33,14 @@ public class GameLobbyScene extends Scene{
         
         if(ImGui.button("Maze info")){
             client.setLastPressedButton(SceneData.BUTTON_MAZEINFO);
-            client.setCurrentScene(SceneData.SCENE_USERNAMECHOICE);
+            client.setCurrentScene(SceneData.SCENE_USERCHOICE);
         }
 
         ImGui.sameLine();
 
         if(ImGui.button("List player")){
             client.setLastPressedButton(SceneData.BUTTON_LISTPLAYER);
-            client.setCurrentScene(SceneData.SCENE_USERNAMECHOICE);
+            client.setCurrentScene(SceneData.SCENE_USERCHOICE);
         }
 
         ImGui.sameLine();

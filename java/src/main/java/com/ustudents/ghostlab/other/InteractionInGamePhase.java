@@ -1,3 +1,4 @@
+package com.ustudents.ghostlab.other;
 /*package com.ustudents.ghostlab.interaction;
 
 import com.ustudents.ghostlab.client.Client;

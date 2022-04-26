@@ -1,12 +1,12 @@
 package com.ustudents.ghostlab.listener;
 
-import com.ustudents.ghostlab.client.Utils;
-
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.Socket;
+
+import com.ustudents.ghostlab.other.Utils;
 
 public class UDPMulticastRunnable implements Runnable{
 

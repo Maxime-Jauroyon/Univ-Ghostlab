@@ -18,9 +18,23 @@ public class InGameScene extends Scene{
         ImGui.setNextWindowSize(ImGui.getIO().getDisplaySizeX(), ImGui.getIO().getDisplaySizeY() * 0.6f);
         ImGui.begin("Ghostlab Client", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.MenuBar);
 
+        char[][] maze = client.getGameModel().getMaze();
+        for(int i = 0; i < maze.length; i++){
+            for(int j = 0; j < maze[i].length; j++){
+                ImGui.text(" ");
+                ImGui.sameLine();
+                ImGui.text(String.valueOf(maze[i][j]));
+                ImGui.sameLine();
+                ImGui.text(" ");
+                if(j != maze[i].length-1){
+                    ImGui.sameLine();
+                }
+            }
+        }
 
         if(ImGui.button("Move")){
-            
+            client.setLastPressedButton(SceneData.BUTTON_MAZEMOVE);
+            client.setCurrentScene(SceneData.SCENE_USERCHOICE);
         }
 
         ImGui.sameLine();
@@ -46,6 +60,8 @@ public class InGameScene extends Scene{
     }    
 
     public void display() throws IOException{ 
+        inGameOption();
         mainContainer();
+        
     }
 }

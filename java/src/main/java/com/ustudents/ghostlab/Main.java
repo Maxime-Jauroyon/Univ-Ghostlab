@@ -1,7 +1,7 @@
 package com.ustudents.ghostlab;
 
 import com.ustudents.ghostlab.client.Client;
-import com.ustudents.ghostlab.client.Utils;
+import com.ustudents.ghostlab.other.Utils;
 
 import static java.lang.System.exit;
 

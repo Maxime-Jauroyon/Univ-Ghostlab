@@ -22,7 +22,7 @@ public class MainScene extends Scene{
         if(ImGui.button("Create Game")){
             client.setLastPressedButton(SceneData.BUTTON_CREATEGAME);
             if(client.getUsername() == null){
-                client.setCurrentScene(SceneData.SCENE_USERNAMECHOICE);
+                client.setCurrentScene(SceneData.SCENE_USERCHOICE);
             }else{
                 client.SendRequest("NEWPL " + client.getUsername() + " " + client.getUdpPort() + "***");
             }
@@ -32,21 +32,21 @@ public class MainScene extends Scene{
         
         if(ImGui.button("Join Game")){
             client.setLastPressedButton(SceneData.BUTTON_JOINGAME);
-            client.setCurrentScene(SceneData.SCENE_USERNAMECHOICE);
+            client.setCurrentScene(SceneData.SCENE_USERCHOICE);
         }
 
         ImGui.sameLine();
         
         if(ImGui.button("Maze info")){
             client.setLastPressedButton(SceneData.BUTTON_MAZEINFO);
-            client.setCurrentScene(SceneData.SCENE_USERNAMECHOICE);
+            client.setCurrentScene(SceneData.SCENE_USERCHOICE);
         }
 
         ImGui.sameLine();
 
         if(ImGui.button("List player")){
             client.setLastPressedButton(SceneData.BUTTON_LISTPLAYER);
-            client.setCurrentScene(SceneData.SCENE_USERNAMECHOICE);
+            client.setCurrentScene(SceneData.SCENE_USERCHOICE);
         }
 
         ImGui.sameLine();

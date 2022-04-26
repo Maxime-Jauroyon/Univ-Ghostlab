@@ -3,18 +3,19 @@ package com.ustudents.ghostlab.scene;
 import java.io.IOException;
 
 import com.ustudents.ghostlab.client.Client;
-import com.ustudents.ghostlab.client.Utils;
+import com.ustudents.ghostlab.other.GameModel;
+import com.ustudents.ghostlab.other.Utils;
 
 import org.lwjgl.glfw.GLFW;
 
 import imgui.ImGui;
 import imgui.flag.ImGuiWindowFlags;
 
-public class UsernameChoiceScene extends Scene {
+public class UserChoiceScene extends Scene {
     
     
 
-    public UsernameChoiceScene(Client client){
+    public UserChoiceScene(Client client){
         super(client);
     }
 
@@ -130,7 +131,52 @@ public class UsernameChoiceScene extends Scene {
         }
     }
 
-    public void usernameChoice() throws IOException{
+    public void mazeMove() throws IOException{
+        ImGui.text("Number of move:");
+        ImGui.sameLine();
+        ImGui.inputText("##MazeMoveChoice", client.getUsernameChoiceContent());
+        String mazeMoveChoice = client.getUsernameChoiceContent().get();
+        for(int i = 0; i < 4 - mazeMoveChoice.length(); i++){
+            mazeMoveChoice = "0" + mazeMoveChoice;
+        }
+
+        if (ImGui.button("Up") && Utils.answerIsCorrectInput(mazeMoveChoice, 1)) {
+            client.addContentTologs("client:", mazeMoveChoice, 1);
+            client.getGameModel().setWantedPos(GameModel.TOWARD_UP, Integer.parseInt(mazeMoveChoice));
+            client.SendRequest("UPMOV " + mazeMoveChoice + "***");
+        }
+
+        ImGui.sameLine();
+
+        if (ImGui.button("Down") && Utils.answerIsCorrectInput(mazeMoveChoice, 1)) {
+            client.getGameModel().setWantedPos(GameModel.TOWARD_DOWN, Integer.parseInt(mazeMoveChoice));
+            client.SendRequest("DOMOV " + mazeMoveChoice + "***");
+        }
+
+        ImGui.sameLine();
+
+        if (ImGui.button("Left") && Utils.answerIsCorrectInput(mazeMoveChoice, 1)) {
+            client.getGameModel().setWantedPos(GameModel.TOWARD_LEFT, Integer.parseInt(mazeMoveChoice));
+            client.SendRequest("LEMOV " + mazeMoveChoice + "***");
+        }
+
+        ImGui.sameLine();
+
+        if (ImGui.button("Right") && Utils.answerIsCorrectInput(mazeMoveChoice, 1)) {
+            client.getGameModel().setWantedPos(GameModel.TOWARD_RIGHT, Integer.parseInt(mazeMoveChoice));
+            client.SendRequest("RIMOV " + mazeMoveChoice + "***");
+        }
+
+        ImGui.sameLine();
+
+        if (ImGui.button("Back") || ImGui.isKeyPressed(GLFW.GLFW_KEY_ESCAPE)) {
+            client.getUsernameChoiceContent().clear();
+            client.getGameChoiceContent().clear();
+            client.backToPreviousScene();
+        }
+    }    
+
+    public void userChoice() throws IOException{
         ImGui.setNextWindowPos(0, 0);
         ImGui.setNextWindowSize(ImGui.getIO().getDisplaySizeX(), ImGui.getIO().getDisplaySizeY() * 0.6f);
         ImGui.begin("Ghostlab Client", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove |
@@ -144,12 +190,14 @@ public class UsernameChoiceScene extends Scene {
             specificGameInfoSection(0);
         }else if(client.getLastPressedButton() == SceneData.BUTTON_LISTPLAYER){
             specificGameInfoSection(1);
+        }else if(client.getLastPressedButton() == SceneData.BUTTON_MAZEMOVE){
+            mazeMove();
         }
         ImGui.end();
     }
 
     public void display() throws IOException{
-        usernameChoice();
+        userChoice();
         mainContainer();
     }
     

@@ -6,10 +6,12 @@ import com.ustudents.common.command.Command;
 import com.ustudents.ghostlab.communication.Sender;
 import com.ustudents.ghostlab.listener.TCPRunnable;
 import com.ustudents.ghostlab.listener.UDPRunnable;
+import com.ustudents.ghostlab.other.GameModel;
 import com.ustudents.ghostlab.scene.GameLobbyScene;
+import com.ustudents.ghostlab.scene.InGameScene;
 import com.ustudents.ghostlab.scene.MainScene;
 import com.ustudents.ghostlab.scene.SceneData;
-import com.ustudents.ghostlab.scene.UsernameChoiceScene;
+import com.ustudents.ghostlab.scene.UserChoiceScene;
 
 import imgui.type.ImBoolean;
 import imgui.type.ImString;
@@ -30,6 +32,10 @@ public class Client extends Application {
     private final PrintWriter pw;
     private String username;
     private String gameRegistered;
+    private final GameModel gameModel;
+    /*private int mazeHeight;
+    private int mazeWidth;
+    private int[][] playerWay;*/
     /*private final Thread tcpThread;
     private final Thread udpThread;*/
     //private String username;
@@ -58,6 +64,7 @@ public class Client extends Application {
         this.pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
         this.username = username;
         gameRegistered = "-1";
+        gameModel = new GameModel();
         /*startedPos = new int[2];
         currentPos = new int[2];
         score = 0;*/
@@ -75,9 +82,21 @@ public class Client extends Application {
         return username;
     }
 
+    public GameModel getGameModel(){
+        return gameModel;
+    }
+
+    /*public char[][] getMaze(){
+        return gameModel.getMaze();
+    }*/
+
     public void setUsername(String username) {
         this.username = username;
     }
+
+    /*public void setMaze(int height, int width){
+        gameModel.setMaze(height, width);
+    }*/
 
     public void SendRequest(String action) throws IOException{
         Sender.send(pw, action);
@@ -90,6 +109,18 @@ public class Client extends Application {
     public void setGameRegister(String gameRegister) {
         this.gameRegistered = gameRegister;
     }
+
+    /*public void setScore(int score){
+        gameModel.setScore(score);
+    }
+
+    public void setWantedPos(int toward, int value){
+        gameModel.setWantedPos(toward, value);
+    }
+
+    public void updateMaze(int[] newPos){
+        gameModel.updateMaze(newPos);
+    }*/
 
     /*public void setHeigthMaze(int heigthMaze) {
         this.heigthMaze = heigthMaze;
@@ -131,53 +162,7 @@ public class Client extends Application {
         System.out.println("Your score are : " + score);
         this.score = score;
     }*/
-
-    /*public void launchGame() throws IOException, InterruptedException {
-        Scanner sc = new Scanner(System.in);
-        BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        PrintWriter pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
-        addContentTologs("client:", "leo is here !");
-        while(true){
-            InteractionIntroductionPhase iip = new InteractionIntroductionPhase(this);
-            iip.getQuestionInIntroductionPhase(br, "");
-
-            String question = "Would you create a new game or join an existant game ? ";
-            question += "Or would you know some information about game ? (register/new/size/list/game/quit)";
-
-            int state = iip.putQuestionOnIntroductionPhase(br, pw, question,
-                    new String[]{"register","new","size","list","game","quit"}, sc);
-
-            if(state == 3){
-                return;
-            }
-
-            question = "Would you start the game ? ";
-            question += "Or would you know some information about game ? (start/unregister/size/list/game/quit)";
-            state = iip.putQuestionOnIntroductionPhase(br, pw, question,
-                    new String[]{"start","unregister","size","list","game","quit"}, sc);
-
-            if(state == 3){
-                return;
-            }else if(state == 2){
-                continue;
-            }
-
-            iip.getQuestionInIntroductionPhase(br, "");
-
-            Thread tcpThread = new Thread(new TCPRunnable(this, br, pw, sc));
-            Thread udpMulticastThread = new Thread(new UDPMulticastRunnable(socket, multicastAddr, multicastPort));
-            Thread udpTread = new Thread(new UDPRunnable(socket, datagramSocket));
-
-            tcpThread.start();
-            udpMulticastThread.start();
-            udpTread.start();
-            tcpThread.join();
-            udpMulticastThread.join();
-            udpTread.join();
-        }
-    }*/
-
-    // -----------------------------------------------------------------------------------------------------------------
+    
     private List<Integer> scene = new ArrayList<>();
     private final List<String> logs = new ArrayList<>();
     private final List<String> serverAnswers = new ArrayList<>();
@@ -270,10 +255,12 @@ public class Client extends Application {
         try{
             if(getCurrentScene() == SceneData.SCENE_MAIN){
                 new MainScene(this).display();
-            }else if(getCurrentScene() == SceneData.SCENE_USERNAMECHOICE){
-                new UsernameChoiceScene(this).display();
+            }else if(getCurrentScene() == SceneData.SCENE_USERCHOICE){
+                new UserChoiceScene(this).display();
             }else if(getCurrentScene() == SceneData.SCENE_GAMELOBBY){
                 new GameLobbyScene(this).display();
+            }else if(getCurrentScene() == SceneData.SCENE_INGAME){
+                new InGameScene(this).display();
             }
             
         }catch(IOException e){

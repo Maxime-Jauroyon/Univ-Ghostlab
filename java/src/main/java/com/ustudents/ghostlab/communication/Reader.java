@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 import com.ustudents.ghostlab.client.Client;
-import com.ustudents.ghostlab.client.Utils;
+import com.ustudents.ghostlab.other.Utils;
 import com.ustudents.ghostlab.scene.SceneData;
 
 public class Reader {
@@ -108,9 +108,49 @@ public class Reader {
     }
 
     private void readWELCO(BufferedReader br) throws IOException{
-        br.read();
+        int gameId = Utils.readOctets(br, 1);
+        int mazeHeight = Utils.readOctets(br, 2);
+        int mazeWidth = Utils.readOctets(br, 2);
+        int ghost = Utils.readOctets(br, 1);
+        String ipMulticast = Utils.readOctetToMakeString(br, 15);
+        String portMulticast = Utils.readOctetToMakeString(br, 4);
+        readThreeEndSeparator(br);
+        client.getGameModel().setMaze(mazeHeight, mazeWidth);
+        client.addContentTologs("client: received from server:",
+         "WELCO " + gameId + " " + mazeHeight + " " + mazeWidth + 
+         " " + ghost + " " + ipMulticast + " " + portMulticast + 
+         "***", 0);
 
-    }    
+    }
+    
+    private void readPOSIT(BufferedReader br) throws IOException{
+        String username = Utils.readOctetToMakeString(br, 8);
+        String posX = Utils.readOctetToMakeString(br, 3);
+        String posY = Utils.readOctetToMakeString(br, 3);
+        readThreeEndSeparator(br);
+        client.getGameModel().setNewPos(Integer.parseInt(posX), Integer.parseInt(posY));
+        client.addContentTologs("client: received from server:",
+         "POSIT " + username + " " + posX + " " + posY + 
+         "***", 0);
+        client.setCurrentScene(SceneData.SCENE_INGAME);
+    }
+    
+    private void readMOVE(BufferedReader br, int flag) throws IOException{
+        String posX = Utils.readOctetToMakeString(br, 3);
+        String posY = Utils.readOctetToMakeString(br, 3);
+        if(flag == 0){
+            client.addContentTologs("client: received from server:",
+            "MOVE! " + posX + " " + posY + "***", 0);
+        }else{
+            String playerScore = Utils.readOctetToMakeString(br, 4);
+            client.addContentTologs("client: received from server:",
+            "MOVEF " + posX + " " + posY + " " + playerScore +"***", 0);
+        }
+        readThreeEndSeparator(br);
+        client.getGameModel().updateMaze(new int[]{Integer.parseInt(posX), Integer.parseInt(posY)});
+        client.setCurrentScene(SceneData.SCENE_INGAME);
+
+    }
 
     public void read(BufferedReader br) throws IOException {
         String read = "";
@@ -141,11 +181,13 @@ public class Reader {
         }else if(read.equals("WELCO")){
             readWELCO(br);
         }else if(read.equals("POSIT")){
-            
-        }else if(read.equals("MOVE")){
-            
+            readPOSIT(br);
+        }else if(read.equals("MOVE!")){
+            readMOVE(br, 0);
+        }else if(read.equals("MOVEF")){
+            readMOVE(br, 1);
         }else if(read.equals("GOBYE")){
-            
+            client.quit();
         }else if(read.equals("GLIS")){
             
         }else if(read.equals("MALL!")){

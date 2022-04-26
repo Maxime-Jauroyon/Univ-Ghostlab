@@ -1,4 +1,4 @@
-package com.ustudents.ghostlab.client;
+package com.ustudents.ghostlab.other;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -45,7 +45,7 @@ public class Utils {
 
     public static boolean answerIsCorrectInput(String answer, int flag){
         if((flag == 0 && answer.length() != 8) || (flag == 1 && (answer.length() > 3 || answer.length() < 1) 
-            && (Integer.parseInt(answer) > 255 || Integer.parseInt(answer) < 0)) 
+            /*&& (Integer.parseInt(answer) > 255 || Integer.parseInt(answer) < 0)*/) 
             || (flag == 2 && (answer.length() > 5 || answer.length() < 1)))
             return false;
 

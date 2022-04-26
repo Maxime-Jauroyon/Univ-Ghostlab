@@ -11,6 +11,8 @@ import imgui.callback.ImListClipperCallback;
 import imgui.flag.ImGuiWindowFlags;
 import static java.lang.System.exit;
 
+import java.io.IOException;
+
 public abstract class Scene {
 
     protected final Client client;
@@ -19,7 +21,7 @@ public abstract class Scene {
         this.client = client;
     }
 
-    protected void mainContainer(){
+    protected void mainContainer() throws IOException{
         ImGui.setNextWindowPos(0, 0);
         ImGui.setNextWindowSize(ImGui.getIO().getDisplaySizeX(), ImGui.getIO().getDisplaySizeY() * 0.6f);
         ImGui.begin("Ghostlab Client", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.MenuBar);
@@ -27,7 +29,7 @@ public abstract class Scene {
         if (ImGui.beginMenuBar()) {
             if (ImGui.beginMenu("File")) {
                 if (ImGui.menuItem("Quit")) {
-                    client.quit();
+                    exit(0);
                 }
                 ImGui.endMenu();
             }
