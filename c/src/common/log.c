@@ -64,6 +64,12 @@ void gl_log_push(const char *format, ...) {
     va_end(args);
 }
 
+void gl_log_push_array(const char *array[], uint32_t length) {
+    for (uint32_t i = 0; i < length; i++) {
+        gl_log_push(array[i], GL_LOG_TYPE_DEFAULT);
+    }
+}
+
 void gl_log_push_info(const char *format, ...) {
     va_list args;
     va_start(args, format);

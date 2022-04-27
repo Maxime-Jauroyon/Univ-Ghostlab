@@ -9,7 +9,7 @@ struct gl_message_t;
 struct gl_ip_socket_t;
 enum gl_movement_t;
 
-extern const char g_help[];
+extern const char *g_help[12];
 extern bool g_should_quit;
 extern bool g_use_legacy_protocol;
 extern char *g_server_ip;
