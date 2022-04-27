@@ -31,7 +31,7 @@ public class UserChoiceScene extends Scene {
             client.getUsernameChoiceContent().clear();
             if(Utils.answerIsCorrectInput(username, 0)){
                 client.setUsername(username);
-                client.addContentTologs("client:", "your username are : " + username, 1);
+                client.addContentTologs("client: info:", "your username are : " + username, 1);
                 client.getSender().send("NEWPL " + username + " " + client.getUdpPort() + "***");
             }else{
                 client.addContentTologs("client: warning:", username, 1);
@@ -69,10 +69,10 @@ public class UserChoiceScene extends Scene {
             client.getGameChoiceContent().clear();
             if(Utils.answerIsCorrectInput(username, 0)){
                 client.setUsername(username);
-                client.addContentTologs("client:", "your username are : " + username, 1);
+                client.addContentTologs("client: info:", "your username are : " + username, 1);
                 if(gameId.length() > 0 && Utils.answerIsCorrectInput(gameId, 1)){
                     client.setGameRegister(gameId);
-                    client.addContentTologs("client:", "choosed game : " + gameId, 1);
+                    client.addContentTologs("client: info:", "choosed game : " + gameId, 1);
                     client.getSender().send("REGIS " + username + " " + client.getUdpPort()
                      + " " + gameId + "***");
                 }else{
@@ -109,7 +109,7 @@ public class UserChoiceScene extends Scene {
             client.getGameChoiceContent().clear();
             if(gameId.length() > 0 && Utils.answerIsCorrectInput(gameId, 1)){
                 client.setGameRegister(gameId);
-                client.addContentTologs("client:", "choosed game : " + gameId, 1);
+                client.addContentTologs("client: info:", "choosed game : " + gameId, 1);
                 if(flag == 0){
                     client.getSender().send("SIZE? " + gameId + "***");
                 }else{
@@ -136,10 +136,10 @@ public class UserChoiceScene extends Scene {
             client.getGameModel().setWantedPos(toward, Integer.parseInt(mazeMoveChoice));
             client.getSender().send(move + " " + mazeMoveChoice + "***");
         }else{
-            client.addContentTologs("client: warning:", "Toward : " + toward +
-             ", move : " + move + ", number of move : " + mazeMoveChoice, 1);
+            client.addContentTologs("client: warning:", ", move : " + move +
+             ", number of move : " + mazeMoveChoice, 1);
             client.addContentTologs("client: warning:",
-             "Wrong choice of moove", 1);
+             "Wrong choice of move", 1);
         }
     }
 
@@ -148,7 +148,7 @@ public class UserChoiceScene extends Scene {
         ImGui.sameLine();
         ImGui.inputText("##MazeMoveChoice", client.getUsernameChoiceContent());
         String mazeMoveChoice = client.getUsernameChoiceContent().get();
-        for(int i = 0; i < 4 - mazeMoveChoice.length(); i++){
+        for(int i = 0; i < 3 - mazeMoveChoice.length(); i++){
             mazeMoveChoice = "0" + mazeMoveChoice;
         }
 

@@ -12,6 +12,7 @@ import imgui.flag.ImGuiWindowFlags;
 import static java.lang.System.exit;
 
 import java.io.IOException;
+import java.util.List;
 
 public abstract class Scene {
 
@@ -75,7 +76,7 @@ public abstract class Scene {
             }else if(command.equals("h") || command.equals("help")){
                 client.helpcommand();
             }else if(command.equals("v") || command.equals("version")){
-                client.addContentTologs("client:", "version : 1.0.0", 1);
+                client.addContentTologs("client: info:", "version : 1.0.0", 1);
             }else{
                 client.addContentTologs("client: warning:", "invalid option `" + command + "`!", 1);
                 client.addContentTologs("client: warning:", "use `h` for more informations.", 1);
@@ -85,17 +86,34 @@ public abstract class Scene {
         ImGui.beginChild("##Logs", 0, 0, true, ImGuiWindowFlags.HorizontalScrollbar);
         ImGui.pushFont(ImGuiManager.firaCode);
 
-        ImGuiListClipper.forEach(client.getLogs().size(), new ImListClipperCallback() {
+        List<String> visibleLogs = client.getVisibleLog();
+        ImGuiListClipper.forEach(visibleLogs.size()/*client.getLogs().size()*/, new ImListClipperCallback() {
             public void accept(int i) {
-                String command = client.getLogs().get(i);
+                String command = visibleLogs.get(i);
                 if(command.startsWith("client: warning:")) 
                     ImGui.textColored(215, 215, 0, 255, command);
-                else if(command.startsWith("client: error:"))
-                    ImGui.textColored(255, 0, 0, 255, command);   
-                else if(command.startsWith("$"))
-                    ImGui.textColored(57, 255, 20, 255, command); 
-                else
-                    ImGui.textUnformatted(command);
+                    else if(command.startsWith("client: error:"))
+                        ImGui.textColored(255, 0, 0, 255, command);   
+                    else if(command.startsWith("$"))
+                        ImGui.textColored(57, 255, 20, 255, command); 
+                    else
+                        ImGui.textUnformatted(command);
+
+                /*String command = client.getLogs().get(i);
+                if((command.startsWith("client: info:") && !client.getConsoleShowInfo().get() ||
+                command.startsWith("client: warning:") && !client.getConsoleShowWarning().get() ||
+                command.startsWith("client: error:") && !client.getConsoleShowError().get())){
+                   return;
+                }else{
+                    if(command.startsWith("client: warning:")) 
+                    ImGui.textColored(215, 215, 0, 255, command);
+                    else if(command.startsWith("client: error:"))
+                        ImGui.textColored(255, 0, 0, 255, command);   
+                    else if(command.startsWith("$"))
+                        ImGui.textColored(57, 255, 20, 255, command); 
+                    else
+                        ImGui.textUnformatted(command);
+                }*/
             }
         });
 

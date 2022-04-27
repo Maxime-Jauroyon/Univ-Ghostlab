@@ -27,7 +27,7 @@ public class Reader {
     private void readGAMES(BufferedReader br) throws IOException{
         int nbGame = Utils.readOctets(br, 1);
         readThreeEndSeparator(br);
-        client.addContentTologs("client: received from server:" ,
+        client.addContentTologs("client: info: received from server:" ,
          "GAMES " + nbGame + "***", 0);
 
         for(int i = 0; i < nbGame; i++){
@@ -40,7 +40,7 @@ public class Reader {
         int nbPlayer = br.read();
         nbPlayer = br.read();
         readThreeEndSeparator(br);
-        client.addContentTologs("client: received from server:",
+        client.addContentTologs("client: info: received from server:",
          "OGAME " + gameId + " " + nbPlayer + "***", 0);
     
     }
@@ -48,7 +48,7 @@ public class Reader {
     private void readREGOK(BufferedReader br) throws IOException{
         int gameId = Utils.readOctets(br, 1);
         readThreeEndSeparator(br);
-        client.addContentTologs("client: received from server:",
+        client.addContentTologs("client: info: received from server:",
          "REGOK " + gameId + "***", 0);
         client.setCurrentScene(SceneData.SCENE_GAMELOBBY);
         
@@ -66,7 +66,7 @@ public class Reader {
     private void readUNROK(BufferedReader br) throws IOException{
         int gameId = Utils.readOctets(br, 1);
         readThreeEndSeparator(br);
-        client.addContentTologs("client: received from server:",
+        client.addContentTologs("client: info: received from server:",
          "UNROK " + gameId + "***", 0);
         client.getSocket().close();
         client.launch(1);
@@ -86,7 +86,7 @@ public class Reader {
         int mazeHeight = Utils.readOctets(br, 2);
         int mazeWidth = Utils.readOctets(br, 2);
         readThreeEndSeparator(br);
-        client.addContentTologs("client: received from server:",
+        client.addContentTologs("client: info: received from server:",
          "SIZE! " + gameId + " " + mazeHeight + " " + mazeWidth + "***", 0);
         client.backToPreviousScene(); 
     }
@@ -95,7 +95,7 @@ public class Reader {
         int gameId = Utils.readOctets(br, 1);
         int nbPlayer = Utils.readOctets(br, 1);
         readThreeEndSeparator(br);
-        client.addContentTologs("client: received from server:" ,
+        client.addContentTologs("client: info: received from server:" ,
          "LIST! " + gameId + " " + nbPlayer + "***", 0);
 
         for(int i = 0; i < nbPlayer; i++){
@@ -107,7 +107,7 @@ public class Reader {
     private void readPLAYR(BufferedReader br) throws IOException{
         String username = Utils.readOctetToMakeString(br, 8);
         readThreeEndSeparator(br);
-        client.addContentTologs("client: received from server:",
+        client.addContentTologs("client: info: received from server:",
          "PLAYR " + username + "***", 0);
     
     }
@@ -121,7 +121,7 @@ public class Reader {
         String portMulticast = Utils.readOctetToMakeString(br, 4);
         readThreeEndSeparator(br);
         client.getGameModel().setMaze(mazeHeight, mazeWidth);
-        client.addContentTologs("client: received from server:",
+        client.addContentTologs("client: info: received from server:",
          "WELCO " + gameId + " " + mazeHeight + " " + mazeWidth + 
          " " + ghost + " " + ipMulticast + " " + portMulticast + 
          "***", 0);
@@ -134,7 +134,7 @@ public class Reader {
         String posY = Utils.readOctetToMakeString(br, 3);
         readThreeEndSeparator(br);
         client.getGameModel().setNewPos(Integer.parseInt(posX), Integer.parseInt(posY));
-        client.addContentTologs("client: received from server:",
+        client.addContentTologs("client: info: received from server:",
          "POSIT " + username + " " + posX + " " + posY + 
          "***", 0);
         client.setCurrentScene(SceneData.SCENE_INGAME);
@@ -144,11 +144,11 @@ public class Reader {
         String posX = Utils.readOctetToMakeString(br, 3);
         String posY = Utils.readOctetToMakeString(br, 3);
         if(flag == 0){
-            client.addContentTologs("client: received from server:",
+            client.addContentTologs("client: info: received from server:",
             "MOVE! " + posX + " " + posY + "***", 0);
         }else{
             String playerScore = Utils.readOctetToMakeString(br, 4);
-            client.addContentTologs("client: received from server:",
+            client.addContentTologs("client: info: received from server:",
             "MOVEF " + posX + " " + posY + " " + playerScore +"***", 0);
         }
         readThreeEndSeparator(br);
@@ -159,7 +159,7 @@ public class Reader {
 
     private void readGOBYE(BufferedReader br) throws IOException{
         readThreeEndSeparator(br);
-        client.addContentTologs("client: received from server:",
+        client.addContentTologs("client: info: received from server:",
             "GOBYE***", 0);
         client.getSocket().close();
         client.launch(1);
@@ -170,7 +170,7 @@ public class Reader {
     private void readGLIST(BufferedReader br) throws IOException{
         int nbPlayer = Utils.readOctets(br, 1);
         readThreeEndSeparator(br);
-        client.addContentTologs("client: received from server:" ,
+        client.addContentTologs("client: info: received from server:" ,
          "GLIS! " + nbPlayer + "***", 0);
 
         for(int i = 0; i < nbPlayer; i++){
@@ -184,7 +184,7 @@ public class Reader {
         String posY = Utils.readOctetToMakeString(br, 3);
         String playerScore = Utils.readOctetToMakeString(br, 4);
         readThreeEndSeparator(br);
-        client.addContentTologs("client: received from server:",
+        client.addContentTologs("client: info: received from server:",
          "GPLYR " + username + " " + posX + " " + posY + " " +
          playerScore +  "***", 0);
     

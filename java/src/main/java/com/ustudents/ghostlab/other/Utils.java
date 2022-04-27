@@ -4,43 +4,17 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
+import java.util.List;
+
+import com.ustudents.ghostlab.client.Client;
 
 public class Utils {
 
-    public static int findEndIndex(String message, int startIndex, char endChar){
+    /*public static int findEndIndex(String message, int startIndex, char endChar){
         while(message.charAt(startIndex) != endChar){
             startIndex++;
         }
         return startIndex;
-    }
-
-    /*private static boolean answerIsCorrect(String[] correctAnswers, String userAnswer){
-        for (String correctAnswer : correctAnswers) {
-            if (userAnswer.equals(correctAnswer))
-                return true;
-        }
-        return false;
-    }
-
-    private static void printCorrectAnswer(String[] correctAnswers){
-        for (String correctAnswer : correctAnswers) {
-            System.out.print(correctAnswer + ", ");
-        }
-        System.out.println();
-    }
-
-    public static String gameStepChoice(String question, String[] correctAnswers, Scanner sc){
-        String userAnswer;
-        while(true){
-            System.out.println(question);
-            userAnswer = sc.next();
-            if(answerIsCorrect(correctAnswers, userAnswer)){
-                return userAnswer;
-            }else{
-                System.out.print("Wrong answer you must choose between : ");
-                printCorrectAnswer(correctAnswers);
-            }
-        }
     }*/
 
     public static boolean answerIsCorrectInput(String answer, int flag){
@@ -56,65 +30,6 @@ public class Utils {
 
         return true;
     }
-
-    /*public static String getInput(String question, Scanner sc, int flag){
-        while(true){
-            System.out.println(question);
-            Scanner sc1 = new Scanner(System.in);
-            String temp = sc1.nextLine();
-            if(answerIsCorrectInput(temp, flag)){
-                return temp;
-            }
-        }
-    }
-
-    public static String messageToSend(){
-        Scanner temp = new Scanner(System.in);
-        System.out.println("Your message : ");
-        String message = temp.nextLine();
-        return (message.length() > 200)? message.substring(0, 200): message;
-    }
-
-    public static String test(Scanner sc){
-        String res = sc.next();
-        while(sc.hasNext()){
-            res += sc.next();
-        }
-        return res;
-    }
-
-    public static void printAllMessage(String receivedMessage, String type){
-        String[] list = receivedMessage.split(" ");
-        System.out.print("[" + type +  " : " + list[1] + "] : ");
-        for(int i = 2; i < list.length; i++){
-            if(i == list.length-1){
-                System.out.print(list[i].substring(0, list[i].length()-3) + " ");
-            }else{
-                System.out.print(list[i] + " ");
-            }
-        }
-        System.out.println();
-    }*/
-
-    /*private static boolean checkThreeNextChar(String read){
-        if(read.length() < 3)
-            return false;
-
-        for(int i = 3; i > 0; i--){
-            if(read.charAt(read.length()-i) != '*'){
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public static String read(BufferedReader br) throws IOException {
-        String read = "";
-        while(!checkThreeNextChar(read)){
-            read += String.valueOf(br.read());
-        }
-        return read;
-    }*/
 
     public static int readOctets(BufferedReader br, int num) throws IOException{
         br.read();
@@ -134,11 +49,11 @@ public class Utils {
         }
         
         return res;
-    }    
-
-    public static char tranformdigitTochar(String string){
-        return (char) Integer.parseInt(string);
     }
+
+    /*public static char tranformdigitTochar(String string){
+        return (char) Integer.parseInt(string);
+    }*/
 
     private static boolean checkServerIp(String[] args){
         try {

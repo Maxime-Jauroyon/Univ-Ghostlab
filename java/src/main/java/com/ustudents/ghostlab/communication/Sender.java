@@ -4,14 +4,18 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
+import com.ustudents.ghostlab.client.Client;
+
 public class Sender {
+    private final Client client;
     private final OutputStream outputStream;
 
-    public Sender(OutputStream outputStream){
+    public Sender(Client client, OutputStream outputStream){
         this.outputStream = outputStream;
+        this.client = client;
     }
 
-    public byte[] convertListToArrayOfByte(List<Byte> byteList){
+    /*public byte[] convertListToArrayOfByte(List<Byte> byteList){
         byte[] byteArray = new byte[byteList.size()];
         for (int index = 0; index < byteList.size(); index++) {
             byteArray[index] = byteList.get(index);
@@ -25,28 +29,9 @@ public class Sender {
             byteList.add(byteArray[i]);
         }
         return byteList;
-    }
+    }*/
 
     public void sendNEWPL(String request) throws IOException{
-        /*byteList = fillListWithString(byteList, request[0] + " ");
-        byteList = fillListWithString(byteList, request[1] + " ");
-        byteList.add((byte)Integer.parseInt(request[2].substring(0, 4)));
-        byteList = fillListWithString(byteList, "***");
-        byte[] byteArray = convertListToArrayOfByte(byteList);
-        outputStream.write(byteArray);
-        outputStream.flush();*/
-
-        /*for(int i = 0; i < request.length; i++){
-            if(i != request.length-1){
-                request[i] += " ";
-                
-            }
-
-            outputStream.write(request[i].getBytes());
-            
-        }*/
-
-
         outputStream.write(request.getBytes());
         outputStream.flush();
 
@@ -67,21 +52,30 @@ public class Sender {
         outputStream.write(request[0].getBytes());
         outputStream.write((byte) Integer.parseInt(request[1].substring(0, request[1].length()-3)));
         outputStream.write("***".getBytes());
+    } 
+    
+    public void sendMOVE(String[] request) throws IOException{
+        for(int i = 0; i < 2; i++){
+            request[i] += " ";
+            outputStream.write(request[i].getBytes());
+        }
+        
+        outputStream.write(request[1].substring(0, request[1].length()-3).getBytes());
     }    
 
     public void send(String request) throws IOException{
+        client.addContentTologs("client: info:", request, 0);
         String[] list = request.split(" ");
         String requestName = list[0];
         if(requestName.contains("NEWPL") || requestName.contains("START") ||
            requestName.contains("UNREG") || requestName.contains("GAME?") ||
-           requestName.contains("GLIS?") || requestName.contains("IQUIT")){
+           requestName.contains("GLIS?") || requestName.contains("IQUIT") ||
+           requestName.contains("MOV")){
             sendNEWPL(request);
         }else if(requestName.contains("REGIS")){
             sendREGIS(list);
         }else if(requestName.contains("SIZE?") || requestName.contains("LIST?")){
             sendSIZEAndLIST(list);
-        }else if(requestName.contains("MOV")){
-            
         }else if(requestName.contains("MALL?")){
             
         }else if(requestName.contains("SEND?")){

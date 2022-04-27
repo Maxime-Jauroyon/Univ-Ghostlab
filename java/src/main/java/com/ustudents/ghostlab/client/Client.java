@@ -21,6 +21,8 @@ import java.net.DatagramSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.LogManager;
+
 import static java.lang.System.exit;
 
 @Command(name = "client", version = "1.0.0", description = "ghostlab is an online matchmaking based game where you take upon yourself to become the best ghost hunter!")
@@ -72,7 +74,7 @@ public class Client extends Application {
     }*/
 
     public void launch(int flag) throws IOException {
-        addContentTologs("client:", "connection to server established.",1);
+        addContentTologs("client: info:", "connection to server established.",1);
         socket = new Socket(ipv4_addr, tcpPort);
         if(flag == 0){
             datagramSocket = new DatagramSocket(udpPort);
@@ -82,10 +84,10 @@ public class Client extends Application {
         Thread udpThread = new Thread(new UDPRunnable(this, datagramSocket));
         tcpThread.start();
         udpThread.start();
-        addContentTologs("client:", "udp listener thread started.",1);
-        addContentTologs("client:", "tcp listener thread started.",1);
+        addContentTologs("client: info:", "udp listener thread started.",1);
+        addContentTologs("client: info:", "tcp listener thread started.",1);
         //sender = new Sender(new PrintWriter(new OutputStreamWriter(socket.getOutputStream())));
-        sender = new Sender(socket.getOutputStream());
+        sender = new Sender(this, socket.getOutputStream());
         gameRegistered = "-1";
         gameModel = new GameModel();
     }
@@ -248,18 +250,31 @@ public class Client extends Application {
     public void setCurrentScene(int scene){
         this.scene.add(scene);
     }
+
+    public List<String> getVisibleLog(){
+        List<String> visibleLogs = new ArrayList<>();
+        for(int i = 0; i < logs.size(); i++){
+            String log = logs.get(i);
+            if((log.startsWith("client: info:") && consoleShowInfo.get()) ||
+                (log.startsWith("client: warning:") && consoleShowWarning.get()) ||
+                (log.startsWith("client: error:") && consoleShowError.get()))
+                visibleLogs.add(log);
+        }
+        return visibleLogs;
+        
+    }
     
     public void helpcommand(){
-        addContentTologs("client:", "commands:", 1);
-        addContentTologs("client:", "\tq, e, quit, exit   terminates the program.", 1);
-        addContentTologs("client:", "\th, help            displays this help message.", 1);
-        addContentTologs("client:", "\tv, version         display the program's version.", 1);
+        addContentTologs("client: info:", "commands:", 1);
+        addContentTologs("client: info:", "\tq, e, quit, exit   terminates the program.", 1);
+        addContentTologs("client: info:", "\th, help            displays this help message.", 1);
+        addContentTologs("client: info:", "\tv, version         display the program's version.", 1);
 
     }
 
     @Override
     protected void initialize() {
-        addContentTologs("client:", "you can now enter commands.",1);
+        addContentTologs("client: info:", "you can now enter commands.",1);
         helpcommand();
         scene.add(SceneData.SCENE_MAIN);
     }
