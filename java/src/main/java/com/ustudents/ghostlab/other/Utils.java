@@ -4,18 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
-import java.util.List;
-
-import com.ustudents.ghostlab.client.Client;
 
 public class Utils {
-
-    /*public static int findEndIndex(String message, int startIndex, char endChar){
-        while(message.charAt(startIndex) != endChar){
-            startIndex++;
-        }
-        return startIndex;
-    }*/
 
     public static boolean answerIsCorrectInput(String answer, int flag){
         if((flag == 0 && answer.length() != 8) || (flag == 1 && ((answer.length() > 3 || answer.length() < 1) 
@@ -29,6 +19,10 @@ public class Utils {
         }
 
         return true;
+    }
+
+    public static boolean messageIsCorrect(String answer){
+        return answer.length() > 0 && answer.length() < 201; 
     }
 
     public static int readOctets(BufferedReader br, int num) throws IOException{
@@ -50,10 +44,6 @@ public class Utils {
         
         return res;
     }
-
-    /*public static char tranformdigitTochar(String string){
-        return (char) Integer.parseInt(string);
-    }*/
 
     private static boolean checkServerIp(String[] args){
         try {

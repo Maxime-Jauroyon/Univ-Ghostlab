@@ -190,6 +190,22 @@ public class Reader {
     
     }
 
+    private void readMESS(BufferedReader br, int flag) throws IOException{
+        if(flag == 0){
+            client.addContentTologs("client: info: received from server:",
+            "SEND!***", 0);
+        }else if(flag == 1){
+            client.addContentTologs("client: warning: received from server:",
+            "NSEND***", 0);
+        }else{
+            client.addContentTologs("client: info: received from server:",
+            "MALL!***", 0);
+            
+        }
+        readThreeEndSeparator(br);
+        client.backToPreviousScene();
+    }
+
     public void read(BufferedReader br) throws IOException {
         String read = "";
         for(int i = 0; i < 5; i++){
@@ -230,12 +246,18 @@ public class Reader {
             readGLIST(br);
         }else if(read.equals("GPLYR")){
             readGPLYR(br);
-        }else if(read.equals("MALL!")){
-            
         }else if(read.equals("SEND!")){
-            
+            readMESS(br, 0);
+        }else if(read.equals("NSEND")){
+            readMESS(br, 1);
+        }else if(read.equals("MALL!")){
+            readMESS(br, 2);    
         }else if(read.length() > 0){
             client.addContentTologs("client: error:", "unknow message", 1);
         }
+
+        client.getUsernameChoiceContent().clear();
+        client.getConsoleCommand().clear();
+        client.getGameChoiceContent().clear();
     }
 }

@@ -21,7 +21,6 @@ import java.net.DatagramSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.LogManager;
 
 import static java.lang.System.exit;
 
@@ -257,7 +256,8 @@ public class Client extends Application {
             String log = logs.get(i);
             if((log.startsWith("client: info:") && consoleShowInfo.get()) ||
                 (log.startsWith("client: warning:") && consoleShowWarning.get()) ||
-                (log.startsWith("client: error:") && consoleShowError.get()))
+                (log.startsWith("client: error:") && consoleShowError.get())
+                || log.startsWith("$"))
                 visibleLogs.add(log);
         }
         return visibleLogs;

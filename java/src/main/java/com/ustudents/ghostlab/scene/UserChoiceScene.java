@@ -185,7 +185,62 @@ public class UserChoiceScene extends Scene {
             client.getGameChoiceContent().clear();
             client.backToPreviousScene();
         }
-    }    
+    }
+
+    public void sendMessage(int flag) throws IOException{
+        String username = "";
+        if(flag == 0){
+            ImGui.text("Player to send:");
+            ImGui.sameLine();
+            ImGui.inputText("##player", client.getUsernameChoiceContent());
+        }
+
+        ImGui.text("Your Message:");
+        ImGui.sameLine();
+        ImGui.inputText("##Message", client.getGameChoiceContent());
+        String message = "";
+
+        if(flag == 0){
+            if(ImGui.button("Send")){
+                username = client.getUsernameChoiceContent().get();
+                message = client.getGameChoiceContent().get();
+                if(Utils.answerIsCorrectInput(username, 0)){
+                    if(Utils.messageIsCorrect(message)){
+                        client.getSender().send("SEND? " + username + " " + message+ "***");
+                    }else{
+                        client.addContentTologs("client: warning:", message, 1);
+                        client.addContentTologs("client: warning:",
+                    "Wrong format of message (between 0 to 200 characters)", 1);
+                    }
+                }else{
+                    client.addContentTologs("client: warning:", username, 1);
+                    client.addContentTologs("client: warning:",
+                    "your username does'nt respect the format (8 characters)", 1);
+                }
+            }
+        }else{
+            if(ImGui.button("Send")){
+                message = client.getGameChoiceContent().get();
+                client.addContentTologs("client: info:", "sdfdfgdgdg", flag);
+                if(Utils.messageIsCorrect(message)){
+                    client.getSender().send("MALL? " + message + "***");
+                }else{
+                    client.addContentTologs("client: warning:", message, 1);
+                    client.addContentTologs("client: warning:",
+                "Wrong format of message (between 0 to 200 characters)", 1);
+                }
+            } 
+        }
+
+        ImGui.sameLine();
+
+        if (ImGui.button("Back") || ImGui.isKeyPressed(GLFW.GLFW_KEY_ESCAPE)) {
+            client.getUsernameChoiceContent().clear();
+            client.getUsernameChoiceContent().clear();
+            client.backToPreviousScene();
+        }
+
+    }     
 
     public void userChoice() throws IOException{
         ImGui.setNextWindowPos(0, 0);
@@ -203,6 +258,10 @@ public class UserChoiceScene extends Scene {
             specificGameInfoSection(1);
         }else if(client.getLastPressedButton() == SceneData.BUTTON_MAZEMOVE){
             mazeMove();
+        }else if(client.getLastPressedButton() == SceneData.BUTTON_PRIVATEMESSAGE){
+            sendMessage(0);
+        }else if(client.getLastPressedButton() == SceneData.BUTTON_ALLMESSAGE){
+            sendMessage(1);
         }
         ImGui.end();
     }

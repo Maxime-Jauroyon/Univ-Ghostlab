@@ -2,7 +2,6 @@ package com.ustudents.ghostlab.communication;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.List;
 
 import com.ustudents.ghostlab.client.Client;
 
@@ -54,14 +53,14 @@ public class Sender {
         outputStream.write("***".getBytes());
     } 
     
-    public void sendMOVE(String[] request) throws IOException{
+    public void sendString(String[] request) throws IOException{
         for(int i = 0; i < 2; i++){
             request[i] += " ";
             outputStream.write(request[i].getBytes());
         }
         
         outputStream.write(request[1].substring(0, request[1].length()-3).getBytes());
-    }    
+    }
 
     public void send(String request) throws IOException{
         client.addContentTologs("client: info:", request, 0);
@@ -70,16 +69,13 @@ public class Sender {
         if(requestName.contains("NEWPL") || requestName.contains("START") ||
            requestName.contains("UNREG") || requestName.contains("GAME?") ||
            requestName.contains("GLIS?") || requestName.contains("IQUIT") ||
-           requestName.contains("MOV")){
+           requestName.contains("MOV") || requestName.contains("MALL?") || 
+           requestName.contains("SEND?")){
             sendNEWPL(request);
         }else if(requestName.contains("REGIS")){
             sendREGIS(list);
         }else if(requestName.contains("SIZE?") || requestName.contains("LIST?")){
             sendSIZEAndLIST(list);
-        }else if(requestName.contains("MALL?")){
-            
-        }else if(requestName.contains("SEND?")){
-            
         }
     }
     
