@@ -40,7 +40,7 @@ public class InGameScene extends Scene{
         ImGui.sameLine();
         
         if(ImGui.button("Player list")){
-            
+            client.sendRequest("GLIS?***");
         }
 
         ImGui.sameLine();

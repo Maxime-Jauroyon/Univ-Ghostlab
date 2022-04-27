@@ -3,8 +3,6 @@ package com.ustudents.ghostlab.other;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ustudents.ghostlab.client.Client;
-
 public class GameModel {
 
     public static final char MAZE_UNKNOWN = '?';
@@ -129,29 +127,28 @@ public class GameModel {
         int diff;
         if(xdiff > 0 && ydiff == 0){
             toward = TOWARD_LEFT;
-            diff = Math.abs(oldPos[0] - wantedPos[0]);
+            diff = Math.abs(oldPos[0] - newPos[0]);
         }else if(xdiff < 0 && ydiff == 0){
             toward = TOWARD_RIGHT;
-            diff = Math.abs(oldPos[0] - wantedPos[0]);
+            diff = Math.abs(oldPos[0] - newPos[0]);
         }else if(xdiff == 0 && ydiff > 0){
             toward = TOWARD_UP;
-            diff = Math.abs(oldPos[1] - wantedPos[1]);
+            diff = Math.abs(oldPos[1] - newPos[1]);
         }else if(xdiff == 0 && ydiff < 0){
             toward = TOWARD_DOWN;
-            diff = Math.abs(oldPos[1] - wantedPos[1]);
+            diff = Math.abs(oldPos[1] - newPos[1]);
         }else{
             toward = TOWARD_UNKNOWN;
             diff = 0;
         }
         
-        for(int i = 0; i < diff-1; i++){
+        for(int i = 0; i < diff; i++){
             attributeNewChar(oldPos, toward, i, 0);
         }
 
         if(!lastPosIsWantedPos(newPos, wantedPos) && lastPosIsWantedPos(oldPos, newPos)){
-            attributeNewChar(oldPos, toward, diff, 1);
+            attributeNewChar(oldPos, toward, diff+1, 1);
         }else if(!lastPosIsWantedPos(newPos, wantedPos)){
-            
             attributeNewChar(oldPos, toward, diff+1, 1);
         }
     }

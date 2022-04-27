@@ -7,7 +7,6 @@ import com.ustudents.ghostlab.client.Client;
 import com.ustudents.ghostlab.listener.TCPRunnable;
 import com.ustudents.ghostlab.other.Utils;
 import com.ustudents.ghostlab.scene.SceneData;
-import static java.lang.System.exit;
 
 public class Reader {
 
@@ -164,7 +163,30 @@ public class Reader {
         client.launch(1);
         client.setCurrentScene(SceneData.SCENE_MAIN);
         tcpRunnable.wantExit();
-    }    
+    }
+    
+    private void readGLIST(BufferedReader br) throws IOException{
+        int nbPlayer = Utils.readOctets(br, 1);
+        readThreeEndSeparator(br);
+        client.addContentTologs("client: received from server:" ,
+         "GLIS! " + nbPlayer + "***", 0);
+
+        for(int i = 0; i < nbPlayer; i++){
+            read(br);
+        }
+    }
+
+    private void readGPLYR(BufferedReader br) throws IOException{
+        String username = Utils.readOctetToMakeString(br, 8);
+        String posX = Utils.readOctetToMakeString(br, 3);
+        String posY = Utils.readOctetToMakeString(br, 3);
+        String playerScore = Utils.readOctetToMakeString(br, 4);
+        readThreeEndSeparator(br);
+        client.addContentTologs("client: received from server:",
+         "GPLYR " + username + " " + posX + " " + posY + " " +
+         playerScore +  "***", 0);
+    
+    }
 
     public void read(BufferedReader br) throws IOException {
         String read = "";
@@ -202,8 +224,10 @@ public class Reader {
             readMOVE(br, 1);
         }else if(read.equals("GOBYE")){
             readGOBYE(br);
-        }else if(read.equals("GLIS")){
-            
+        }else if(read.equals("GLIS!")){
+            readGLIST(br);
+        }else if(read.equals("GPLYR")){
+            readGPLYR(br);
         }else if(read.equals("MALL!")){
             
         }else if(read.equals("SEND!")){
