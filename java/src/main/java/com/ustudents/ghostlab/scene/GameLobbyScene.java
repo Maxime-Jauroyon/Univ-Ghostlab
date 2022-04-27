@@ -20,13 +20,13 @@ public class GameLobbyScene extends Scene{
 
 
         if(ImGui.button("Start")){
-            client.sendRequest("START***");
+            client.getSender().send("START***");
         }
 
         ImGui.sameLine();
         
         if(ImGui.button("Unregister")){
-            client.sendRequest("UNREG***");
+            client.getSender().send("UNREG***");
         }
 
         ImGui.sameLine();
@@ -46,7 +46,7 @@ public class GameLobbyScene extends Scene{
         ImGui.sameLine();
 
         if(ImGui.button("Game Info")){
-            client.sendRequest("GAME?***");
+            client.getSender().send("GAME?***");
         }
 
         ImGui.end();

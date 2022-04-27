@@ -29,7 +29,8 @@ public class Client extends Application {
     private Socket socket;
     private DatagramSocket datagramSocket;
     private TCPRunnable tcpRunnable;
-    private PrintWriter pw;
+    //private PrintWriter pw;
+    private Sender sender;
     private String ipv4_addr;
     private int tcpPort;
     private String username;
@@ -83,7 +84,8 @@ public class Client extends Application {
         udpThread.start();
         addContentTologs("client:", "udp listener thread started.",1);
         addContentTologs("client:", "tcp listener thread started.",1);
-        this.pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
+        //sender = new Sender(new PrintWriter(new OutputStreamWriter(socket.getOutputStream())));
+        sender = new Sender(socket.getOutputStream());
         gameRegistered = "-1";
         gameModel = new GameModel();
     }
@@ -99,6 +101,10 @@ public class Client extends Application {
 
     public int getUdpPort() {
         return datagramSocket.getLocalPort();
+    }
+
+    public Sender getSender(){
+        return sender;
     }
 
     public String getUsername() {
@@ -125,9 +131,9 @@ public class Client extends Application {
         this.udpPort = udpPort;
     }
 
-    public void sendRequest(String action) throws IOException{
+    /*public void sendRequest(String action) throws IOException{
         Sender.send(pw, action);
-    }
+    }*/
 
     public String getGameRegister(){
         return gameRegistered;

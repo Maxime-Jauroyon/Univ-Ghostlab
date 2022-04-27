@@ -40,25 +40,27 @@ public class InGameScene extends Scene{
         ImGui.sameLine();
         
         if(ImGui.button("Player list")){
-            client.sendRequest("GLIS?***");
+            client.getSender().send("GLIS?***");
         }
 
         ImGui.sameLine();
         
         if(ImGui.button("Send Everyone Message")){
-            
+            client.setLastPressedButton(SceneData.BUTTON_ALLMESSAGE);
+            client.setCurrentScene(SceneData.SCENE_USERCHOICE);
         }
 
         ImGui.sameLine();
 
         if(ImGui.button("Send Private Message")){
-            
+            client.setLastPressedButton(SceneData.BUTTON_PRIVATEMESSAGE);
+            client.setCurrentScene(SceneData.SCENE_USERCHOICE);
         }
 
         ImGui.sameLine();
 
         if(ImGui.button("Quit Game")){
-            client.sendRequest("IQUIT***");
+            client.getSender().send("IQUIT***");
         }
 
         ImGui.end();

@@ -68,8 +68,10 @@ public class Reader {
         readThreeEndSeparator(br);
         client.addContentTologs("client: received from server:",
          "UNROK " + gameId + "***", 0);
-        client.setGameRegister("-1"); 
+        client.getSocket().close();
+        client.launch(1);
         client.setCurrentScene(SceneData.SCENE_MAIN);
+        tcpRunnable.wantExit();
         
     }
 

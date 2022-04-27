@@ -32,8 +32,7 @@ public class UserChoiceScene extends Scene {
             if(Utils.answerIsCorrectInput(username, 0)){
                 client.setUsername(username);
                 client.addContentTologs("client:", "your username are : " + username, 1);
-                //client.setScene(SceneData.GAMELOBBY);
-                client.sendRequest("NEWPL " + username + " " + client.getUdpPort() + "***");
+                client.getSender().send("NEWPL " + username + " " + client.getUdpPort() + "***");
             }else{
                 client.addContentTologs("client: warning:", username, 1);
                 client.addContentTologs("client: warning:",
@@ -74,9 +73,10 @@ public class UserChoiceScene extends Scene {
                 if(gameId.length() > 0 && Utils.answerIsCorrectInput(gameId, 1)){
                     client.setGameRegister(gameId);
                     client.addContentTologs("client:", "choosed game : " + gameId, 1);
-                    client.sendRequest("REGIS " + username + " " + client.getUdpPort()
-                     + " " + Utils.tranformdigitTochar(gameId) + "***");
+                    client.getSender().send("REGIS " + username + " " + client.getUdpPort()
+                     + " " + gameId + "***");
                 }else{
+                    client.setUsername(null);
                     client.addContentTologs("client: warning:", gameId, 1);
                     client.addContentTologs("client: warning:",
                  "your game choice does'nt respect the format (between 0 to 255)", 1);
@@ -111,9 +111,9 @@ public class UserChoiceScene extends Scene {
                 client.setGameRegister(gameId);
                 client.addContentTologs("client:", "choosed game : " + gameId, 1);
                 if(flag == 0){
-                    client.sendRequest("SIZE? " + Utils.tranformdigitTochar(gameId) + "***");
+                    client.getSender().send("SIZE? " + gameId + "***");
                 }else{
-                    client.sendRequest("LIST? " + Utils.tranformdigitTochar(gameId) + "***");
+                    client.getSender().send("LIST? " + gameId + "***");
                 }
             }else{
                 client.addContentTologs("client: warning:", gameId, 1);
@@ -131,6 +131,18 @@ public class UserChoiceScene extends Scene {
         }
     }
 
+    private void moveSend(int toward, String move, String mazeMoveChoice) throws IOException{
+        if(Utils.answerIsCorrectInput(mazeMoveChoice, 1)){
+            client.getGameModel().setWantedPos(toward, Integer.parseInt(mazeMoveChoice));
+            client.getSender().send(move + " " + mazeMoveChoice + "***");
+        }else{
+            client.addContentTologs("client: warning:", "Toward : " + toward +
+             ", move : " + move + ", number of move : " + mazeMoveChoice, 1);
+            client.addContentTologs("client: warning:",
+             "Wrong choice of moove", 1);
+        }
+    }
+
     public void mazeMove() throws IOException{
         ImGui.text("Number of move:");
         ImGui.sameLine();
@@ -140,31 +152,30 @@ public class UserChoiceScene extends Scene {
             mazeMoveChoice = "0" + mazeMoveChoice;
         }
 
-        if (ImGui.button("Up") && Utils.answerIsCorrectInput(mazeMoveChoice, 1)) {
-            client.addContentTologs("client:", mazeMoveChoice, 1);
+        if (ImGui.button("Up")){
             client.getGameModel().setWantedPos(GameModel.TOWARD_UP, Integer.parseInt(mazeMoveChoice));
-            client.sendRequest("UPMOV " + mazeMoveChoice + "***");
+            moveSend(GameModel.TOWARD_UP, "UPMOV", mazeMoveChoice);
         }
 
         ImGui.sameLine();
 
         if (ImGui.button("Down") && Utils.answerIsCorrectInput(mazeMoveChoice, 1)) {
             client.getGameModel().setWantedPos(GameModel.TOWARD_DOWN, Integer.parseInt(mazeMoveChoice));
-            client.sendRequest("DOMOV " + mazeMoveChoice + "***");
+            moveSend(GameModel.TOWARD_UP, "DOMOV", mazeMoveChoice);
         }
 
         ImGui.sameLine();
 
         if (ImGui.button("Left") && Utils.answerIsCorrectInput(mazeMoveChoice, 1)) {
             client.getGameModel().setWantedPos(GameModel.TOWARD_LEFT, Integer.parseInt(mazeMoveChoice));
-            client.sendRequest("LEMOV " + mazeMoveChoice + "***");
+            moveSend(GameModel.TOWARD_UP, "LEMOV", mazeMoveChoice);
         }
 
         ImGui.sameLine();
 
         if (ImGui.button("Right") && Utils.answerIsCorrectInput(mazeMoveChoice, 1)) {
             client.getGameModel().setWantedPos(GameModel.TOWARD_RIGHT, Integer.parseInt(mazeMoveChoice));
-            client.sendRequest("RIMOV " + mazeMoveChoice + "***");
+            moveSend(GameModel.TOWARD_UP, "RIMOV", mazeMoveChoice);
         }
 
         ImGui.sameLine();
