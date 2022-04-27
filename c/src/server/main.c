@@ -128,7 +128,7 @@ static int32_t gl_server_handle_args(int argc, char **argv) {
             g_use_legacy_protocol = true;
             break;
         case 'h':
-            gl_log_push("%s", g_help);
+            gl_log_push_array(g_help, sizeof(g_help) / sizeof(g_help[0]));
             return 1;
         case 'v':
             gl_log_push("version: " GHOSTLAB_VERSION);

@@ -20,6 +20,8 @@ void gl_log_vpush(const char *format, gl_log_type_t type, va_list args);
 
 void gl_log_push(const char *format, ...);
 
+void gl_log_push_array(const char *array[], uint32_t length);
+
 void gl_log_push_info(const char *format, ...);
 
 void gl_log_push_warning(const char *format, ...);

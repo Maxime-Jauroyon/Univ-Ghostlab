@@ -6,7 +6,7 @@
 struct gl_game_t;
 struct gl_player_t;
 
-extern const char g_help[];
+extern const char *g_help[11];
 extern bool g_should_quit;
 extern bool g_is_server_down;
 extern bool g_use_legacy_protocol;

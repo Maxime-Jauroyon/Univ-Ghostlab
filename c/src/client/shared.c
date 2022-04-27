@@ -11,18 +11,19 @@
 
 static pthread_mutex_t internal_g_main_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-const char g_help[] =
-    "usage: " GHOSTLAB_EXECUTABLE_NAME " [options]\n"
-    "\n"
-    "ghostlab is an online matchmaking based game where you take upon yourself to become the best ghost hunter!\n"
-    "\n"
-    "options:\n"
-    "\t-i, --ip <server ip>             defines the ip to connect to (" GHOSTLAB_DEFAULT_SERVER_IP " by default).\n"
-    "\t-p, --port <server port>         defines the port to connect to (" GHOSTLAB_DEFAULT_SERVER_PORT " by default).\n"
-    "\t-u, --udp-port,  <client port>   defines the udp port to use to communicate with other players (" GHOSTLAB_DEFAULT_UDP_PORT " used by default).\n"
-    "\t-l, --legacy-protocol            sets the protocol version to legacy (the program will not run any extensions).\n"
-    "\t-h, --help                       displays this help message and exits.\n"
-    "\t-v, --version                    displays the program's version and exits.\n";
+const char *g_help[11] = {
+    "usage: " GHOSTLAB_EXECUTABLE_NAME " [options]\n",
+    "\n",
+    "ghostlab is an online matchmaking based game where you take upon yourself to become the best ghost hunter!\n",
+    "\n",
+    "options:\n",
+    "\t-i, --ip <server ip>             defines the ip to connect to (" GHOSTLAB_DEFAULT_SERVER_IP " by default).\n",
+    "\t-p, --port <server port>         defines the port to connect to (" GHOSTLAB_DEFAULT_SERVER_PORT " by default).\n",
+    "\t-u, --udp-port,  <client port>   defines the udp port to use to communicate with other players (" GHOSTLAB_DEFAULT_UDP_PORT " used by default).\n",
+    "\t-l, --legacy-protocol            sets the protocol version to legacy (the program will not run any extensions).\n",
+    "\t-h, --help                       displays this help message and exits.\n",
+    "\t-v, --version                    displays the program's version and exits.\n"
+};
 bool g_should_quit = false;
 bool g_is_server_down = false;
 bool g_use_legacy_protocol = false;
