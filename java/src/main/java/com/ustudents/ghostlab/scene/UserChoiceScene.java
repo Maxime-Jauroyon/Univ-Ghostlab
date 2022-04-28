@@ -133,6 +133,12 @@ public class UserChoiceScene extends Scene {
 
     private void moveSend(int toward, String move, String mazeMoveChoice) throws IOException{
         if(Utils.answerIsCorrectInput(mazeMoveChoice, 1)){
+            client.addContentTologs("client: info: taille :", String.valueOf(mazeMoveChoice.length()), 1);
+            int size = mazeMoveChoice.length();
+            for(int i = 0; i < 3 - size; i++){
+                mazeMoveChoice = "0" + mazeMoveChoice;
+            }
+            client.addContentTologs("client: info:", mazeMoveChoice, 1);
             client.getGameModel().setWantedPos(toward, Integer.parseInt(mazeMoveChoice));
             client.getSender().send(move + " " + mazeMoveChoice + "***");
         }else{
@@ -148,9 +154,6 @@ public class UserChoiceScene extends Scene {
         ImGui.sameLine();
         ImGui.inputText("##MazeMoveChoice", client.getUsernameChoiceContent());
         String mazeMoveChoice = client.getUsernameChoiceContent().get();
-        for(int i = 0; i < 3 - mazeMoveChoice.length(); i++){
-            mazeMoveChoice = "0" + mazeMoveChoice;
-        }
 
         if (ImGui.button("Up")){
             client.getGameModel().setWantedPos(GameModel.TOWARD_UP, Integer.parseInt(mazeMoveChoice));
@@ -161,21 +164,21 @@ public class UserChoiceScene extends Scene {
 
         if (ImGui.button("Down") && Utils.answerIsCorrectInput(mazeMoveChoice, 1)) {
             client.getGameModel().setWantedPos(GameModel.TOWARD_DOWN, Integer.parseInt(mazeMoveChoice));
-            moveSend(GameModel.TOWARD_UP, "DOMOV", mazeMoveChoice);
+            moveSend(GameModel.TOWARD_DOWN, "DOMOV", mazeMoveChoice);
         }
 
         ImGui.sameLine();
 
         if (ImGui.button("Left") && Utils.answerIsCorrectInput(mazeMoveChoice, 1)) {
             client.getGameModel().setWantedPos(GameModel.TOWARD_LEFT, Integer.parseInt(mazeMoveChoice));
-            moveSend(GameModel.TOWARD_UP, "LEMOV", mazeMoveChoice);
+            moveSend(GameModel.TOWARD_LEFT, "LEMOV", mazeMoveChoice);
         }
 
         ImGui.sameLine();
 
         if (ImGui.button("Right") && Utils.answerIsCorrectInput(mazeMoveChoice, 1)) {
             client.getGameModel().setWantedPos(GameModel.TOWARD_RIGHT, Integer.parseInt(mazeMoveChoice));
-            moveSend(GameModel.TOWARD_UP, "RIMOV", mazeMoveChoice);
+            moveSend(GameModel.TOWARD_RIGHT, "RIMOV", mazeMoveChoice);
         }
 
         ImGui.sameLine();

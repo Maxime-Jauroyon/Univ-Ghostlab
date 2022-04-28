@@ -23,7 +23,10 @@ public class UDPRunnable implements Runnable{
                 DatagramPacket packet = new DatagramPacket(data, data.length);
                 datagramSocket.receive(packet);
                 String receivedMessage = new String(packet.getData(), 0, packet.getLength());
-                //Utils.printAllMessage(receivedMessage, "Private Message From");
+                String list[] = receivedMessage.split(" ");
+                String message = list[2].substring(list[2].length()-3);
+                client.addContentTologs("client: info: received from server", receivedMessage, 0);
+                client.addContentTologs("client: info: received from " + list[1], message, 1);
             }
 
         } catch (IOException e) {

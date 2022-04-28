@@ -1,13 +1,9 @@
 package com.ustudents.ghostlab.communication;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
-
 import com.ustudents.ghostlab.client.Client;
 import com.ustudents.ghostlab.listener.TCPRunnable;
-import com.ustudents.ghostlab.other.Utils;
 import com.ustudents.ghostlab.scene.SceneData;
 
 public class Reader {
@@ -224,14 +220,14 @@ public class Reader {
         }
     }*/
 
-    private int convertByteToInt(byte[] bytes, int begin, int end){
+    /*private int convertByteToInt(byte[] bytes, int begin, int end){
         ByteBuffer byteBuffer = ByteBuffer.wrap(bytes, begin, end);
         return (int)byteBuffer.get();
-    }
+    }*/
  
     private void readGAMES(InputStream inputStream) throws IOException{
         byte[] bytes = new byte[5];
-        int readBytes = inputStream.read(bytes);
+        inputStream.read(bytes);
         int nbGames = bytes[1];
         
         client.addContentTologs("client: info: received from server:", 
@@ -240,7 +236,7 @@ public class Reader {
 
     private void readOGAMES(InputStream inputStream) throws IOException{
         byte[] bytes = new byte[7];
-        int readBytes = inputStream.read(bytes);
+        inputStream.read(bytes);
         int gameId = bytes[1];
         int nbPlayer = bytes[3];
 
@@ -251,7 +247,7 @@ public class Reader {
 
     private void readREGOK(InputStream inputStream) throws IOException{
         byte[] bytes = new byte[5];
-        int readBytes = inputStream.read(bytes);
+        inputStream.read(bytes);
         int gameId = bytes[1];
 
         client.addContentTologs("client: info: received from server:",
@@ -271,7 +267,7 @@ public class Reader {
 
     private void readUNROK(InputStream inputStream) throws IOException{
         byte[] bytes = new byte[5];
-        int readBytes = inputStream.read(bytes);
+        inputStream.read(bytes);
         int gameId = bytes[1];
 
         client.addContentTologs("client: info: received from server:",
@@ -291,7 +287,7 @@ public class Reader {
 
     private void readSIZE(InputStream inputStream) throws IOException{
         byte[] bytes = new byte[11];
-        int readBytes = inputStream.read(bytes);
+        inputStream.read(bytes);
         int gameId = bytes[1];
         int mazeHeight = bytes[3];
         int mazeWidth = bytes[6];
@@ -303,7 +299,7 @@ public class Reader {
     
     private void readLIST(InputStream inputStream) throws IOException{
         byte[] bytes = new byte[7];
-        int readBytes = inputStream.read(bytes);
+        inputStream.read(bytes);
         int gameId = bytes[1];
         int nbPlayer = bytes[3];
 
@@ -332,27 +328,28 @@ public class Reader {
 
     private void readWELCO(InputStream inputStream) throws IOException{
         byte[] bytes = new byte[34];
-        int readBytes = inputStream.read(bytes);
+        inputStream.read(bytes);
         int gameId = bytes[1];
         int mazeHeight = bytes[3];
         int mazeWidth = bytes[6];
         int ghost = bytes[9];
-        String ipMulticast = convertByteArrayToString(bytes, 11, 26);
-        client.addContentTologs("$", ipMulticast, 1);
-        String portMulticast = convertByteArrayToString(bytes, 27, 31);
+        String multicastAddr = convertByteArrayToString(bytes, 11, 26);
+        client.addContentTologs("$", multicastAddr, 1);
+        String multicastPort = convertByteArrayToString(bytes, 27, 31);
+        client.addContentTologs("$", multicastPort, 1);
 
-        client.addContentTologs("$", portMulticast, 1);
+        client.launchMulticastThread(multicastAddr, Integer.parseInt(multicastPort));
         client.getGameModel().setMaze(mazeHeight, mazeWidth);
         client.addContentTologs("client: info: received from server:",
          "WELCO " + gameId + " " + mazeHeight + " " + mazeWidth + 
-         " " + ghost + " " + ipMulticast + " " + portMulticast + 
+         " " + ghost + " " + multicastAddr + " " + multicastPort + 
          "***", 0);
 
     }
     
     private void readPOSIT(InputStream inputStream) throws IOException{
         byte[] bytes = new byte[20];
-        int readBytes = inputStream.read(bytes);
+        inputStream.read(bytes);
         String username = convertByteArrayToString(bytes, 1, 9);
         String posX = convertByteArrayToString(bytes, 10, 13);
         String posY = convertByteArrayToString(bytes, 14, 17);
@@ -362,6 +359,36 @@ public class Reader {
          "POSIT " + username + " " + posX + " " + posY + 
          "***", 0);
         client.setCurrentScene(SceneData.SCENE_INGAME);
+    }
+
+    private void readMOVE(InputStream inputStream, int flag) throws IOException{
+        byte[] bytes = new byte[11];
+        inputStream.read(bytes);
+        String posX = convertByteArrayToString(bytes, 1, 4);
+        String posY = convertByteArrayToString(bytes, 5, 8);
+
+        if(flag == 0){
+            client.addContentTologs("client: info: received from server:",
+            "MOVE! " + posX + " " + posY + "***", 0);
+        }else{
+            String playerScore = convertByteArrayToString(bytes, 9, 12);
+            client.addContentTologs("client: info: received from server:",
+            "MOVEF " + posX + " " + posY + " " + playerScore +"***", 0);
+        }
+        
+        client.getGameModel().updateMaze(new int[]{Integer.parseInt(posX), Integer.parseInt(posY)});
+        client.setCurrentScene(SceneData.SCENE_INGAME);
+
+    }
+
+    private void readGOBYE(InputStream inputStream) throws IOException{
+        inputStream.read(new byte[3]);
+        client.addContentTologs("client: info: received from server:",
+            "GOBYE***", 0);
+        client.getSocket().close();
+        client.launch(1);
+        client.setCurrentScene(SceneData.SCENE_MAIN);
+        tcpRunnable.wantExit();
     }
 
     public void read(InputStream inputStream) throws IOException {
@@ -395,11 +422,11 @@ public class Reader {
         }else if(read.equals("POSIT")){
             readPOSIT(inputStream);
         }else if(read.equals("MOVE!")){
-            
+            readMOVE(inputStream, 0);
         }else if(read.equals("MOVEF")){
-            
+            readMOVE(inputStream, 1);
         }else if(read.equals("GOBYE")){
-            
+            readGOBYE(inputStream);
         }else if(read.equals("GLIS!")){
             
         }else if(read.equals("GPLYR")){

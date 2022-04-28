@@ -5,6 +5,7 @@ import com.ustudents.application.window.WindowInfo;
 import com.ustudents.common.command.Command;
 import com.ustudents.ghostlab.communication.Sender;
 import com.ustudents.ghostlab.listener.TCPRunnable;
+import com.ustudents.ghostlab.listener.MulticastRunnable;
 import com.ustudents.ghostlab.listener.UDPRunnable;
 import com.ustudents.ghostlab.other.GameModel;
 import com.ustudents.ghostlab.scene.GameLobbyScene;
@@ -30,6 +31,7 @@ public class Client extends Application {
     private Socket socket;
     private DatagramSocket datagramSocket;
     private TCPRunnable tcpRunnable;
+    private MulticastRunnable multicastRunnable;
     //private PrintWriter pw;
     private Sender sender;
     private String ipv4_addr;
@@ -95,6 +97,11 @@ public class Client extends Application {
         datagramSocket.close();
         datagramSocket = new DatagramSocket(udpPort);
     }*/
+
+    public void launchMulticastThread(String multicastAddr, int multicastPort){
+        multicastRunnable = new MulticastRunnable(this, multicastAddr, multicastPort);
+        Thread multicastThread = new Thread(multicastRunnable);
+    }
 
     public Socket getSocket() {
         return socket;
