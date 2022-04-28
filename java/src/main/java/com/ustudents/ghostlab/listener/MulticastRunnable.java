@@ -29,6 +29,7 @@ public class MulticastRunnable implements Runnable{
             while(!client.getSocket().isClosed()){
                 mso.receive(paquet);
                 String receivedMessage = new String(paquet.getData(),0,paquet.getLength());
+                client.addContentTologs("client: info:", receivedMessage, 0);
                 String[] list = receivedMessage.split(" ");
 
                 if(list[0].equals("GHOST")) {

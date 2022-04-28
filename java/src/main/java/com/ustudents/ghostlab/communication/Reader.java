@@ -338,7 +338,7 @@ public class Reader {
         String multicastPort = convertByteArrayToString(bytes, 27, 31);
         client.addContentTologs("$", multicastPort, 1);
 
-        client.launchMulticastThread(multicastAddr, Integer.parseInt(multicastPort));
+        client.launchMulticastThread(multicastAddr.split("#")[0], Integer.parseInt(multicastPort));
         client.getGameModel().setMaze(mazeHeight, mazeWidth);
         client.addContentTologs("client: info: received from server:",
          "WELCO " + gameId + " " + mazeHeight + " " + mazeWidth + 
@@ -362,7 +362,7 @@ public class Reader {
     }
 
     private void readMOVE(InputStream inputStream, int flag) throws IOException{
-        byte[] bytes = new byte[11];
+        byte[] bytes = new byte[15];
         inputStream.read(bytes);
         String posX = convertByteArrayToString(bytes, 1, 4);
         String posY = convertByteArrayToString(bytes, 5, 8);
@@ -379,6 +379,49 @@ public class Reader {
         client.getGameModel().updateMaze(new int[]{Integer.parseInt(posX), Integer.parseInt(posY)});
         client.setCurrentScene(SceneData.SCENE_INGAME);
 
+    }
+
+    private void readGLIST(InputStream inputStream) throws IOException{
+        byte[] bytes = new byte[5];
+        inputStream.read(bytes);
+        int nbPlayer = bytes[1];
+    
+        client.addContentTologs("client: info: received from server:" ,
+         "GLIS! " + nbPlayer + "***", 0);
+
+    }
+
+    private void readGPLYR(InputStream inputStream) throws IOException{
+        byte[] bytes = new byte[25];
+        inputStream.read(bytes);
+        String username = convertByteArrayToString(bytes, 1, 9);
+        String posX = convertByteArrayToString(bytes, 10, 13);
+        String posY = convertByteArrayToString(bytes, 14, 17);
+        String playerScore = convertByteArrayToString(bytes, 18, 22);
+
+        client.addContentTologs("client: info: received from server:",
+         "GPLYR " + username + " " + posX + " " + posY + " " +
+         playerScore +  "***", 0);
+    
+    }
+
+    private void readMESS(InputStream inputStream, int flag) throws IOException{
+        byte[] bytes = new byte[8];
+        inputStream.read(bytes);
+        if(flag == 0){
+            client.addContentTologs("client: info: received from server:",
+            "SEND!***", 0);
+        }else if(flag == 1){
+            client.addContentTologs("client: warning: received from server:",
+            "NSEND***", 0);
+        }else{
+            client.addContentTologs("client: info: received from server:",
+            "MALL!***", 0);
+            
+        }
+
+        if(flag != 1)
+            client.backToPreviousScene();
     }
 
     private void readGOBYE(InputStream inputStream) throws IOException{
@@ -428,15 +471,15 @@ public class Reader {
         }else if(read.equals("GOBYE")){
             readGOBYE(inputStream);
         }else if(read.equals("GLIS!")){
-            
+            readGLIST(inputStream);
         }else if(read.equals("GPLYR")){
-            
+            readGPLYR(inputStream);
         }else if(read.equals("SEND!")){
-            
+            readMESS(inputStream, 0);
         }else if(read.equals("NSEND")){
-            
+            readMESS(inputStream, 1);
         }else if(read.equals("MALL!")){
-                
+            readMESS(inputStream, 2);    
         }else if(read.length() > 0){
             client.addContentTologs("client: error:", "unknow message", 1);
         }

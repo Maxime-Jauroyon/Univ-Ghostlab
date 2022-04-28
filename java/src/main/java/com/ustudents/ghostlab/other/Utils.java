@@ -7,8 +7,18 @@ import java.net.UnknownHostException;
 
 public class Utils {
 
+    public static boolean containsChar(String answer){
+        for(int i = 0; i < answer.length(); i++){
+            char temp = answer.charAt(i);
+            if(temp < 48 || temp > 57)
+                return false;
+        }
+        return true;
+    }
+
     public static boolean answerIsCorrectInput(String answer, int flag){
-        if((flag == 0 && answer.length() != 8) || (flag == 1 && ((answer.length() > 3 || answer.length() < 1) 
+        if((flag == 0 && answer.length() != 8) || (flag == 1 && 
+             (!containsChar(answer) || (answer.length() > 3 || answer.length() < 1) 
             || (Integer.parseInt(answer) > 255 || Integer.parseInt(answer) < 0))) 
             || (flag == 2 && (answer.length() > 5 || answer.length() < 1)))
             return false;

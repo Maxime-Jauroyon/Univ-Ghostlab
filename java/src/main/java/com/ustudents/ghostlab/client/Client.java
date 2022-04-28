@@ -101,6 +101,7 @@ public class Client extends Application {
     public void launchMulticastThread(String multicastAddr, int multicastPort){
         multicastRunnable = new MulticastRunnable(this, multicastAddr, multicastPort);
         Thread multicastThread = new Thread(multicastRunnable);
+        multicastThread.start();
     }
 
     public Socket getSocket() {

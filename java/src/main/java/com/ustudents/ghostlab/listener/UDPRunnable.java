@@ -24,9 +24,9 @@ public class UDPRunnable implements Runnable{
                 datagramSocket.receive(packet);
                 String receivedMessage = new String(packet.getData(), 0, packet.getLength());
                 String list[] = receivedMessage.split(" ");
-                String message = list[2].substring(list[2].length()-3);
-                client.addContentTologs("client: info: received from server", receivedMessage, 0);
-                client.addContentTologs("client: info: received from " + list[1], message, 1);
+                String message = list[2].substring(0, list[2].length()-3);
+                client.addContentTologs("client: info: received from server:", receivedMessage, 0);
+                client.addContentTologs("client: info: received from " + list[1] + ":", message, 1);
             }
 
         } catch (IOException e) {

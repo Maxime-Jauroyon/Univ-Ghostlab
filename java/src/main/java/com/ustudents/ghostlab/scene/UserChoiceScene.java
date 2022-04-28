@@ -28,7 +28,6 @@ public class UserChoiceScene extends Scene {
         if (ImGui.button("Use it")) {
 
             String username = client.getUsernameChoiceContent().get();
-            client.getUsernameChoiceContent().clear();
             if(Utils.answerIsCorrectInput(username, 0)){
                 client.setUsername(username);
                 client.addContentTologs("client: info:", "your username are : " + username, 1);
@@ -65,7 +64,6 @@ public class UserChoiceScene extends Scene {
             String username = client.getUsernameChoiceContent().get();
             String gameId = client.getGameChoiceContent().get();
             username = (client.getUsername() == null)? username: client.getUsername();
-            client.getUsernameChoiceContent().clear();
             client.getGameChoiceContent().clear();
             if(Utils.answerIsCorrectInput(username, 0)){
                 client.setUsername(username);
@@ -156,28 +154,24 @@ public class UserChoiceScene extends Scene {
         String mazeMoveChoice = client.getUsernameChoiceContent().get();
 
         if (ImGui.button("Up")){
-            client.getGameModel().setWantedPos(GameModel.TOWARD_UP, Integer.parseInt(mazeMoveChoice));
             moveSend(GameModel.TOWARD_UP, "UPMOV", mazeMoveChoice);
         }
 
         ImGui.sameLine();
 
         if (ImGui.button("Down") && Utils.answerIsCorrectInput(mazeMoveChoice, 1)) {
-            client.getGameModel().setWantedPos(GameModel.TOWARD_DOWN, Integer.parseInt(mazeMoveChoice));
             moveSend(GameModel.TOWARD_DOWN, "DOMOV", mazeMoveChoice);
         }
 
         ImGui.sameLine();
 
         if (ImGui.button("Left") && Utils.answerIsCorrectInput(mazeMoveChoice, 1)) {
-            client.getGameModel().setWantedPos(GameModel.TOWARD_LEFT, Integer.parseInt(mazeMoveChoice));
             moveSend(GameModel.TOWARD_LEFT, "LEMOV", mazeMoveChoice);
         }
 
         ImGui.sameLine();
 
         if (ImGui.button("Right") && Utils.answerIsCorrectInput(mazeMoveChoice, 1)) {
-            client.getGameModel().setWantedPos(GameModel.TOWARD_RIGHT, Integer.parseInt(mazeMoveChoice));
             moveSend(GameModel.TOWARD_RIGHT, "RIMOV", mazeMoveChoice);
         }
 
