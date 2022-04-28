@@ -29,26 +29,27 @@ public class MulticastRunnable implements Runnable{
             while(!client.getSocket().isClosed()){
                 mso.receive(paquet);
                 String receivedMessage = new String(paquet.getData(),0,paquet.getLength());
-                client.addContentTologs("client: info:", receivedMessage, 0);
+                client.addContentTologs("client: info: received from server:", receivedMessage, 0);
                 String[] list = receivedMessage.split(" ");
 
                 if(list[0].equals("GHOST")) {
                     String posX = list[1];
                     String posY = list[2].substring(0, list[2].length() - 3);
-                    System.out.println("[Ghost] : has moved in : (" + posX + "," + posY + ")");
+                    client.addContentTologs("client: info:", "ghost has been heard in " +
+                     posX + " and " + posY, 0);
                 }else if(list[0].equals("SCORE")) {
-                    String username = list[1];
                     String score = list[2];
-                    String posX = list[3];
-                    String posY = list[4].substring(0, list[4].length() - 3);
-                    System.out.println("[" + username + "] : has kept a ghost in : (" + posX + "," + posY + ") "
-                            + " with " + score + " points");
+                    client.addContentTologs("client: info:", "your score has been updated" +
+                     score, 0);
+                    client.getGameModel().setScore(Integer.parseInt(score));
                 }else if(list[0].equals("ENDGA")){
                     String username = list[1];
                     String score = list[2].substring(0, list[2].length() - 3);
-                    System.out.println("[Winner] : " + username + " with " + score + " points");
+                    client.addContentTologs("client: info:", username + " won the game with " + score + " points", 1);
+                    client.getSender().send("IQUIT***");
                 }else if(list[0].equals("MESSA")){
-                    //Utils.printAllMessage(receivedMessage, "Global Message From");
+                    String message = list[2].substring(0, list[2].length()-3);
+                    client.addContentTologs("client: info: received from " + list[1] + ":", message, 1);
                 }
             }
 
