@@ -2,6 +2,7 @@ package com.ustudents.ghostlab.scene;
 
 import java.io.IOException;
 
+import com.ustudents.application.graphic.ImGuiManager;
 import com.ustudents.ghostlab.client.Client;
 
 import imgui.ImGui;
@@ -17,20 +18,29 @@ public class InGameScene extends Scene{
         ImGui.setNextWindowPos(0, 0);
         ImGui.setNextWindowSize(ImGui.getIO().getDisplaySizeX(), ImGui.getIO().getDisplaySizeY() * 0.6f);
         ImGui.begin("Ghostlab Client", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.MenuBar);
+        ImGui.pushFont(ImGuiManager.firaCode);
 
         char[][] maze = client.getGameModel().getMaze();
         for(int i = 0; i < maze.length; i++){
+            String line = "";
             for(int j = 0; j < maze[i].length; j++){
-                ImGui.text(" ");
-                ImGui.sameLine();
-                ImGui.text(String.valueOf(maze[i][j]));
-                ImGui.sameLine();
-                ImGui.text(" ");
-                if(j != maze[i].length-1){
+                //ImGui.text(" ");
+                //ImGui.sameLine();
+                //ImGui.text(String.valueOf(maze[i][j]));
+                line += maze[i][j];
+                //ImGui.sameLine();
+                //ImGui.text(" ");
+                /*if(j != maze[i].length-1){
                     ImGui.sameLine();
-                }
+                }*/
             }
+            if(i > 0){
+                ImGui.setCursorPosY(ImGui.getCursorPosY() - 6);
+            }
+            ImGui.textUnformatted(line);
         }
+
+        ImGui.popFont();
 
         if(ImGui.button("Move")){
             client.setLastPressedButton(SceneData.BUTTON_MAZEMOVE);

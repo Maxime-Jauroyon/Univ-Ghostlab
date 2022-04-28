@@ -98,22 +98,6 @@ public abstract class Scene {
                         ImGui.textColored(57, 255, 20, 255, command); 
                     else
                         ImGui.textUnformatted(command);
-
-                /*String command = client.getLogs().get(i);
-                if((command.startsWith("client: info:") && !client.getConsoleShowInfo().get() ||
-                command.startsWith("client: warning:") && !client.getConsoleShowWarning().get() ||
-                command.startsWith("client: error:") && !client.getConsoleShowError().get())){
-                   return;
-                }else{
-                    if(command.startsWith("client: warning:")) 
-                    ImGui.textColored(215, 215, 0, 255, command);
-                    else if(command.startsWith("client: error:"))
-                        ImGui.textColored(255, 0, 0, 255, command);   
-                    else if(command.startsWith("$"))
-                        ImGui.textColored(57, 255, 20, 255, command); 
-                    else
-                        ImGui.textUnformatted(command);
-                }*/
             }
         });
 
