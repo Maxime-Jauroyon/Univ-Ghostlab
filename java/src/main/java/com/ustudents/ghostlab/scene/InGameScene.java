@@ -24,15 +24,7 @@ public class InGameScene extends Scene{
         for(int i = 0; i < maze.length; i++){
             String line = "";
             for(int j = 0; j < maze[i].length; j++){
-                //ImGui.text(" ");
-                //ImGui.sameLine();
-                //ImGui.text(String.valueOf(maze[i][j]));
                 line += maze[i][j];
-                //ImGui.sameLine();
-                //ImGui.text(" ");
-                /*if(j != maze[i].length-1){
-                    ImGui.sameLine();
-                }*/
             }
             if(i > 0){
                 ImGui.setCursorPosY(ImGui.getCursorPosY() - 6);
