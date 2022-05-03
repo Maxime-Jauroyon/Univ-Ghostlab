@@ -48,7 +48,7 @@ public class MulticastRunnable implements Runnable{
                     client.addContentTologs("client: info:", username + " won the game with " + score + " points", 1);
                     client.getSender().send("IQUIT***");
                 }else if(list[0].equals("MESSA")){
-                    String message = list[2].substring(0, list[2].length()-3);
+                    String message = receivedMessage.substring(15, receivedMessage.length()-3); 
                     client.addContentTologs("client: info: received from " + list[1] + ":", message, 1);
                 }
             }
