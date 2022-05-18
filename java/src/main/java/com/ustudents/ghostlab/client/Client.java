@@ -32,7 +32,6 @@ public class Client extends Application {
     private DatagramSocket datagramSocket;
     private TCPRunnable tcpRunnable;
     private MulticastRunnable multicastRunnable;
-    //private PrintWriter pw;
     private Sender sender;
     private String ipv4_addr;
     private int tcpPort;
@@ -40,39 +39,6 @@ public class Client extends Application {
     private int udpPort;
     private String gameRegistered;
     private GameModel gameModel;
-    /*private int mazeHeight;
-    private int mazeWidth;
-    private int[][] playerWay;*/
-    /*private final Thread tcpThread;
-    private final Thread udpThread;*/
-    //private String username;
-    /*private int gameRegistered;
-    private int heigthMaze;
-    private int widthMaze;
-    private int numberOfghost;
-    private String multicastAddr;
-    private int multicastPort;
-    private String idPlayer;
-    private int[] startedPos;
-    private int[] currentPos;
-    private int score;*/
-
-    /*public Client(String ipv4, int tcpPort, String username, int udpPort) throws IOException {
-        addContentTologs("client:", "connection to server established.",1);
-        socket = new Socket(ipv4, tcpPort);
-        datagramSocket = new DatagramSocket(udpPort);
-        tcpRunnable = new TCPRunnable(this);
-        Thread tcpThread = new Thread(tcpRunnable);
-        Thread udpThread = new Thread(new UDPRunnable(this, datagramSocket));
-        tcpThread.start();
-        udpThread.start();
-        addContentTologs("client:", "udp listener thread started.",1);
-        addContentTologs("client:", "tcp listener thread started.",1);
-        this.pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
-        this.username = username;
-        gameRegistered = "-1";
-        gameModel = new GameModel();
-    }*/
 
     public void launch(int flag) throws IOException {
         addContentTologs("client: info:", "connection to server established.",1);
@@ -92,11 +58,6 @@ public class Client extends Application {
         gameRegistered = "-1";
         gameModel = new GameModel();
     }
-
-    /*public void close(BufferedReader br) throws IOException{
-        datagramSocket.close();
-        datagramSocket = new DatagramSocket(udpPort);
-    }*/
 
     public void launchMulticastThread(String multicastAddr, int multicastPort){
         multicastRunnable = new MulticastRunnable(this, multicastAddr, multicastPort);
@@ -140,10 +101,6 @@ public class Client extends Application {
         this.udpPort = udpPort;
     }
 
-    /*public void sendRequest(String action) throws IOException{
-        Sender.send(pw, action);
-    }*/
-
     public String getGameRegister(){
         return gameRegistered;
     }
@@ -151,40 +108,6 @@ public class Client extends Application {
     public void setGameRegister(String gameRegister) {
         this.gameRegistered = gameRegister;
     }
-
-
-    /*public void setNumberOfghost(int numberOfghost) {
-        this.numberOfghost = numberOfghost;
-    }
-
-    public void setMulticastAddr(String multicastAddr) {
-        this.multicastAddr = multicastAddr;
-    }
-
-    public void setMulticastPort(int multicastPort) {
-        this.multicastPort = multicastPort;
-    }
-
-    public void setIdPlayer(String idPlayer) {
-        this.idPlayer = idPlayer;
-    }
-
-    public void setStartedPos(int h, int w){
-        System.out.println("Your position on the maze are : (" +  h + "," + w + ")");
-        startedPos[0] = h;
-        startedPos[1] = w;
-    }
-
-    public void setCurrentPos(int h, int w){
-        System.out.println("Your position on the maze are : (" +  h + "," + w + ")");
-        currentPos[0] = h;
-        currentPos[1] = w;
-    }
-
-    public void setScore(int score) {
-        System.out.println("Your score are : " + score);
-        this.score = score;
-    }*/
     
     private List<Integer> scene = new ArrayList<>();
     private final List<String> logs = new ArrayList<>();
