@@ -78,6 +78,15 @@ public class Sender {
             sendSIZEAndLIST(list);
         }
     }
+
+    public void sendServerInfo() throws IOException{
+        client.getRequestGamesId().clear();
+        client.getRequestPlayersUsernamePerGames().clear();
+        client.getRequestMazeSizePerGame().clear();
+        send("GAME?***");
+        for(int gameId: client.getRequestGamesId())
+            send("LIST? " + gameId  + "***");
+    }
     
     
     

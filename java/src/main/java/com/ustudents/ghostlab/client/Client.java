@@ -22,6 +22,8 @@ import java.net.DatagramSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import static java.lang.System.exit;
 
@@ -39,6 +41,9 @@ public class Client extends Application {
     private int udpPort;
     private String gameRegistered;
     private GameModel gameModel;
+    private List<Integer> requestGamesId = new ArrayList<>();
+    private SortedMap<Integer, List<String>> requestPlayersUsernamePerGames = new TreeMap<>();
+    private SortedMap<Integer, List<Integer>> requestMazeSizePerGame = new TreeMap<>();
 
     public void launch(int flag) throws IOException {
         addContentTologs("client: info:", "connection to server established.",1);
@@ -85,6 +90,18 @@ public class Client extends Application {
         return gameModel;
     }
 
+    public List<Integer> getRequestGamesId(){
+        return requestGamesId;
+    }
+
+    public SortedMap<Integer, List<String>> getRequestPlayersUsernamePerGames(){
+        return requestPlayersUsernamePerGames;
+    }
+
+    public SortedMap<Integer, List<Integer>> getRequestMazeSizePerGame(){
+        return requestMazeSizePerGame;
+    }
+
     public void setIPv4Addr(String ipv4_addr) {
         this.ipv4_addr = ipv4_addr;
     }
@@ -107,6 +124,20 @@ public class Client extends Application {
 
     public void setGameRegister(String gameRegister) {
         this.gameRegistered = gameRegister;
+    }
+
+    public void addInRequestGamesId(int gameId){
+        requestGamesId.add(gameId);
+    }
+
+    public void addInRequestPlayersUsernamePerGames(int gameId, String username){
+        if(!requestPlayersUsernamePerGames.containsKey(gameId))
+            requestPlayersUsernamePerGames.put(gameId, new ArrayList<>());
+        requestPlayersUsernamePerGames.get(gameId).add(username);
+    }
+
+    public void addInRequestMazeSizePerGame(int gameId, int mazeHeight, int mazeWidth){
+        requestMazeSizePerGame.put(gameId, new ArrayList<>(List.of(mazeHeight, mazeWidth)));
     }
     
     private List<Integer> scene = new ArrayList<>();

@@ -1,6 +1,7 @@
 package com.ustudents.ghostlab.scene;
 
 import java.io.IOException;
+import java.util.List;
 
 import com.ustudents.ghostlab.client.Client;
 
@@ -18,7 +19,6 @@ public class GameLobbyScene extends Scene{
         ImGui.setNextWindowSize(ImGui.getIO().getDisplaySizeX(), ImGui.getIO().getDisplaySizeY() * 0.6f);
         ImGui.begin("Ghostlab Client", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.MenuBar);
 
-
         if(ImGui.button("Start")){
             client.getSender().send("START***");
         }
@@ -28,25 +28,25 @@ public class GameLobbyScene extends Scene{
         if(ImGui.button("Unregister")){
             client.getSender().send("UNREG***");
         }
-
-        ImGui.sameLine();
         
-        if(ImGui.button("Maze info")){
-            client.setLastPressedButton(SceneData.BUTTON_MAZEINFO);
-            client.setCurrentScene(SceneData.SCENE_USERCHOICE);
-        }
-
-        ImGui.sameLine();
-
-        if(ImGui.button("List player")){
-            client.setLastPressedButton(SceneData.BUTTON_LISTPLAYER);
-            client.setCurrentScene(SceneData.SCENE_USERCHOICE);
-        }
-
-        ImGui.sameLine();
-
-        if(ImGui.button("Game Info")){
-            client.getSender().send("GAME?***");
+        if(ImGui.collapsingHeader("Available Games")){
+            if(ImGui.button("Reload Games Data")){
+                client.getSender().sendServerInfo();
+            } 
+            
+            for(int gameId: client.getRequestGamesId()){
+                if(ImGui.collapsingHeader("Game " + gameId)){
+                    if(ImGui.collapsingHeader("Players") && 
+                        client.getRequestPlayersUsernamePerGames().containsKey(gameId)){
+                        List<String> playersUsername = client.getRequestPlayersUsernamePerGames().get(gameId);
+                        for(String playerUsername: playersUsername){
+                            ImGui.text("- " + playerUsername);
+                        }
+                    }
+                }    
+            }
+            
+            
         }
 
         ImGui.end();
