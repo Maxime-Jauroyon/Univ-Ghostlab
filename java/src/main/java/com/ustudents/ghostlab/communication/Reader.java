@@ -37,6 +37,7 @@ public class Reader {
         client.addContentTologs("client: info: received from server:",
          "OGAME " + gameId + " " + nbPlayer + "***", 0);
         client.addInRequestGamesId(gameId);
+        client.getSender().send("LIST? " + gameId  + "***");
     }
 
     private void readREGOK(InputStream inputStream) throws IOException{
@@ -46,7 +47,7 @@ public class Reader {
 
         client.addContentTologs("client: info: received from server:",
          "REGOK " + gameId + "***", 0);
-        client.clearData();
+        client.getSender().sendServerInfo();
         client.setCurrentScene(SceneData.SCENE_GAMELOBBY);
     }
     
@@ -54,6 +55,7 @@ public class Reader {
         inputStream.read(new byte[3]);
         client.addContentTologs("client: error: received from server:",
          "REGNO***", 0);
+        client.getSender().sendServerInfo();
         client.setUsername(null);
         client.setCurrentScene(SceneData.SCENE_MAIN);
         
@@ -67,11 +69,11 @@ public class Reader {
         client.addContentTologs("client: info: received from server:",
          "UNROK " + gameId + "***", 0);
         client.getSocket().close();
-        client.launch(1);
-        client.setCurrentScene(SceneData.SCENE_MAIN);
         tcpRunnable.wantExit();
-        client.clearData();
-        
+        client.launch(1);
+        client.getSender().sendServerInfo();
+        client.setUsername(null);
+        client.setCurrentScene(SceneData.SCENE_MAIN);
     }
 
     private void readDUNNO(InputStream inputStream) throws IOException{

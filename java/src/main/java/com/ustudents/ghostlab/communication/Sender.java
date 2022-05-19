@@ -94,7 +94,7 @@ public class Sender {
     public void sendServerInfo() throws IOException{
         client.clearData();
         send("GAME?***");
-        try{
+        /*try{
             Thread.sleep(1000);
         }catch(InterruptedException e){
             e.printStackTrace();
@@ -103,7 +103,7 @@ public class Sender {
         for(int gameId: client.getRequestGamesId()){
             System.out.println("boucle : " + gameId);
             send("LIST? " + gameId  + "***");
-        }
+        }*/
             
     }
     

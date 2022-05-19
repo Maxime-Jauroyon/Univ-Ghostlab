@@ -47,7 +47,10 @@ public class Client extends Application {
 
     public void launch(int flag) throws IOException {
         addContentTologs("client: info:", "connection to server established.",1);
+        gameRegistered = -1;
+        gameModel = new GameModel();
         socket = new Socket(ipv4_addr, tcpPort);
+        sender = new Sender(this, socket.getOutputStream());
         if(flag == 0){
             datagramSocket = new DatagramSocket(udpPort);
         }
@@ -58,9 +61,6 @@ public class Client extends Application {
         udpThread.start();
         addContentTologs("client: info:", "udp listener thread started.",1);
         addContentTologs("client: info:", "tcp listener thread started.",1);
-        sender = new Sender(this, socket.getOutputStream());
-        gameRegistered = -1;
-        gameModel = new GameModel();
     }
 
     public void launchMulticastThread(String multicastAddr, int multicastPort){
