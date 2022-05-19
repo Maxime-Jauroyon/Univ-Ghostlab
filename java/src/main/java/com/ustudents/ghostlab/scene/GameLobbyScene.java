@@ -42,7 +42,15 @@ public class GameLobbyScene extends Scene{
                         for(String playerUsername: playersUsername){
                             ImGui.text("- " + playerUsername);
                         }
+                        
                     }
+
+                    if(ImGui.collapsingHeader("Maze") && 
+                    client.getRequestPlayersUsernamePerGames().containsKey(gameId)){
+                        List<Integer> mazes = client.getRequestMazeSizePerGame().get(gameId);
+                        ImGui.text("- Size : " + mazes.get(0) + "x" + mazes.get(1));
+                    }
+                    
                 }    
             }
             

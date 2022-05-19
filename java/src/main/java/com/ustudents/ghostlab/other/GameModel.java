@@ -20,6 +20,7 @@ public class GameModel {
     private int[] wantedPos;
     private final List<int[]> pos = new ArrayList<>();
     private char[][] maze;
+    private final List<Player> players = new ArrayList<>();
 
     public int[] getLastPos(){
         return pos.get(pos.size() - 1);
@@ -27,6 +28,10 @@ public class GameModel {
 
     public char[][] getMaze(){
         return maze;
+    }
+
+    public List<Player> players(){
+        return players;
     }
 
     public void setScore(int score){
@@ -59,6 +64,10 @@ public class GameModel {
                 maze[i][j] = MAZE_UNKNOWN; 
             }
         }
+    }
+
+    public void addInPlayers(String username, String posX, String posY, String score){
+        players.add(new Player(username, posX, posY, score));
     }
 
     private boolean lastPosIsWantedPos(int[] newPos, int[] wantedPos){

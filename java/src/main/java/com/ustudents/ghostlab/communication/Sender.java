@@ -44,14 +44,14 @@ public class Sender {
 
         //outputStream.write("REGIS leotom99 7777 ".getBytes());
         outputStream.write(("REGIS " + request[1] + " " + request[2] + " ").getBytes());
-        for(int i = 0; i < request.length; i++){
+        /*for(int i = 0; i < request.length; i++){
             System.out.println(request[i]);
-        }
+        }*/
 
         /*System.out.println(request[3].substring(0, request[3].length()-3));
-        System.out.println(Integer.parseInt(request[3].substring(0, request[3].length()-3)));*/
-        System.out.println(client.getGameRegister());
         System.out.println(Integer.parseInt(request[3].substring(0, request[3].length()-3)));
+        System.out.println(client.getGameRegister());
+        System.out.println(Integer.parseInt(request[3].substring(0, request[3].length()-3)));*/
         outputStream.write((byte) client.getGameRegister()/*Integer.parseInt(request[3].substring(0, request[3].length()-3))*/);
         outputStream.write("***".getBytes());
         outputStream.flush();

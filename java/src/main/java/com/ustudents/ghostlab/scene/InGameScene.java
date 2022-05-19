@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import com.ustudents.application.graphic.ImGuiManager;
 import com.ustudents.ghostlab.client.Client;
+import com.ustudents.ghostlab.other.Player;
 
 import imgui.ImGui;
 import imgui.flag.ImGuiWindowFlags;
@@ -14,7 +15,7 @@ public class InGameScene extends Scene{
         super(client);
     }
 
-    public void inGameOption() throws IOException{
+    /*public void inGameOption() throws IOException{
         ImGui.setNextWindowPos(0, 0);
         ImGui.setNextWindowSize(ImGui.getIO().getDisplaySizeX(), ImGui.getIO().getDisplaySizeY() * 0.6f);
         ImGui.begin("Ghostlab Client", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.MenuBar);
@@ -67,7 +68,55 @@ public class InGameScene extends Scene{
 
         ImGui.end();
     
-    }    
+    }*/  
+
+
+    public void inGameOption() throws IOException{
+        ImGui.setNextWindowPos(0, 0);
+        ImGui.setNextWindowSize(ImGui.getIO().getDisplaySizeX(), ImGui.getIO().getDisplaySizeY() * 0.6f);
+        ImGui.begin("Ghostlab Client", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.MenuBar);
+
+        if(ImGui.button("Move")){
+        }
+
+        ImGui.sameLine();
+        
+        if(ImGui.button("Send Everyone Message")){
+            
+        }
+
+        ImGui.sameLine();
+
+        if(ImGui.button("Send Private Message")){
+            
+        }
+
+        ImGui.sameLine();
+
+        if(ImGui.button("Quit Game")){
+            client.getSender().send("IQUIT***");
+        }
+        
+        if(ImGui.collapsingHeader("Players")){
+            if(ImGui.button("Reload Players Data")){
+                client.getSender().send("GLIS?***");
+            } 
+
+            for(Player player : client.getGameModel().players()){
+                if(ImGui.collapsingHeader(player.getUsername())){
+                    ImGui.text("- Position x : " + player.getPosX());
+                    ImGui.text("- Position y : " + player.getPosY());
+                    ImGui.text("- Score : " + player.getScore());
+                }
+                
+            }
+            
+        }
+
+        ImGui.end();
+
+
+    }
 
     public void display() throws IOException{ 
         inGameOption();

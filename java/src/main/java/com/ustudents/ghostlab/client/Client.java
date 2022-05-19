@@ -144,6 +144,15 @@ public class Client extends Application {
         getRequestPlayersUsernamePerGames().clear();
         getRequestMazeSizePerGame().clear();
     }
+
+    public void resetClient() throws IOException{
+        socket.close();
+        tcpRunnable.wantExit();
+        launch(1);
+        sender.sendServerInfo();
+        setUsername(null);
+        setCurrentScene(SceneData.SCENE_MAIN);
+    }
     
     private List<Integer> scene = new ArrayList<>();
     private final List<String> logs = new ArrayList<>();
