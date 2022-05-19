@@ -157,7 +157,7 @@ public class Reader {
     }
 
     private void readMOVE(InputStream inputStream, int flag) throws IOException{
-        byte[] bytes = new byte[15];
+        byte[] bytes = new byte[16];
         inputStream.read(bytes);
         String posX = convertByteArrayToString(bytes, 1, 4);
         String posY = convertByteArrayToString(bytes, 5, 8);
@@ -166,7 +166,7 @@ public class Reader {
             client.addContentTologs("client: info: received from server:",
             "MOVE! " + posX + " " + posY + "***", 0);
         }else{
-            String playerScore = convertByteArrayToString(bytes, 9, 12);
+            String playerScore = convertByteArrayToString(bytes, 9, 13);
             client.addContentTologs("client: info: received from server:",
             "MOVEF " + posX + " " + posY + " " + playerScore +"***", 0);
         }

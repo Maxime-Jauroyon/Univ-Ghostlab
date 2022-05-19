@@ -22,12 +22,12 @@ public class MulticastRunnable implements Runnable{
     @Override
     public void run() {
         try {
-            MulticastSocket mso = new MulticastSocket(multicastPort);
-            mso.joinGroup(InetAddress.getByName(multicastAddr));
+            MulticastSocket multicastSocket = new MulticastSocket(multicastPort);
+            multicastSocket.joinGroup(InetAddress.getByName(multicastAddr));
             byte[]data=new byte[220];
             DatagramPacket paquet=new DatagramPacket(data,data.length);
             while(!client.getSocket().isClosed()){
-                mso.receive(paquet);
+                multicastSocket.receive(paquet);
                 String receivedMessage = new String(paquet.getData(),0,paquet.getLength());
                 client.addContentTologs("client: info: received from server:", receivedMessage, 0);
                 String[] list = receivedMessage.split(" ");
@@ -53,7 +53,7 @@ public class MulticastRunnable implements Runnable{
                 }
             }
 
-            mso.leaveGroup(InetAddress.getByName("231.1.2.4"));
+            multicastSocket.leaveGroup(InetAddress.getByName("231.1.2.4"));
 
         } catch (IOException e) {
             e.printStackTrace();

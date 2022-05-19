@@ -359,7 +359,7 @@ public class UserChoiceScene extends Scene {
             ImGui.sameLine();
 
             if(ImGui.button("Send")){
-                if(Utils.answerIsCorrectInput(mazeMoveChoice, 1)){
+                if(Utils.answerIsCorrectInput(mazeMoveChoice, 3)){
                     client.addContentTologs("client: info: taille :", String.valueOf(mazeMoveChoice.length()), 1);
                     int size = mazeMoveChoice.length();
                     for(int i = 0; i < 3 - size; i++){
@@ -372,7 +372,7 @@ public class UserChoiceScene extends Scene {
                     client.addContentTologs("client: warning:", "move : " + move +
                      ", number of move : " + mazeMoveChoice, 1);
                     client.addContentTologs("client: warning:",
-                     "Wrong choice of move", 1);
+                     "Wrong choice of move, you must choose an value between 0 to 999", 1);
                     client.backToPreviousScene(); 
                 }
                 client.getUsernameChoiceContent().clear();

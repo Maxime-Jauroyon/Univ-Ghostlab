@@ -28,7 +28,9 @@ public class Utils {
         if((flag == 0 && answer.length() != 8) || (flag == 1 && 
              (!containsChar(answer) || (answer.length() > 3 || answer.length() < 1) 
             || (Integer.parseInt(answer) > 255 || Integer.parseInt(answer) < 0))) 
-            || (flag == 2 && (answer.length() > 5 || answer.length() < 1)))
+            || (flag == 2 && (answer.length() > 5 || answer.length() < 1))
+            || (flag == 3 && (!containsChar(answer) || Integer.parseInt(answer) < 0 
+            || Integer.parseInt(answer) > 999)))
             return false;
 
         for(char c: answer.toCharArray()){
