@@ -77,6 +77,9 @@ public class Main {
         }
     }
 
+    /**
+     * Display help commands.
+     */
     private static void help(){
         System.out.println("usage: client [options]");
         System.out.println();

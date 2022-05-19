@@ -2,11 +2,13 @@ package com.ustudents.ghostlab.scene;
 
 public class SceneData {
 
+    /**All type of scene. */
     public static final int SCENE_MAIN = 0;
     public static final int SCENE_USERCHOICE = 1;
     public static final int SCENE_GAMELOBBY = 2;
     public static final int SCENE_INGAME = 3;
 
+    /**All type of button. */
     public static final int BUTTON_CREATEGAME = 0;
     public static final int BUTTON_JOINGAME = 1;
     public static final int BUTTON_MAZEINFO = 2;

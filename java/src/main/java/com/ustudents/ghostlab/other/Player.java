@@ -15,30 +15,54 @@ public class Player {
         this.score = score;
     }
 
+    /**
+     * @return Get the player username.
+     */
     public String getUsername(){
         return username;
     }
 
+    /**
+     * @return Get the player position x.
+     */
     public String getPosX(){
         return posX;
     }
 
+    /**
+     * @return Get the player position y.
+     */
     public String getPosY(){
         return posY;
     }
 
+    /**
+     * @return Get the player score.
+     */
     public String getScore(){
         return score;
     }
 
+    /**
+     * Set the player Position x.
+     * @param posX Position x.
+     */
     public void setPosX(String posX){
         this.posX = posX;
     }
 
+    /**
+     * Set the player Position y.
+     * @param posX Position y.
+     */
     public void setPosY(String posY){
         this.posY = posY;
     }
 
+    /**
+     * Set the player score.
+     * @param posX Player score.
+     */
     public void setScore(String score){
         this.score = score;
     }

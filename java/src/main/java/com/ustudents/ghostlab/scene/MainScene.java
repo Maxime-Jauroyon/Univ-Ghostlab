@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.List;
 
 import com.ustudents.ghostlab.client.Client;
-import com.ustudents.ghostlab.other.Utils;
 
 import imgui.ImGui;
 import imgui.flag.ImGuiWindowFlags;
@@ -15,6 +14,9 @@ public class MainScene extends Scene{
         super(client);
     }
 
+    /**
+     * To display the option of the main scene.
+     */
     public void mainSceneOption() throws IOException{
         ImGui.setNextWindowPos(0, 0);
         ImGui.setNextWindowSize(ImGui.getIO().getDisplaySizeX(), ImGui.getIO().getDisplaySizeY() * 0.6f);
@@ -61,6 +63,9 @@ public class MainScene extends Scene{
         ImGui.end();
     }
 
+    /**
+     * To display the main scene.
+     */
     public void display() throws IOException{ 
         mainSceneOption();  
         mainContainer();

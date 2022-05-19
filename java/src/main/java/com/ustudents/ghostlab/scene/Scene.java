@@ -22,6 +22,9 @@ public abstract class Scene {
         this.client = client;
     }
 
+    /**
+     * To display the main container.
+     */
     protected void mainContainer() throws IOException{
         ImGui.setNextWindowPos(0, 0);
         ImGui.setNextWindowSize(ImGui.getIO().getDisplaySizeX(), ImGui.getIO().getDisplaySizeY() * 0.6f);

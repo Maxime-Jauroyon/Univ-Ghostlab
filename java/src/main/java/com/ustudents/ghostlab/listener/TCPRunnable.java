@@ -19,13 +19,16 @@ public class TCPRunnable implements Runnable{
         exit = false;
     }
 
+    /**
+     * Allow to stop the thread.
+     */
     public void wantExit(){
         this.exit = true;
     }
 
     @Override
     public void run() {
-        Reader reader = new Reader(client, this);
+        Reader reader = new Reader(client);
         try {
             while(!exit && !client.getSocket().isClosed()){
                 reader.read(inputStream);

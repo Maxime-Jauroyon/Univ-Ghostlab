@@ -14,6 +14,9 @@ public class GameLobbyScene extends Scene{
         super(client);
     }
 
+    /**
+     * To display the option of the game lobby scene.
+     */
     public void gameLobbyOption() throws IOException{
         ImGui.setNextWindowPos(0, 0);
         ImGui.setNextWindowSize(ImGui.getIO().getDisplaySizeX(), ImGui.getIO().getDisplaySizeY() * 0.6f);
@@ -60,6 +63,9 @@ public class GameLobbyScene extends Scene{
         ImGui.end();
     }
 
+    /**
+     * To display the game lobby scene.
+     */
     public void display() throws IOException{
         gameLobbyOption();  
         mainContainer();

@@ -7,11 +7,13 @@ import com.ustudents.ghostlab.scene.SceneData;
 
 public class GameModel {
 
+    /**All type of maze char. */
     public static final char MAZE_UNKNOWN = '?';
     public static final char MAZE_PLAYER = 'P';
     public static final char MAZE_GROUND = '.';
     public static final char MAZE_WALL = '#';
 
+    /**All type of direction. */
     public static final int TOWARD_UNKNOWN = -1;
     public static final int TOWARD_UP = 0;
     public static final int TOWARD_DOWN = 1;
@@ -23,18 +25,32 @@ public class GameModel {
     private char[][] maze;
     private final List<Player> players = new ArrayList<>();
 
+    /**
+     * @return Get last pos.
+     */
     public int[] getLastPos(){
         return pos.get(pos.size() - 1);
     }
 
+    /**
+     * @return Get maze.
+     */
     public char[][] getMaze(){
         return maze;
     }
 
+    /**
+     * @return Get players.
+     */
     public List<Player> players(){
         return players;
     }
 
+    /**
+     * Set wanted position.
+     * @param toward Toward a next position.
+     * @param value distance to the next position.
+     */
     public void setWantedPos(int toward, int value){
         int[] oldpos = getLastPos();
         if(toward == SceneData.BUTTON_MAZEMOVE_TOWARD_UP){
@@ -48,11 +64,21 @@ public class GameModel {
         }
     }
 
+    /**
+     * Set new position.
+     * @param posX New position x
+     * @param posY New position y
+     */
     public void setNewPos(int posX, int posY){
         pos.add(new int[]{posX, posY});
         maze[posY][posX] = MAZE_PLAYER;
     }
 
+    /**
+     * Initialize maze.
+     * @param height Height of maze.
+     * @param width Witdh of maze.
+     */
     public void setMaze(int height, int width){
         pos.clear();
         maze = new char[height][width];
@@ -63,14 +89,36 @@ public class GameModel {
         }
     }
 
+    /**
+     * Add player into the list of players.
+     * @param username Player username.
+     * @param posX Player position x.
+     * @param posY Player position y.
+     * @param score Player score.
+     */
     public void addInPlayers(String username, String posX, String posY, String score){
         players.add(new Player(username, posX, posY, score));
     }
 
+    /**
+     * Check if the last position is the wanted position.
+     * @param newPos New position.
+     * @param wantedPos Wanted position.
+     * @return true if the last position is the wanted position, 
+     * else false.
+     */
     private boolean lastPosIsWantedPos(int[] newPos, int[] wantedPos){
         return newPos[0] == wantedPos[0] && newPos[1] == wantedPos[1];
     }
 
+    /**
+     * Change information into the maze (in function of players moves).
+     * @param oldPos Start position.
+     * @param toward Toward the final position.
+     * @param index Number of move (actually did).
+     * @param flag 0 to transform position to MAZE_GROUND, 
+     * else MAZE_WALL.
+     */
     private void attributeNewChar(int[] oldPos, int toward, int index, int flag){
         if(toward == TOWARD_UP){
             if(flag == 0){
@@ -103,6 +151,10 @@ public class GameModel {
         }
     }
 
+    /**
+     * To update maze.
+     * @param newPos Wanted position.
+     */
     public void updateMaze(int[] newPos){
         int[] oldPos = getLastPos();
         pos.add(newPos);
@@ -140,6 +192,13 @@ public class GameModel {
         }
     }
 
+    /**
+     * Update player info.
+     * @param username Player username.
+     * @param posX Player position x.
+     * @param posY Player position y.
+     * @param score Player score.
+     */
     public void updatePlayerInfo(String username, String posX, String posY, String score){
         for(Player wanted: players){
             wanted.setPosX(posX);
