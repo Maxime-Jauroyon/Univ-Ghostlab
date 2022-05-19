@@ -3,6 +3,8 @@ package com.ustudents.ghostlab.other;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ustudents.ghostlab.scene.SceneData;
+
 public class GameModel {
 
     public static final char MAZE_UNKNOWN = '?';
@@ -15,8 +17,7 @@ public class GameModel {
     public static final int TOWARD_DOWN = 1;
     public static final int TOWARD_LEFT = 2;
     public static final int TOWARD_RIGHT = 3;
-    
-    private int playerScore;
+
     private int[] wantedPos;
     private final List<int[]> pos = new ArrayList<>();
     private char[][] maze;
@@ -34,19 +35,15 @@ public class GameModel {
         return players;
     }
 
-    public void setScore(int score){
-        this.playerScore = score;
-    }
-
     public void setWantedPos(int toward, int value){
         int[] oldpos = getLastPos();
-        if(toward == TOWARD_UP){
+        if(toward == SceneData.BUTTON_MAZEMOVE_TOWARD_UP){
             wantedPos = new int[]{oldpos[0], oldpos[1]-value};
-        }else if(toward == TOWARD_DOWN){
+        }else if(toward == SceneData.BUTTON_MAZEMOVE_TOWARD_DOWN){
             wantedPos = new int[]{oldpos[0], oldpos[1]+value};
-        }else if(toward == TOWARD_LEFT){
+        }else if(toward == SceneData.BUTTON_MAZEMOVE_TOWARD_LEFT){
             wantedPos = new int[]{oldpos[0]-value, oldpos[1]};
-        }else if(toward == TOWARD_RIGHT){
+        }else if(toward == SceneData.BUTTON_MAZEMOVE_TOWARD_RIGHT){
             wantedPos = new int[]{oldpos[0]+value, oldpos[1]};  
         }
     }
@@ -140,6 +137,14 @@ public class GameModel {
             attributeNewChar(oldPos, toward, diff+1, 1);
         }else if(!lastPosIsWantedPos(newPos, wantedPos)){
             attributeNewChar(oldPos, toward, diff+1, 1);
+        }
+    }
+
+    public void updatePlayerInfo(String username, String posX, String posY, String score){
+        for(Player wanted: players){
+            wanted.setPosX(posX);
+            wanted.setPosY(posY);
+            wanted.setScore(score);
         }
     }
 }

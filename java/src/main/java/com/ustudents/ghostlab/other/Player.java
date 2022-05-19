@@ -3,9 +3,9 @@ package com.ustudents.ghostlab.other;
 public class Player {
     
     private final String username;
-    private final String posX;
-    private final String posY;
-    private final String score;
+    private String posX;
+    private String posY;
+    private String score;
 
 
     public Player(String username, String posX, String posY, String score){
@@ -30,4 +30,17 @@ public class Player {
     public String getScore(){
         return score;
     }
+
+    public void setPosX(String posX){
+        this.posX = posX;
+    }
+
+    public void setPosY(String posY){
+        this.posY = posY;
+    }
+
+    public void setScore(String score){
+        this.score = score;
+    }
+    
 }

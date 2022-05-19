@@ -11,7 +11,12 @@ public class SceneData {
     public static final int BUTTON_JOINGAME = 1;
     public static final int BUTTON_MAZEINFO = 2;
     public static final int BUTTON_LISTPLAYER = 3;
-    public static final int BUTTON_MAZEMOVE = 4;
-    public static final int BUTTON_ALLMESSAGE = 5;
-    public static final int BUTTON_PRIVATEMESSAGE = 6;
+    public static final int BUTTON_ALLMESSAGE = 4;
+    public static final int BUTTON_PRIVATEMESSAGE = 5;
+    public static final int BUTTON_MAZEMOVE_TOWARD_UP = 6;
+    public static final int BUTTON_MAZEMOVE_TOWARD_DOWN = 7;
+    public static final int BUTTON_MAZEMOVE_TOWARD_LEFT = 8;
+    public static final int BUTTON_MAZEMOVE_TOWARD_RIGHT = 9;
+    
+    
 }

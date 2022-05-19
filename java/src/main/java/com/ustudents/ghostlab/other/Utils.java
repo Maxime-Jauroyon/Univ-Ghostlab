@@ -7,6 +7,14 @@ import java.net.UnknownHostException;
 
 public class Utils {
 
+    public static String makeSpace(int n){
+        String res = "";
+        for(int i = 0; i < n; i++){
+            res += " ";
+        }
+        return res;
+    }
+
     public static boolean containsChar(String answer){
         for(int i = 0; i < answer.length(); i++){
             char temp = answer.charAt(i);

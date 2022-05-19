@@ -148,10 +148,10 @@ public class Client extends Application {
     public void resetClient() throws IOException{
         socket.close();
         tcpRunnable.wantExit();
+        setCurrentScene(SceneData.SCENE_MAIN);
         launch(1);
         sender.sendServerInfo();
         setUsername(null);
-        setCurrentScene(SceneData.SCENE_MAIN);
     }
     
     private List<Integer> scene = new ArrayList<>();

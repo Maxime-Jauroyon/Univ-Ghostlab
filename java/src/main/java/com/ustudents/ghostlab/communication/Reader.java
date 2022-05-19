@@ -9,12 +9,12 @@ import com.ustudents.ghostlab.scene.SceneData;
 public class Reader {
 
     private final Client client;
-    private final TCPRunnable tcpRunnable;
+    //private final TCPRunnable tcpRunnable;
     private int currentGameID;
 
     public Reader(Client client, TCPRunnable tcpRunnable){
         this.client = client;
-        this.tcpRunnable = tcpRunnable;
+        //this.tcpRunnable = tcpRunnable;
     }
  
     private void readGAMES(InputStream inputStream) throws IOException{

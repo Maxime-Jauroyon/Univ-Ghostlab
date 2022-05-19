@@ -24,7 +24,7 @@ public class MulticastRunnable implements Runnable{
         try {
             MulticastSocket mso = new MulticastSocket(multicastPort);
             mso.joinGroup(InetAddress.getByName(multicastAddr));
-            byte[]data=new byte[200];
+            byte[]data=new byte[220];
             DatagramPacket paquet=new DatagramPacket(data,data.length);
             while(!client.getSocket().isClosed()){
                 mso.receive(paquet);
@@ -38,10 +38,10 @@ public class MulticastRunnable implements Runnable{
                     client.addContentTologs("client: info:", "ghost has been heard in " +
                      posX + " and " + posY, 0);
                 }else if(list[0].equals("SCORE")) {
-                    String score = list[2];
-                    client.addContentTologs("client: info:", "your score has been updated" +
-                     score, 0);
-                    client.getGameModel().setScore(Integer.parseInt(score));
+                    list[4] = list[4].substring(0, list[4].length()-3);
+                    client.getGameModel().updatePlayerInfo(list[1], list[3], list[4], list[2]);
+                    client.addContentTologs("client: info:", "the score of " + list[1] + " has been updated " 
+                    + list[2] + " and has been heard in " + list[3] + " and " + list[4], 0);
                 }else if(list[0].equals("ENDGA")){
                     String username = list[1];
                     String score = list[2].substring(0, list[2].length() - 3);
