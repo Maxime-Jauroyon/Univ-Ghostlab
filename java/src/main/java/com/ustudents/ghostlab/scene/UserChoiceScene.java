@@ -19,7 +19,7 @@ public class UserChoiceScene extends Scene {
         super(client);
     }
 
-    private void createGameSection() throws IOException{
+    /*private void createGameSection() throws IOException{
         ImGui.text("Enter a username:");
         ImGui.sameLine();
         ImGui.inputText("##UsernameChoice", client.getUsernameChoiceContent());
@@ -237,7 +237,47 @@ public class UserChoiceScene extends Scene {
             client.backToPreviousScene();
         }
 
-    }     
+    }*/  
+    
+    public void joinOrCreateGamePopupDraw(String type) throws IOException{
+        ImGui.openPopup("###" + type, 0);
+
+        if (ImGui.beginPopupModal(type + "###" + type, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove)) {
+            ImGui.text("Choose a name:");
+            ImGui.sameLine();
+            ImGui.inputText("###PlayerName", client.getUsernameChoiceContent());
+            ImGui.sameLine();
+
+            if (ImGui.button("Back")) {
+                client.backToPreviousScene();
+            }
+            
+            ImGui.sameLine();
+
+            if(ImGui.button("Send")){
+                String username = client.getUsernameChoiceContent().get();
+                client.getUsernameChoiceContent().clear();
+                if(Utils.answerIsCorrectInput(username, 0)){
+                    client.setUsername(username);
+                    client.addContentTologs("client: info:", "your username are : " + 
+                    username, 1);
+                    if(type.equals("CreateGame")){
+                        client.getSender().send("NEWPL " + username + " " + client.getUdpPort() + "***");
+                    }else{
+                        client.getSender().send("REGIS " + username + " " + client.getUdpPort() + " " + client.getGameRegister() + "***");
+                    }
+                }else{
+                    client.addContentTologs("client: warning:", username, 1);
+                    client.addContentTologs("client: warning:",
+                    "your username does'nt respect the format (8 characters)", 1);
+                    client.setCurrentScene(SceneData.SCENE_MAIN);
+                }
+            }
+
+            
+        }
+        ImGui.endPopup();
+    }
 
     public void userChoice() throws IOException{
         ImGui.setNextWindowPos(0, 0);
@@ -246,19 +286,15 @@ public class UserChoiceScene extends Scene {
         ImGuiWindowFlags.NoCollapse);
 
         if(client.getLastPressedButton() == SceneData.BUTTON_CREATEGAME){
-            createGameSection();
+            joinOrCreateGamePopupDraw("CreateGame");
         }else if(client.getLastPressedButton() == SceneData.BUTTON_JOINGAME){
-            joinGameSection();
-        }else if(client.getLastPressedButton() == SceneData.BUTTON_MAZEINFO){
-            specificGameInfoSection(0);
-        }else if(client.getLastPressedButton() == SceneData.BUTTON_LISTPLAYER){
-            specificGameInfoSection(1);
+            joinOrCreateGamePopupDraw("JoinGame");
         }else if(client.getLastPressedButton() == SceneData.BUTTON_MAZEMOVE){
-            mazeMove();
+            //mazeMove();
         }else if(client.getLastPressedButton() == SceneData.BUTTON_PRIVATEMESSAGE){
-            sendMessage(0);
+            //sendMessage(0);
         }else if(client.getLastPressedButton() == SceneData.BUTTON_ALLMESSAGE){
-            sendMessage(1);
+            //sendMessage(1);
         }
         ImGui.end();
     }

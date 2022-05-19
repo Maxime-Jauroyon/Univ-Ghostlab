@@ -6,6 +6,8 @@ import com.ustudents.ghostlab.client.Client;
 import com.ustudents.ghostlab.listener.TCPRunnable;
 import com.ustudents.ghostlab.scene.SceneData;
 
+import imgui.ImGui;
+
 public class Reader {
 
     private final Client client;
@@ -44,8 +46,8 @@ public class Reader {
 
         client.addContentTologs("client: info: received from server:",
          "REGOK " + gameId + "***", 0);
+        client.clearData();
         client.setCurrentScene(SceneData.SCENE_GAMELOBBY);
-        
     }
     
     private void readREGNO(InputStream inputStream) throws IOException{
@@ -53,7 +55,7 @@ public class Reader {
         client.addContentTologs("client: error: received from server:",
          "REGNO***", 0);
         client.setUsername(null);
-        //client.setCurrentScene(SceneData.SCENE_MAIN);
+        client.setCurrentScene(SceneData.SCENE_MAIN);
         
     }
 
@@ -68,6 +70,7 @@ public class Reader {
         client.launch(1);
         client.setCurrentScene(SceneData.SCENE_MAIN);
         tcpRunnable.wantExit();
+        client.clearData();
         
     }
 

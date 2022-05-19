@@ -39,7 +39,7 @@ public class Client extends Application {
     private int tcpPort;
     private String username;
     private int udpPort;
-    private String gameRegistered;
+    private int gameRegistered;
     private GameModel gameModel;
     private List<Integer> requestGamesId = new ArrayList<>();
     private SortedMap<Integer, List<String>> requestPlayersUsernamePerGames = new TreeMap<>();
@@ -58,9 +58,8 @@ public class Client extends Application {
         udpThread.start();
         addContentTologs("client: info:", "udp listener thread started.",1);
         addContentTologs("client: info:", "tcp listener thread started.",1);
-        //sender = new Sender(new PrintWriter(new OutputStreamWriter(socket.getOutputStream())));
         sender = new Sender(this, socket.getOutputStream());
-        gameRegistered = "-1";
+        gameRegistered = -1;
         gameModel = new GameModel();
     }
 
@@ -118,11 +117,11 @@ public class Client extends Application {
         this.udpPort = udpPort;
     }
 
-    public String getGameRegister(){
+    public int getGameRegister(){
         return gameRegistered;
     }
 
-    public void setGameRegister(String gameRegister) {
+    public void setGameRegister(int gameRegister) {
         this.gameRegistered = gameRegister;
     }
 
@@ -138,6 +137,12 @@ public class Client extends Application {
 
     public void addInRequestMazeSizePerGame(int gameId, int mazeHeight, int mazeWidth){
         requestMazeSizePerGame.put(gameId, new ArrayList<>(List.of(mazeHeight, mazeWidth)));
+    }
+
+    public void clearData(){
+        getRequestGamesId().clear();
+        getRequestPlayersUsernamePerGames().clear();
+        getRequestMazeSizePerGame().clear();
     }
     
     private List<Integer> scene = new ArrayList<>();
