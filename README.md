@@ -27,6 +27,8 @@ Ghostlab is an online matchmaking based game where you take upon yourself to bec
 
 The architecture uses the concept of concurrency to be able to use only blocking sockets:
 
+### Shared
+
 - Main thread: Draws and handles interactions with the user interface (in a loop which should run at least 60 times per second).
 
 ### Server
