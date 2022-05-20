@@ -66,7 +66,7 @@ void gl_client_main_window_draw() {
         
         if (!gl_client_get_player()->ready || gl_client_get_game()->started) {
             if (igButton("Disconnect", (ImVec2) { 0, 0 })) {
-                gl_client_disconnect(false);
+                gl_client_disconnect(false, false);
             }
         }
         
@@ -454,7 +454,7 @@ void gl_client_game_over_popup_draw() {
         }
         
         if (igButton("Back", (ImVec2) { 0, 0 })) {
-            gl_client_disconnect(false);
+            gl_client_disconnect(false, true);
             g_game_over_popup_visible = false;
         }
         

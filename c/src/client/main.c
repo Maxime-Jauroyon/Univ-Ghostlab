@@ -165,7 +165,7 @@ static void gl_client_free() {
     }
     
     if (g_tcp_listener_socket) {
-        gl_client_disconnect(true);
+        gl_client_disconnect(true, false);
     }
     
     if (g_tcp_listener_thread) {

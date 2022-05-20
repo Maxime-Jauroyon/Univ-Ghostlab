@@ -36,7 +36,7 @@ extern char g_last_sent_message[201];
 int32_t gl_client_connect();
 
 // Sends a disconnect message to the server (and closes the socket if needed).
-void gl_client_disconnect(bool close_socket);
+void gl_client_disconnect(bool close_socket, bool game_req);
 
 // Adds a game to the list of games.
 struct gl_game_t *gl_client_add_game(uint8_t id);

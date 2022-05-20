@@ -61,7 +61,7 @@ int32_t gl_client_connect() {
     return 0;
 }
 
-void gl_client_disconnect(bool close_socket) {
+void gl_client_disconnect(bool close_socket, bool game_req) {
     gl_game_t *game = gl_client_get_game();
     
     if (game && game->started) {
@@ -74,7 +74,9 @@ void gl_client_disconnect(bool close_socket) {
     
     if (close_socket) {
         gl_socket_close(&g_tcp_listener_socket);
-    } else {
+    }
+    
+    if (game_req) {
         gl_message_t msg = { .type = GL_MESSAGE_TYPE_GAME_REQ, .parameters_value = 0 };
         gl_message_send_tcp(g_tcp_listener_socket, &msg);
     }
