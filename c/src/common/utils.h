@@ -54,10 +54,13 @@ bool gl_is_ip_valid(const char *src);
 // Checks if a given C-string is a valid number format.
 bool gl_is_number_valid(const char *src, uint32_t size);
 
+// Take the number of ticks at the start of the program.
 void gl_start_ticking();
 
+// Gets the current number of tick.
 uint32_t gl_get_ticks();
 
+// Sleeps a certain time in ms.
 void gl_sleep(uint32_t ms);
 
 #endif /* GHOSTLAB_UTILS_H */
