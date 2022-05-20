@@ -23,8 +23,8 @@ public class InGameScene extends Scene{
     public void inGameOption() throws IOException{
         ImGui.setNextWindowPos(0, 0);
         ImGui.setNextWindowSize(ImGui.getIO().getDisplaySizeX(), ImGui.getIO().getDisplaySizeY() * 0.6f);
-        ImGui.begin("Ghostlab Client", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.MenuBar);
-        
+        ImGui.begin("Ghostlab Client - Game " + client.getGameRegister(), ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.MenuBar);
+
         if(ImGui.button("Send Everyone Message")){
             client.setLastPressedButton(SceneData.BUTTON_ALLMESSAGE);
             client.setCurrentScene(SceneData.SCENE_USERCHOICE);

@@ -55,6 +55,7 @@ public class Reader {
 
         client.addContentTologs("client: info: received from server:",
          "REGOK " + gameId + "***", 0);
+        client.setGameRegister(gameId);
         client.getSender().sendServerInfo();
         client.setCurrentScene(SceneData.SCENE_GAMELOBBY);
     }
@@ -67,6 +68,7 @@ public class Reader {
         inputStream.read(new byte[3]);
         client.addContentTologs("client: error: received from server:",
          "REGNO***", 0);
+        client.setGameRegister(-1);
         client.getSender().sendServerInfo();
         client.setUsername(null);
         client.setCurrentScene(SceneData.SCENE_MAIN);
@@ -139,7 +141,7 @@ public class Reader {
 
         client.addContentTologs("client: info: received from server:",
          "PLAYR " + username + "***", 0);
-        if(username.equals(client.getUsername()))
+        if(gameId == client.getGameRegister() && username.equals(client.getUsername()))
             username += " (you)";
         client.addInRequestPlayersUsernamePerGames(gameId, username); 
     

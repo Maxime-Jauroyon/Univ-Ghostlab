@@ -40,8 +40,8 @@ public class MainScene extends Scene{
             for(int gameId: client.getRequestGamesId()){
                 if(ImGui.collapsingHeader("Game " + gameId)){
                     if(ImGui.button("Join")){
+                        client.setGameRegister(gameId);
                         if(client.getUsername() == null){
-                            client.setGameRegister(gameId);
                             client.setLastPressedButton(SceneData.BUTTON_JOINGAME);
                             client.setCurrentScene(SceneData.SCENE_USERCHOICE);
                         }else{

@@ -20,7 +20,7 @@ public class GameLobbyScene extends Scene{
     public void gameLobbyOption() throws IOException{
         ImGui.setNextWindowPos(0, 0);
         ImGui.setNextWindowSize(ImGui.getIO().getDisplaySizeX(), ImGui.getIO().getDisplaySizeY() * 0.6f);
-        ImGui.begin("Ghostlab Client", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.MenuBar);
+        ImGui.begin("Ghostlab Client - Game " + client.getGameRegister(), ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.MenuBar);
         
         if(!client.getBlockClientRequest().get()){
             if(ImGui.button("Start")){
@@ -38,7 +38,8 @@ public class GameLobbyScene extends Scene{
             } 
             
             for(int gameId: client.getRequestGamesId()){
-                if(ImGui.collapsingHeader("Game " + gameId)){
+                String yourgame = (client.getGameRegister() == gameId)? "(your registered game)": "";
+                if(ImGui.collapsingHeader("Game " + gameId + " " + yourgame)){
                     if(ImGui.collapsingHeader("Players") 
                         && client.getRequestPlayersUsernamePerGames().containsKey(gameId)){
                         List<String> playersUsername = client.getRequestPlayersUsernamePerGames().get(gameId);
@@ -56,8 +57,6 @@ public class GameLobbyScene extends Scene{
                     
                 }    
             }
-            
-            
         }
 
         ImGui.end();
