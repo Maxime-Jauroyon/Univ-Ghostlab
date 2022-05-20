@@ -52,7 +52,7 @@ public class Sender {
      * @param request Request.
      */
     public void send(String request) throws IOException{
-        client.addContentTologs("client: info:", request, 0);
+        client.addContentTologs("client: info: sent to the server:", request, 0);
         String[] list = request.split(" ");
         String requestName = list[0];
         if(requestName.contains("NEWPL") || requestName.contains("START") || 
