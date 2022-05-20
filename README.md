@@ -40,7 +40,7 @@ The architecture uses the concept of concurrency to be able to use only blocking
 ### Client
 
 - TCP Listener Thread: Waits and handles the server's messages (on a TCP socket).
-- UDP Listener Thread: Waits and handles the UDP socket's messages.
+- UDP Listener Thread: Waits and handles the UDP client socket's messages.
 - Game Multicast Listener Thread: Waits and handles the Game Multicast's messages (this type of message can be send by the server to reach every connected clients of a specific game in progress).
 
 #### C Sources Only
