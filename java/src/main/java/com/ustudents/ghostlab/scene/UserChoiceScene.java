@@ -71,16 +71,17 @@ public class UserChoiceScene extends Scene {
         ImGui.openPopup("###" + type, 0);
 
         if (ImGui.beginPopupModal(type + "###" + type, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove)) {
-            String username = "";
-            if(flag == 0){
+            
+            /*if(flag == 0){
                 ImGui.text("Player to send:");
                 ImGui.sameLine();
                 ImGui.inputText("##player", client.getUsernameChoiceContent());
-            }
+            }*/
 
             ImGui.text("Your Message:");
             ImGui.sameLine();
             ImGui.inputText("##Message", client.getGameChoiceContent());
+            String username = "";
             String message = "";
 
             if(flag == 0){

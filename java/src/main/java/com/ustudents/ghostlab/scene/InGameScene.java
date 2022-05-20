@@ -32,13 +32,6 @@ public class InGameScene extends Scene{
 
         ImGui.sameLine();
 
-        if(ImGui.button("Send Private Message")){
-            client.setLastPressedButton(SceneData.BUTTON_PRIVATEMESSAGE);
-            client.setCurrentScene(SceneData.SCENE_USERCHOICE);
-        }
-
-        ImGui.sameLine();
-
         if(ImGui.button("Quit Game")){
             client.getSender().send("IQUIT***");
         }
@@ -101,6 +94,11 @@ public class InGameScene extends Scene{
 
             for(Player player : client.getGameModel().players()){
                 if(ImGui.collapsingHeader(player.getUsername())){
+                    if(ImGui.button("Send Private Message")){
+                        client.getUsernameChoiceContent().set(player.getUsername().substring(0,8));
+                        client.setLastPressedButton(SceneData.BUTTON_PRIVATEMESSAGE);
+                        client.setCurrentScene(SceneData.SCENE_USERCHOICE);
+                    }
                     ImGui.text("- Position x : " + player.getPosX());
                     ImGui.text("- Position y : " + player.getPosY());
                     ImGui.text("- Score : " + player.getScore());
