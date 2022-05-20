@@ -3,7 +3,7 @@
 #include <getopt.h>
 #include <stdlib.h>
 #include <pthread.h>
-#include <common/gui.h>
+#include <common/ui.h>
 #include <common/log.h>
 #include <common/game.h>
 #include <common/array.h>
@@ -11,7 +11,7 @@
 #include <common/memory.h>
 #include <common/message.h>
 #include <common/network.h>
-#include <client/gui.h>
+#include <client/ui.h>
 #include <client/shared.h>
 #include <client/message.h>
 #include <client/thread_tcp_listener.h>

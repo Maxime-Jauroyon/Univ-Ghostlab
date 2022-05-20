@@ -8,7 +8,7 @@
 #include <common/string.h>
 #include <common/message.h>
 #include <common/network.h>
-#include <client/gui.h>
+#include <client/ui.h>
 #include <client/shared.h>
 #include <client/thread_multicast_game_listener.h>
 #include <client/thread_multicast_general_listener.h>

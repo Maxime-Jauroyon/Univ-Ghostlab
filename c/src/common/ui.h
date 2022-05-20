@@ -1,7 +1,7 @@
 #if GHOSTLAB_TUI || GHOSTLAB_GUI
 
-#ifndef GHOSTLAB_GUI_H
-#define GHOSTLAB_GUI_H
+#ifndef GHOSTLAB_UI_H
+#define GHOSTLAB_UI_H
 
 #include <common/types.h>
 
@@ -26,6 +26,6 @@ int32_t gl_igFilterWithSpaces(struct ImGuiInputTextCallbackData *data);
 
 bool gl_gui_started();
 
-#endif /* GHOSTLAB_GUI_H */
+#endif /* GHOSTLAB_UI_H */
 
 #endif

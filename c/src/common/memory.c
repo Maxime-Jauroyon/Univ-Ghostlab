@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #if GHOSTLAB_TUI || GHOSTLAB_GUI
 #include <cimgui/cimgui.h>
-#include <common/gui.h>
+#include <common/ui.h>
 #endif
 #include <common/log.h>
 

@@ -1,7 +1,7 @@
-#include <client/gui.h>
+#include <client/ui.h>
 #include <string.h>
 #include <cimgui/cimgui.h>
-#include <common/gui.h>
+#include <common/ui.h>
 #include <common/game.h>
 #include <common/array.h>
 #include <common/string.h>

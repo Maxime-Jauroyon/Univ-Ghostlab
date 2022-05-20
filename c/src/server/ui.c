@@ -1,6 +1,6 @@
-#include <server/gui.h>
+#include <server/ui.h>
 #include <cimgui/cimgui.h>
-#include <common/gui.h>
+#include <common/ui.h>
 #include <common/maze.h>
 #include <common/game.h>
 #include <common/array.h>

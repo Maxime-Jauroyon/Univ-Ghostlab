@@ -1,6 +1,6 @@
 #if GHOSTLAB_TUI || GHOSTLAB_GUI
 
-#include <common/gui.h>
+#include <common/ui.h>
 #include <string.h>
 #include <cimgui/cimgui.h>
 #if GHOSTLAB_TUI

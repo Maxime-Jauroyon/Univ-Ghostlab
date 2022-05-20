@@ -1,5 +1,5 @@
-#ifndef GHOSTLAB_CLIENT_GUI_H
-#define GHOSTLAB_CLIENT_GUI_H
+#ifndef GHOSTLAB_CLIENT_UI_H
+#define GHOSTLAB_CLIENT_UI_H
 
 #include <common/types.h>
 
@@ -31,4 +31,4 @@ void gl_client_join_game_popup_close();
 
 void gl_client_error(uint32_t error);
 
-#endif /* GHOSTLAB_CLIENT_GUI_H */
+#endif /* GHOSTLAB_CLIENT_UI_H */

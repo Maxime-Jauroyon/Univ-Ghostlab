@@ -3,7 +3,7 @@
 #include <string.h>
 #include <pthread.h>
 #if GHOSTLAB_TUI
-#include <common/gui.h>
+#include <common/ui.h>
 #endif
 #include <common/array.h>
 #include <common/memory.h>

@@ -4,14 +4,14 @@
 #include <getopt.h>
 #include <pthread.h>
 #include <common/log.h>
-#include <common/gui.h>
+#include <common/ui.h>
 #include <common/game.h>
 #include <common/maze.h>
 #include <common/array.h>
 #include <common/utils.h>
 #include <common/memory.h>
 #include <common/message.h>
-#include <server/gui.h>
+#include <server/ui.h>
 #include <server/shared.h>
 #include <server/message.h>
 #include <server/thread_tcp_acceptor.h>

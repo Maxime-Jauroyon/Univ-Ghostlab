@@ -60,8 +60,8 @@ set(COMMON_SRC
         src/common/command.h
         src/common/game.c
         src/common/game.h
-        src/common/gui.c
-        src/common/gui.h
+        src/common/ui.c
+        src/common/ui.h
         src/common/log.c
         src/common/log.h
         src/common/maze.c
@@ -80,8 +80,8 @@ set(COMMON_SRC
 set(SERVER_SRC
         src/server/command.c
         src/server/command.h
-        src/server/gui.c
-        src/server/gui.h
+        src/server/ui.c
+        src/server/ui.h
         src/server/main.c
         src/server/message.c
         src/server/message.h
@@ -96,8 +96,8 @@ set(SERVER_SRC
 set(CLIENT_SRC
         src/client/command.c
         src/client/command.h
-        src/client/gui.c
-        src/client/gui.h
+        src/client/ui.c
+        src/client/ui.h
         src/client/main.c
         src/client/message.c
         src/client/message.h
