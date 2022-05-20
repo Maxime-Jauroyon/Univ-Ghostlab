@@ -26,6 +26,7 @@ public class TCPRunnable implements Runnable{
         this.exit = true;
     }
 
+    /**Method run of TCPRunnable. */
     @Override
     public void run() {
         Reader reader = new Reader(client);

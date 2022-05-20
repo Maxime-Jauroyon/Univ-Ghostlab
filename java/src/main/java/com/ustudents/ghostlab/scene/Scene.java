@@ -104,11 +104,11 @@ public abstract class Scene {
             }
         });
 
-        //TODO: Scroll quand tu rajoute un element dans logs
-        /*if (client.consoleShouldScroll) {
-           ImGui.setScrollHereX(1.0f);
+        if (client.getConsoleShouldScroll().get()) {
+            ImGui.setScrollHereX(1.0f);
             ImGui.setScrollHereY(1.0f);
-        }*/
+            client.getConsoleShouldScroll().set(false);
+        }
 
         ImGui.popFont();
         ImGui.endChild();

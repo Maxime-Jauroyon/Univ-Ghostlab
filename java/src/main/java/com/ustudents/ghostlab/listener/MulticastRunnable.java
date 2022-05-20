@@ -19,6 +19,7 @@ public class MulticastRunnable implements Runnable{
         this.multicastPort = multicastPort;
     }
 
+    /**Method run of MulticastRunnable. */
     @Override
     public void run() {
         try {

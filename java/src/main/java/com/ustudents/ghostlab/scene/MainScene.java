@@ -39,6 +39,17 @@ public class MainScene extends Scene{
             
             for(int gameId: client.getRequestGamesId()){
                 if(ImGui.collapsingHeader("Game " + gameId)){
+                    if(ImGui.button("Join")){
+                        if(client.getUsername() == null){
+                            client.setGameRegister(gameId);
+                            client.setLastPressedButton(SceneData.BUTTON_JOINGAME);
+                            client.setCurrentScene(SceneData.SCENE_USERCHOICE);
+                        }else{
+                            client.getSender().send("REGIS " + client.getUsername() + " " + client.getUdpPort()
+                            + " " + gameId + "***");
+                        }
+                    }
+
                     if(ImGui.collapsingHeader("Players") && 
                         client.getRequestPlayersUsernamePerGames().containsKey(gameId)){
                         List<String> playersUsername = client.getRequestPlayersUsernamePerGames().get(gameId);

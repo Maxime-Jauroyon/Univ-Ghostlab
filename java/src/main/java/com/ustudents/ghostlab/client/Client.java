@@ -241,6 +241,8 @@ public class Client extends Application {
     private ImBoolean consoleShowInfo = new ImBoolean(true);
     private ImBoolean consoleShowWarning = new ImBoolean(true);
     private ImBoolean consoleShowError = new ImBoolean(true);
+    private ImBoolean consoleShouldScroll = new ImBoolean();
+    private ImBoolean blockClientRequest = new ImBoolean();
     private ImString consoleCommand = new ImString();
     private ImString usernameChoiceContent = new ImString();
     private ImString gameChoiceContent = new ImString();
@@ -265,6 +267,20 @@ public class Client extends Application {
      */
     public ImBoolean getConsoleShowError(){
         return consoleShowError;
+    }
+
+    /**
+     * @return Get the auto scroll option.
+     */
+    public ImBoolean getConsoleShouldScroll(){
+        return consoleShouldScroll;
+    }
+
+    /**
+     * @return Get the block client request option.
+     */
+    public ImBoolean getBlockClientRequest(){
+        return blockClientRequest;
     }
 
     /**
@@ -324,6 +340,7 @@ public class Client extends Application {
      * @param flag 0 to add player command into the log.
      */
     public void addContentTologs(String separator, String content, int flag){
+        consoleShouldScroll.set(true);
         if(flag == 0){
             serverAnswers.add(content);
         }

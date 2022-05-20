@@ -21,26 +21,26 @@ public class GameLobbyScene extends Scene{
         ImGui.setNextWindowPos(0, 0);
         ImGui.setNextWindowSize(ImGui.getIO().getDisplaySizeX(), ImGui.getIO().getDisplaySizeY() * 0.6f);
         ImGui.begin("Ghostlab Client", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.MenuBar);
-
-        if(ImGui.button("Start")){
-            client.getSender().send("START***");
-        }
-
-        ImGui.sameLine();
         
-        if(ImGui.button("Unregister")){
-            client.getSender().send("UNREG***");
+        if(!client.getBlockClientRequest().get()){
+            if(ImGui.button("Start")){
+                client.getBlockClientRequest().set(true);
+                client.getSender().send("START***");
+            }
+            ImGui.sameLine();
+            if(ImGui.button("Unregister"))
+                client.getSender().send("UNREG***");
         }
         
         if(ImGui.collapsingHeader("Available Games")){
-            if(ImGui.button("Reload Games Data")){
+            if(!client.getBlockClientRequest().get() && ImGui.button("Reload Games Data")){
                 client.getSender().sendServerInfo();
             } 
             
             for(int gameId: client.getRequestGamesId()){
                 if(ImGui.collapsingHeader("Game " + gameId)){
-                    if(ImGui.collapsingHeader("Players") && 
-                        client.getRequestPlayersUsernamePerGames().containsKey(gameId)){
+                    if(ImGui.collapsingHeader("Players") 
+                        && client.getRequestPlayersUsernamePerGames().containsKey(gameId)){
                         List<String> playersUsername = client.getRequestPlayersUsernamePerGames().get(gameId);
                         for(String playerUsername: playersUsername){
                             ImGui.text("- " + playerUsername);

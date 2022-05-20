@@ -15,6 +15,7 @@ public class UDPRunnable implements Runnable{
         this.datagramSocket = datagramSocket;
     }
 
+    /**Method run of UDPRunnable. */
     @Override
     public void run() {
         try {

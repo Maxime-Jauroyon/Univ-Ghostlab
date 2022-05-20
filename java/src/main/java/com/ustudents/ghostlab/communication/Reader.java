@@ -139,6 +139,8 @@ public class Reader {
 
         client.addContentTologs("client: info: received from server:",
          "PLAYR " + username + "***", 0);
+        if(username.equals(client.getUsername()))
+            username += " (you)";
         client.addInRequestPlayersUsernamePerGames(gameId, username); 
     
     }
@@ -198,6 +200,7 @@ public class Reader {
         client.addContentTologs("client: info: received from server:",
          "POSIT " + username + " " + posX + " " + posY + 
          "***", 0);
+        client.getBlockClientRequest().set(false);
         client.setCurrentScene(SceneData.SCENE_INGAME);
         client.getSender().send("GLIS?***");
     }
@@ -256,6 +259,8 @@ public class Reader {
         client.addContentTologs("client: info: received from server:",
          "GPLYR " + username + " " + posX + " " + posY + " " +
          score +  "***", 0);
+         if(username.equals(client.getUsername()))
+            username += " (you)";
          client.getGameModel().addInPlayers(username, posX, posY, score);
     
     }
