@@ -72,7 +72,9 @@ static int32_t gl_client_init(int argc, char **argv) {
         return -1;
     }
     
-    g_multicast_general_listener_thread = gl_malloc(sizeof(pthread_t));
+    if (!g_use_legacy_protocol) {
+        g_multicast_general_listener_thread = gl_malloc(sizeof(pthread_t));
+    }
     g_tcp_listener_thread = gl_malloc(sizeof(pthread_t));
     pthread_create(g_tcp_listener_thread, 0, gl_client_thread_tcp_listener_main, 0);
     g_udp_listener_thread = gl_malloc(sizeof(pthread_t));
