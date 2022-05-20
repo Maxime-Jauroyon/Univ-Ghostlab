@@ -244,8 +244,8 @@ public class Client extends Application {
     private ImBoolean consoleShouldScroll = new ImBoolean();
     private ImBoolean blockClientRequest = new ImBoolean();
     private ImString consoleCommand = new ImString();
-    private ImString usernameChoiceContent = new ImString();
-    private ImString gameChoiceContent = new ImString();
+    private ImString usernameChoiceContent = new ImString(200);
+    private ImString gameChoiceContent = new ImString(200);
     private int lastPressedButton = -1;
     
     /**

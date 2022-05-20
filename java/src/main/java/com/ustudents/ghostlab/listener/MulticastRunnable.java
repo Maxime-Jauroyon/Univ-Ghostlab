@@ -50,6 +50,7 @@ public class MulticastRunnable implements Runnable{
                     client.getSender().send("IQUIT***");
                 }else if(list[0].equals("MESSA")){
                     String message = receivedMessage.substring(15, receivedMessage.length()-3); 
+                    System.out.println("Size of message : " + message.length());
                     client.addContentTologs("client: info: received from " + list[1] + ":", message, 1);
                 }
             }
