@@ -61,14 +61,23 @@ The recommended user interface to launch with is the GUI mode.
 
 The Java sources uses Gradle as a cross-platform build system, it should install itself automatically when compiling the project.
 
-#### Compile
+#### Launch Server
 
 - Open a terminal in the project's root directory.
-- Run `./java/gradlew build` to compile the code.
+- Run `./c/build/server_gui -l` to launch the server in GUI mode with only the recquired protocol.
+- Alternatively, run `./c/build/server_tui -l` to launch th server in TUI mode only the recquired protocol.
+
+#### Compile
+
+- Open an other terminal in the project's root directory.
+- Execute `cd java` in your shell.
+- Run `./gradlew build` to compile the code.
 
 #### Launch Client
 
-- Run `./java/gradlew run` to run the Java version of the client.
+- Run `./gradlew run` to run the Java version of the client.
+- Run with options `./java/gradlew run --args="<option> <argument> ..."` to run the Java version of the client with arguments
+  (see all type of argument in `./java/ghostlab/Main.java`).
 
 ## Dependencies
 
