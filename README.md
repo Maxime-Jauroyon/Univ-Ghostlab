@@ -16,14 +16,14 @@ Ghostlab is an online matchmaking based game where you take upon yourself to bec
 
 ## Features
 
-- Chase ghosts through perfect mazes.
+- Chase ghosts through randomly generated perfect mazes.
 - Interactive console.
 - Advanced graphical user interface (made with ImGui).
 - Terminal user interface for maximum compatibility (made with ImTui).
 - Robust network architecture.
-- Works on Linux (Ubuntu/Debian), macOS and Windows (WSL).
 - Server made in C.
 - Client made in both C and Java.
+- Works on Linux (Ubuntu/Debian), macOS and Windows (WSL).
 
 ## Architecture
 
