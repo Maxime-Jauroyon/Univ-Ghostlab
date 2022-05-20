@@ -22,6 +22,8 @@ Ghostlab is an online matchmaking based game where you take upon yourself to bec
 - Terminal user interface for maximum compatibility (made with ImTui).
 - Robust network architecture.
 - Works on Linux (Ubuntu/Debian), macOS and Windows (WSL).
+- Server made in C.
+- Client made in both C and Java.
 
 ## Architecture
 
