@@ -25,7 +25,7 @@
 #define ntohll(x) be64toh(x)
 #endif
 #include <common/array.h>
-#include <sys/time.h>
+#include <time.h>
 
 static struct timespec g_start_ticks;
 
