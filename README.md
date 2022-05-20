@@ -18,8 +18,8 @@ Ghostlab is an online matchmaking based game where you take upon yourself to bec
 
 - Chase ghosts through perfect mazes.
 - Interactive console.
-- Advanced graphical user interface.
-- Terminal user interface for maximum compatibility.
+- Advanced graphical user interface (made with ImGui).
+- Terminal user interface for maximum compatibility (made with ImTui).
 - Robust network architecture.
 - Works on Linux (Ubuntu/Debian), macOS and Windows (WSL).
 
