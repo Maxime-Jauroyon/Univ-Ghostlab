@@ -15,8 +15,12 @@ public class Main {
             String username = null;
             int udpPort = 5541;
 
-
             for(int i = 0; i < args.length; i++){
+                if(i == args.length-1 && !args[i].equals("--help") && !args[i].equals("-h")){
+                    System.out.println("Error : You must give an argument with an option");
+                    help();
+                    exit(0);
+                }
                 String[] options = (i < args.length-1)? new String[]{args[i], args[i+1]}: new String[0];
 
 
@@ -62,7 +66,6 @@ public class Main {
                 }
             }
 
-            //Client c = new Client(ipv4Addr, tcpPort, username, udpPort);
             Client c = new Client();
             c.setIPv4Addr(ipv4Addr);
             c.settcpPort(tcpPort);
@@ -77,6 +80,9 @@ public class Main {
         }
     }
 
+    /**
+     * Display help commands.
+     */
     private static void help(){
         System.out.println("usage: client [options]");
         System.out.println();

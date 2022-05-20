@@ -1,6 +1,7 @@
 package com.ustudents.ghostlab.scene;
 
 import java.io.IOException;
+import java.util.List;
 
 import com.ustudents.ghostlab.client.Client;
 
@@ -13,13 +14,16 @@ public class MainScene extends Scene{
         super(client);
     }
 
+    /**
+     * To display the option of the main scene.
+     */
     public void mainSceneOption() throws IOException{
         ImGui.setNextWindowPos(0, 0);
         ImGui.setNextWindowSize(ImGui.getIO().getDisplaySizeX(), ImGui.getIO().getDisplaySizeY() * 0.6f);
         ImGui.begin("Ghostlab Client", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.MenuBar);
 
 
-        if(ImGui.button("Create Game")){
+        if(ImGui.button("Creates Game")){
             client.setLastPressedButton(SceneData.BUTTON_CREATEGAME);
             if(client.getUsername() == null){
                 client.setCurrentScene(SceneData.SCENE_USERCHOICE);
@@ -28,36 +32,51 @@ public class MainScene extends Scene{
             }
         }
         
-        ImGui.sameLine();
-        
-        if(ImGui.button("Join Game")){
-            client.setLastPressedButton(SceneData.BUTTON_JOINGAME);
-            client.setCurrentScene(SceneData.SCENE_USERCHOICE);
-        }
+        if(ImGui.collapsingHeader("Available Games")){
+            if(ImGui.button("Reload Games Data")){
+                client.getSender().sendServerInfo();
+            } 
+            
+            for(int gameId: client.getRequestGamesId()){
+                if(ImGui.collapsingHeader("Game " + gameId)){
+                    if(ImGui.button("Join")){
+                        if(client.getUsername() == null){
+                            client.setGameRegister(gameId);
+                            client.setLastPressedButton(SceneData.BUTTON_JOINGAME);
+                            client.setCurrentScene(SceneData.SCENE_USERCHOICE);
+                        }else{
+                            client.getSender().send("REGIS " + client.getUsername() + " " + client.getUdpPort()
+                            + " " + gameId + "***");
+                        }
+                    }
 
-        ImGui.sameLine();
-        
-        if(ImGui.button("Maze info")){
-            client.setLastPressedButton(SceneData.BUTTON_MAZEINFO);
-            client.setCurrentScene(SceneData.SCENE_USERCHOICE);
-        }
+                    if(ImGui.collapsingHeader("Players") && 
+                        client.getRequestPlayersUsernamePerGames().containsKey(gameId)){
+                        List<String> playersUsername = client.getRequestPlayersUsernamePerGames().get(gameId);
+                        for(String playerUsername: playersUsername){
+                            ImGui.text("- " + playerUsername);
+                        }
+                        
+                    }
 
-        ImGui.sameLine();
-
-        if(ImGui.button("List player")){
-            client.setLastPressedButton(SceneData.BUTTON_LISTPLAYER);
-            client.setCurrentScene(SceneData.SCENE_USERCHOICE);
-        }
-
-        ImGui.sameLine();
-
-        if(ImGui.button("Game Info")){
-            client.getSender().send("GAME?***");
+                    if(ImGui.collapsingHeader("Maze") && 
+                    client.getRequestPlayersUsernamePerGames().containsKey(gameId)){
+                        List<Integer> mazes = client.getRequestMazeSizePerGame().get(gameId);
+                        ImGui.text("- Size : " + mazes.get(0) + "x" + mazes.get(1));
+                    }
+                    
+                }    
+            }
+            
+            
         }
 
         ImGui.end();
     }
 
+    /**
+     * To display the main scene.
+     */
     public void display() throws IOException{ 
         mainSceneOption();  
         mainContainer();

@@ -22,6 +22,9 @@ public abstract class Scene {
         this.client = client;
     }
 
+    /**
+     * To display the main container.
+     */
     protected void mainContainer() throws IOException{
         ImGui.setNextWindowPos(0, 0);
         ImGui.setNextWindowSize(ImGui.getIO().getDisplaySizeX(), ImGui.getIO().getDisplaySizeY() * 0.6f);
@@ -101,11 +104,11 @@ public abstract class Scene {
             }
         });
 
-        //TODO: Scroll quand tu rajoute un element dans logs
-        /*if (client.consoleShouldScroll) {
-           ImGui.setScrollHereX(1.0f);
+        if (client.getConsoleShouldScroll().get()) {
+            ImGui.setScrollHereX(1.0f);
             ImGui.setScrollHereY(1.0f);
-        }*/
+            client.getConsoleShouldScroll().set(false);
+        }
 
         ImGui.popFont();
         ImGui.endChild();

@@ -14,69 +14,67 @@ public class Sender {
         this.client = client;
     }
 
-    /*public byte[] convertListToArrayOfByte(List<Byte> byteList){
-        byte[] byteArray = new byte[byteList.size()];
-        for (int index = 0; index < byteList.size(); index++) {
-            byteArray[index] = byteList.get(index);
-        }
-        return byteArray;
-    }
-
-    public List<Byte> fillListWithString(List<Byte> byteList, String content){
-        byte[] byteArray = new byte[content.length()];
-        for(int i = 0; i < byteArray.length; i++){
-            byteList.add(byteArray[i]);
-        }
-        return byteList;
-    }*/
-
-    public void sendNEWPL(String request) throws IOException{
+    /**
+     * Send request to the server.
+     * @param request Request.
+     */
+    public void sendString(String request) throws IOException{
         outputStream.write(request.getBytes());
         outputStream.flush();
 
     }
 
+    /**
+     * Send register request to the server.
+     * @param request Request.
+     */
     public void sendREGIS(String[] request) throws IOException{
-        for(int i = 0; i < 3; i++){
-            request[i] += " ";
-            outputStream.write(request[i].getBytes());
-        }
-        outputStream.write((byte) Integer.parseInt(request[3].substring(0, request[3].length()-3)));
+        outputStream.write(("REGIS " + request[1] + " " + request[2] + " ").getBytes());
+        outputStream.write((byte) client.getGameRegister());
         outputStream.write("***".getBytes());
         outputStream.flush();
     } 
     
+    /**
+     * Send size and list request to the server.
+     * @param request Request.
+     */
     public void sendSIZEAndLIST(String[] request) throws IOException{
         request[0] += " ";
         outputStream.write(request[0].getBytes());
         outputStream.write((byte) Integer.parseInt(request[1].substring(0, request[1].length()-3)));
         outputStream.write("***".getBytes());
-    } 
-    
-    public void sendString(String[] request) throws IOException{
-        for(int i = 0; i < 2; i++){
-            request[i] += " ";
-            outputStream.write(request[i].getBytes());
-        }
-        
-        outputStream.write(request[1].substring(0, request[1].length()-3).getBytes());
+        outputStream.flush();
     }
 
+    /**
+     * Send request to the server.
+     * @param request Request.
+     */
     public void send(String request) throws IOException{
         client.addContentTologs("client: info:", request, 0);
         String[] list = request.split(" ");
         String requestName = list[0];
-        if(requestName.contains("NEWPL") || requestName.contains("START") ||
-           requestName.contains("UNREG") || requestName.contains("GAME?") ||
-           requestName.contains("GLIS?") || requestName.contains("IQUIT") ||
+        if(requestName.contains("NEWPL") || requestName.contains("START") || 
+           requestName.contains("UNREG") || requestName.contains("GAME?") || 
+           requestName.contains("GLIS?") || requestName.contains("IQUIT") || 
            requestName.contains("MOV") || requestName.contains("MALL?") || 
            requestName.contains("SEND?")){
-            sendNEWPL(request);
+            sendString(request);
         }else if(requestName.contains("REGIS")){
             sendREGIS(list);
         }else if(requestName.contains("SIZE?") || requestName.contains("LIST?")){
             sendSIZEAndLIST(list);
         }
+    }
+
+    /**
+     * Send request to the server to get games infos.
+     * @param request Request.
+     */
+    public void sendServerInfo() throws IOException{
+        client.clearData();
+        send("GAME?***");
     }
     
     

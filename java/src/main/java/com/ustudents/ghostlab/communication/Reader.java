@@ -3,228 +3,21 @@ package com.ustudents.ghostlab.communication;
 import java.io.IOException;
 import java.io.InputStream;
 import com.ustudents.ghostlab.client.Client;
-import com.ustudents.ghostlab.listener.TCPRunnable;
 import com.ustudents.ghostlab.scene.SceneData;
 
 public class Reader {
 
     private final Client client;
-    private final TCPRunnable tcpRunnable;
+    private int currentGameID;
 
-    public Reader(Client client, TCPRunnable tcpRunnable){
+    public Reader(Client client){
         this.client = client;
-        this.tcpRunnable = tcpRunnable;
-    }
-
-    /*public void readThreeEndSeparator(BufferedReader br) throws IOException{
-        for(int i = 0; i < 3; i++){
-            br.read();
-        }
-    }
-
-    private void readGAMES(BufferedReader br) throws IOException{
-        int nbGame = Utils.readOctets(br, 1);
-        readThreeEndSeparator(br);
-        client.addContentTologs("client: info: received from server:" ,
-         "GAMES " + nbGame + "***", 0);
-
-        for(int i = 0; i < nbGame; i++){
-            read(br);
-        }
-    }
-
-    private void readOGAMES(BufferedReader br) throws IOException{
-        int gameId = Utils.readOctets(br, 1);
-        int nbPlayer = br.read();
-        nbPlayer = br.read();
-        readThreeEndSeparator(br);
-        client.addContentTologs("client: info: received from server:",
-         "OGAME " + gameId + " " + nbPlayer + "***", 0);
-    
     }
     
-    private void readREGOK(BufferedReader br) throws IOException{
-        int gameId = Utils.readOctets(br, 1);
-        readThreeEndSeparator(br);
-        client.addContentTologs("client: info: received from server:",
-         "REGOK " + gameId + "***", 0);
-        client.setCurrentScene(SceneData.SCENE_GAMELOBBY);
-        
-    }
-    
-    private void readREGNO(BufferedReader br) throws IOException{
-        readThreeEndSeparator(br);
-        client.addContentTologs("client: error: received from server:",
-         "REGNO***", 0);
-        client.setUsername(null);
-        client.setCurrentScene(SceneData.SCENE_MAIN);
-        
-    }
-    
-    private void readUNROK(BufferedReader br) throws IOException{
-        int gameId = Utils.readOctets(br, 1);
-        readThreeEndSeparator(br);
-        client.addContentTologs("client: info: received from server:",
-         "UNROK " + gameId + "***", 0);
-        client.getSocket().close();
-        client.launch(1);
-        client.setCurrentScene(SceneData.SCENE_MAIN);
-        tcpRunnable.wantExit();
-        
-    }
-
-    private void readDUNNO(BufferedReader br) throws IOException{
-        readThreeEndSeparator(br);
-        client.addContentTologs("client: error: received from server:",
-         "DUNNO***", 0);
-    }
-    
-    private void readSIZE(BufferedReader br) throws IOException{
-        int gameId = Utils.readOctets(br, 1);
-        int mazeHeight = Utils.readOctets(br, 2);
-        int mazeWidth = Utils.readOctets(br, 2);
-        readThreeEndSeparator(br);
-        client.addContentTologs("client: info: received from server:",
-         "SIZE! " + gameId + " " + mazeHeight + " " + mazeWidth + "***", 0);
-        client.backToPreviousScene(); 
-    }
-    
-    private void readLIST(BufferedReader br) throws IOException{
-        int gameId = Utils.readOctets(br, 1);
-        int nbPlayer = Utils.readOctets(br, 1);
-        readThreeEndSeparator(br);
-        client.addContentTologs("client: info: received from server:" ,
-         "LIST! " + gameId + " " + nbPlayer + "***", 0);
-
-        for(int i = 0; i < nbPlayer; i++){
-            read(br);
-        }
-        client.backToPreviousScene();
-    }
-
-    private void readPLAYR(BufferedReader br) throws IOException{
-        String username = Utils.readOctetToMakeString(br, 8);
-        readThreeEndSeparator(br);
-        client.addContentTologs("client: info: received from server:",
-         "PLAYR " + username + "***", 0);
-    
-    }
-
-    private void readWELCO(BufferedReader br) throws IOException{
-        int gameId = Utils.readOctets(br, 1);
-        int mazeHeight = Utils.readOctets(br, 2);
-        int mazeWidth = Utils.readOctets(br, 2);
-        int ghost = Utils.readOctets(br, 1);
-        String ipMulticast = Utils.readOctetToMakeString(br, 15);
-        String portMulticast = Utils.readOctetToMakeString(br, 4);
-        readThreeEndSeparator(br);
-        client.getGameModel().setMaze(mazeHeight, mazeWidth);
-        client.addContentTologs("client: info: received from server:",
-         "WELCO " + gameId + " " + mazeHeight + " " + mazeWidth + 
-         " " + ghost + " " + ipMulticast + " " + portMulticast + 
-         "***", 0);
-
-    }
-    
-    private void readPOSIT(BufferedReader br) throws IOException{
-        String username = Utils.readOctetToMakeString(br, 8);
-        String posX = Utils.readOctetToMakeString(br, 3);
-        String posY = Utils.readOctetToMakeString(br, 3);
-        readThreeEndSeparator(br);
-        client.getGameModel().setNewPos(Integer.parseInt(posX), Integer.parseInt(posY));
-        client.addContentTologs("client: info: received from server:",
-         "POSIT " + username + " " + posX + " " + posY + 
-         "***", 0);
-        client.setCurrentScene(SceneData.SCENE_INGAME);
-    }
-    
-    private void readMOVE(BufferedReader br, int flag) throws IOException{
-        String posX = Utils.readOctetToMakeString(br, 3);
-        String posY = Utils.readOctetToMakeString(br, 3);
-        if(flag == 0){
-            client.addContentTologs("client: info: received from server:",
-            "MOVE! " + posX + " " + posY + "***", 0);
-        }else{
-            String playerScore = Utils.readOctetToMakeString(br, 4);
-            client.addContentTologs("client: info: received from server:",
-            "MOVEF " + posX + " " + posY + " " + playerScore +"***", 0);
-        }
-        readThreeEndSeparator(br);
-        client.getGameModel().updateMaze(new int[]{Integer.parseInt(posX), Integer.parseInt(posY)});
-        client.setCurrentScene(SceneData.SCENE_INGAME);
-
-    }
-
-    private void readGOBYE(BufferedReader br) throws IOException{
-        readThreeEndSeparator(br);
-        client.addContentTologs("client: info: received from server:",
-            "GOBYE***", 0);
-        client.getSocket().close();
-        client.launch(1);
-        client.setCurrentScene(SceneData.SCENE_MAIN);
-        tcpRunnable.wantExit();
-    }
-    
-    private void readGLIST(BufferedReader br) throws IOException{
-        int nbPlayer = Utils.readOctets(br, 1);
-        readThreeEndSeparator(br);
-        client.addContentTologs("client: info: received from server:" ,
-         "GLIS! " + nbPlayer + "***", 0);
-
-        for(int i = 0; i < nbPlayer; i++){
-            read(br);
-        }
-    }
-
-    private void readGPLYR(BufferedReader br) throws IOException{
-        String username = Utils.readOctetToMakeString(br, 8);
-        String posX = Utils.readOctetToMakeString(br, 3);
-        String posY = Utils.readOctetToMakeString(br, 3);
-        String playerScore = Utils.readOctetToMakeString(br, 4);
-        readThreeEndSeparator(br);
-        client.addContentTologs("client: info: received from server:",
-         "GPLYR " + username + " " + posX + " " + posY + " " +
-         playerScore +  "***", 0);
-    
-    }
-
-    private void readMESS(BufferedReader br, int flag) throws IOException{
-        if(flag == 0){
-            client.addContentTologs("client: info: received from server:",
-            "SEND!***", 0);
-        }else if(flag == 1){
-            client.addContentTologs("client: warning: received from server:",
-            "NSEND***", 0);
-        }else{
-            client.addContentTologs("client: info: received from server:",
-            "MALL!***", 0);
-            
-        }
-        readThreeEndSeparator(br);
-        client.backToPreviousScene();
-    }*/
-
-    /*private byte[] cleanRead(InputStream inputStream) throws IOException{
-        byte[] bytes = new byte[218];
-        int readChar = inputStream.read(bytes);
-        byte[] cleanBytes = new byte[readChar];
-        for(int i = 0; i < cleanBytes.length; i++){
-            cleanBytes[i] = bytes[i];
-        }
-        return cleanBytes;
-    }*/
-
-    /*public void readThreeEndSeparator(InputStream inputStream) throws IOException{
-        for(int i = 0; i < 3; i++){
-            inputStream.read();
-        }
-    }*/
-
-    /*private int convertByteToInt(byte[] bytes, int begin, int end){
-        ByteBuffer byteBuffer = ByteBuffer.wrap(bytes, begin, end);
-        return (int)byteBuffer.get();
-    }*/
- 
+    /**
+     * Read server answer about games request.
+     * @param inputStream InputStream.
+     */
     private void readGAMES(InputStream inputStream) throws IOException{
         byte[] bytes = new byte[5];
         inputStream.read(bytes);
@@ -234,6 +27,10 @@ public class Reader {
         "GAMES " + nbGames + "***", 0);
     }
 
+    /**
+     * Read server answer about games request.
+     * @param inputStream InputStream.
+     */
     private void readOGAMES(InputStream inputStream) throws IOException{
         byte[] bytes = new byte[7];
         inputStream.read(bytes);
@@ -242,9 +39,15 @@ public class Reader {
 
         client.addContentTologs("client: info: received from server:",
          "OGAME " + gameId + " " + nbPlayer + "***", 0);
-    
+        client.addInRequestGamesId(gameId);
+        client.getSender().send("LIST? " + gameId  + "***");
+        client.getSender().send("SIZE? " + gameId  + "***");
     }
 
+    /**
+     * Read server answer about register request.
+     * @param inputStream InputStream.
+     */
     private void readREGOK(InputStream inputStream) throws IOException{
         byte[] bytes = new byte[5];
         inputStream.read(bytes);
@@ -252,19 +55,28 @@ public class Reader {
 
         client.addContentTologs("client: info: received from server:",
          "REGOK " + gameId + "***", 0);
+        client.getSender().sendServerInfo();
         client.setCurrentScene(SceneData.SCENE_GAMELOBBY);
-        
     }
     
+    /**
+     * Read server answer about register request.
+     * @param inputStream InputStream.
+     */
     private void readREGNO(InputStream inputStream) throws IOException{
         inputStream.read(new byte[3]);
         client.addContentTologs("client: error: received from server:",
          "REGNO***", 0);
+        client.getSender().sendServerInfo();
         client.setUsername(null);
         client.setCurrentScene(SceneData.SCENE_MAIN);
         
     }
 
+    /**
+     * Read server answer about register request.
+     * @param inputStream InputStream.
+     */
     private void readUNROK(InputStream inputStream) throws IOException{
         byte[] bytes = new byte[5];
         inputStream.read(bytes);
@@ -272,19 +84,23 @@ public class Reader {
 
         client.addContentTologs("client: info: received from server:",
          "UNROK " + gameId + "***", 0);
-        client.getSocket().close();
-        client.launch(1);
-        client.setCurrentScene(SceneData.SCENE_MAIN);
-        tcpRunnable.wantExit();
-        
+        client.resetClient();
     }
 
+    /**
+     * Read server answer about request.
+     * @param inputStream InputStream.
+     */
     private void readDUNNO(InputStream inputStream) throws IOException{
         inputStream.read(new byte[3]);
         client.addContentTologs("client: error: received from server:",
          "DUNNO***", 0);
     }
 
+    /**
+     * Read server answer about size request.
+     * @param inputStream InputStream.
+     */
     private void readSIZE(InputStream inputStream) throws IOException{
         byte[] bytes = new byte[11];
         inputStream.read(bytes);
@@ -294,9 +110,13 @@ public class Reader {
         
         client.addContentTologs("client: info: received from server:",
          "SIZE! " + gameId + " " + mazeHeight + " " + mazeWidth + "***", 0);
-        client.backToPreviousScene(); 
+        client.addInRequestMazeSizePerGame(gameId, mazeHeight, mazeWidth); 
     }
     
+    /**
+     * Read server answer about list request.
+     * @param inputStream InputStream.
+     */
     private void readLIST(InputStream inputStream) throws IOException{
         byte[] bytes = new byte[7];
         inputStream.read(bytes);
@@ -305,19 +125,33 @@ public class Reader {
 
         client.addContentTologs("client: info: received from server:" ,
          "LIST! " + gameId + " " + nbPlayer + "***", 0);
-        client.backToPreviousScene();
+        currentGameID = gameId;
     }
 
-    private void readPLAYR(InputStream inputStream) throws IOException{
+    /**
+     * Read server answer about list request.
+     * @param inputStream InputStream.
+     */
+    private void readPLAYR(InputStream inputStream, int gameId) throws IOException{
         byte[] bytes = new byte[12];
         int readBytes = inputStream.read(bytes);
-        String username = new String(bytes, 1, readBytes-3);
+        String username = new String(bytes, 1, readBytes-4);
 
         client.addContentTologs("client: info: received from server:",
          "PLAYR " + username + "***", 0);
+        if(username.equals(client.getUsername()))
+            username += " (you)";
+        client.addInRequestPlayersUsernamePerGames(gameId, username); 
     
     }
 
+    /**
+     * Convert byte array to string.
+     * @param bytes Byte array.
+     * @param begin Start index.
+     * @param end End index.
+     * @return String extract from the byte array.
+     */
     private String convertByteArrayToString(byte[] bytes, int begin, int end){
         String res = "";
         for(int i = begin; i < end; i++){
@@ -326,6 +160,10 @@ public class Reader {
         return res;
     }
 
+    /**
+     * Read server answer about start request.
+     * @param inputStream InputStream.
+     */
     private void readWELCO(InputStream inputStream) throws IOException{
         byte[] bytes = new byte[34];
         inputStream.read(bytes);
@@ -347,6 +185,10 @@ public class Reader {
 
     }
     
+    /**
+     * Read server answer about start request.
+     * @param inputStream InputStream.
+     */
     private void readPOSIT(InputStream inputStream) throws IOException{
         byte[] bytes = new byte[20];
         inputStream.read(bytes);
@@ -358,11 +200,17 @@ public class Reader {
         client.addContentTologs("client: info: received from server:",
          "POSIT " + username + " " + posX + " " + posY + 
          "***", 0);
+        client.getBlockClientRequest().set(false);
         client.setCurrentScene(SceneData.SCENE_INGAME);
+        client.getSender().send("GLIS?***");
     }
 
+    /**
+     * Read server answer about move request.
+     * @param inputStream InputStream.
+     */
     private void readMOVE(InputStream inputStream, int flag) throws IOException{
-        byte[] bytes = new byte[15];
+        byte[] bytes = new byte[16];
         inputStream.read(bytes);
         String posX = convertByteArrayToString(bytes, 1, 4);
         String posY = convertByteArrayToString(bytes, 5, 8);
@@ -371,7 +219,7 @@ public class Reader {
             client.addContentTologs("client: info: received from server:",
             "MOVE! " + posX + " " + posY + "***", 0);
         }else{
-            String playerScore = convertByteArrayToString(bytes, 9, 12);
+            String playerScore = convertByteArrayToString(bytes, 9, 13);
             client.addContentTologs("client: info: received from server:",
             "MOVEF " + posX + " " + posY + " " + playerScore +"***", 0);
         }
@@ -381,30 +229,46 @@ public class Reader {
 
     }
 
+    /**
+     * Read server answer about glist request.
+     * @param inputStream InputStream.
+     */
     private void readGLIST(InputStream inputStream) throws IOException{
         byte[] bytes = new byte[5];
         inputStream.read(bytes);
         int nbPlayer = bytes[1];
-    
+        
+        client.getGameModel().players().clear();
         client.addContentTologs("client: info: received from server:" ,
          "GLIS! " + nbPlayer + "***", 0);
 
     }
 
+    /**
+     * Read server answer about glist request.
+     * @param inputStream InputStream.
+     */
     private void readGPLYR(InputStream inputStream) throws IOException{
         byte[] bytes = new byte[25];
         inputStream.read(bytes);
         String username = convertByteArrayToString(bytes, 1, 9);
         String posX = convertByteArrayToString(bytes, 10, 13);
         String posY = convertByteArrayToString(bytes, 14, 17);
-        String playerScore = convertByteArrayToString(bytes, 18, 22);
+        String score = convertByteArrayToString(bytes, 18, 22);
 
         client.addContentTologs("client: info: received from server:",
          "GPLYR " + username + " " + posX + " " + posY + " " +
-         playerScore +  "***", 0);
+         score +  "***", 0);
+         if(username.equals(client.getUsername()))
+            username += " (you)";
+         client.getGameModel().addInPlayers(username, posX, posY, score);
     
     }
 
+    /**
+     * Read server answer about mess request.
+     * @param inputStream InputStream.
+     */
     private void readMESS(InputStream inputStream, int flag) throws IOException{
         byte[] bytes = new byte[8];
         inputStream.read(bytes);
@@ -424,22 +288,26 @@ public class Reader {
             client.backToPreviousScene();
     }
 
+    /**
+     * Read server answer about godbye request.
+     * @param inputStream InputStream.
+     */
     private void readGOBYE(InputStream inputStream) throws IOException{
         inputStream.read(new byte[3]);
         client.addContentTologs("client: info: received from server:",
             "GOBYE***", 0);
-        client.getSocket().close();
-        client.launch(1);
-        client.setCurrentScene(SceneData.SCENE_MAIN);
-        tcpRunnable.wantExit();
+        client.resetClient();
+        
     }
 
+    /**
+     * Read server answer.
+     * @param inputStream InputStream.
+     */
     public void read(InputStream inputStream) throws IOException {
         byte[] bytes = new byte[5];
         inputStream.read(bytes);
         String read = new String(bytes);
-        //client.addContentTologs("client: info: received from server:", read, 0);
-
         client.addContentTologs("$", read, 1);
 
         if(read.equals("GAMES")){
@@ -459,7 +327,7 @@ public class Reader {
         }else if(read.equals("LIST!")){
             readLIST(inputStream);
         }else if(read.equals("PLAYR")){
-            readPLAYR(inputStream);
+            readPLAYR(inputStream, currentGameID);
         }else if(read.equals("WELCO")){
             readWELCO(inputStream);
         }else if(read.equals("POSIT")){
@@ -487,58 +355,5 @@ public class Reader {
         client.getUsernameChoiceContent().clear();
         client.getConsoleCommand().clear();
         client.getGameChoiceContent().clear();
-
-        /*String read = "";
-        for(int i = 0; i < 5; i++){
-            read += (char) br.read();
-        }
-        
-        client.addContentTologs("$", read, 1);
-
-        if(read.equals("GAMES")){
-            readGAMES(br);
-        }else if(read.equals("OGAME")){
-            readOGAMES(br);
-        }else if(read.equals("REGOK")){
-            readREGOK(br);
-        }else if(read.equals("REGNO")){
-            readREGNO(br);
-        }else if(read.equals("UNROK")){
-            readUNROK(br);
-        }else if(read.equals("DUNNO")){
-            readDUNNO(br);
-        }else if(read.equals("SIZE!")){
-            readSIZE(br);
-        }else if(read.equals("LIST!")){
-            readLIST(br);
-        }else if(read.equals("PLAYR")){
-            readPLAYR(br);
-        }else if(read.equals("WELCO")){
-            readWELCO(br);
-        }else if(read.equals("POSIT")){
-            readPOSIT(br);
-        }else if(read.equals("MOVE!")){
-            readMOVE(br, 0);
-        }else if(read.equals("MOVEF")){
-            readMOVE(br, 1);
-        }else if(read.equals("GOBYE")){
-            readGOBYE(br);
-        }else if(read.equals("GLIS!")){
-            readGLIST(br);
-        }else if(read.equals("GPLYR")){
-            readGPLYR(br);
-        }else if(read.equals("SEND!")){
-            readMESS(br, 0);
-        }else if(read.equals("NSEND")){
-            readMESS(br, 1);
-        }else if(read.equals("MALL!")){
-            readMESS(br, 2);    
-        }else if(read.length() > 0){
-            client.addContentTologs("client: error:", "unknow message", 1);
-        }
-
-        client.getUsernameChoiceContent().clear();
-        client.getConsoleCommand().clear();
-        client.getGameChoiceContent().clear();*/
     }
 }
