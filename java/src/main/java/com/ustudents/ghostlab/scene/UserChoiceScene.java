@@ -31,12 +31,6 @@ public class UserChoiceScene extends Scene {
             ImGui.inputText("###PlayerName", client.getUsernameChoiceContent());
             ImGui.sameLine();
 
-            if (ImGui.button("Back")) {
-                client.backToPreviousScene();
-            }
-            
-            ImGui.sameLine();
-
             if(ImGui.button("Send")){
                 String username = client.getUsernameChoiceContent().get();
                 client.getUsernameChoiceContent().clear();
@@ -57,7 +51,11 @@ public class UserChoiceScene extends Scene {
                 }
             }
 
-            
+            ImGui.sameLine();
+
+            if (ImGui.button("Back")) {
+                client.backToPreviousScene();
+            }
         }
         ImGui.endPopup();
     }
@@ -71,16 +69,11 @@ public class UserChoiceScene extends Scene {
         ImGui.openPopup("###" + type, 0);
 
         if (ImGui.beginPopupModal(type + "###" + type, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove)) {
-            
-            /*if(flag == 0){
-                ImGui.text("Player to send:");
-                ImGui.sameLine();
-                ImGui.inputText("##player", client.getUsernameChoiceContent());
-            }*/
 
             ImGui.text("Your Message:");
             ImGui.sameLine();
             ImGui.inputText("##Message", client.getGameChoiceContent());
+            ImGui.sameLine();
             String username = "";
             String message = "";
 
@@ -125,8 +118,6 @@ public class UserChoiceScene extends Scene {
                 client.getGameChoiceContent().clear();
                 client.backToPreviousScene();
             }
-
-            
         }
         ImGui.endPopup();
     }
@@ -144,14 +135,8 @@ public class UserChoiceScene extends Scene {
             ImGui.text("Number of move:");
             ImGui.sameLine();
             ImGui.inputText("##MazeMoveChoice", client.getUsernameChoiceContent());
-            String mazeMoveChoice = client.getUsernameChoiceContent().get();
-            
-            if (ImGui.button("Back")) {
-                client.getUsernameChoiceContent().clear();
-                client.backToPreviousScene();
-            }
-            
             ImGui.sameLine();
+            String mazeMoveChoice = client.getUsernameChoiceContent().get();
 
             if(ImGui.button("Send")){
                 if(Utils.answerIsCorrectInput(mazeMoveChoice, 3)){
@@ -173,7 +158,12 @@ public class UserChoiceScene extends Scene {
                 client.getUsernameChoiceContent().clear();
             }
 
-            
+            ImGui.sameLine();
+
+            if (ImGui.button("Back")) {
+                client.getUsernameChoiceContent().clear();
+                client.backToPreviousScene();
+            }
         }
         ImGui.endPopup();
     }
@@ -205,6 +195,10 @@ public class UserChoiceScene extends Scene {
         ImGui.end();
     }
 
+    /**
+     * Display user choice.
+     * @throws IOException
+     */
     public void display() throws IOException{
         userChoice();
         mainContainer();
