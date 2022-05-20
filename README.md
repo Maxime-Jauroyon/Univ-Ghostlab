@@ -76,7 +76,7 @@ The Java sources uses Gradle as a cross-platform build system, it should install
 #### Launch Client
 
 - Run `./gradlew run` to run the Java version of the client.
-- Run with options `./java/gradlew run --args="<option> <argument> ..."` to run the Java version of the client with arguments
+- Alternatively, run with options `./java/gradlew run --args="<option> <argument> ..."` to run the Java version of the client with arguments
   (see all type of argument in `./java/ghostlab/Main.java`).
 
 ## Dependencies
