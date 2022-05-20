@@ -1,5 +1,6 @@
 #include <common/utils.h>
 #include <ctype.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
@@ -24,6 +25,9 @@
 #define ntohll(x) be64toh(x)
 #endif
 #include <common/array.h>
+#include <sys/time.h>
+
+static struct timespec g_start_ticks;
 
 uint16_t gl_string_to_uint16(const uint8_t *n, gl_conversion_type_t conversion_type) {
     uint16_t r =
@@ -222,4 +226,37 @@ bool gl_is_number_valid(const char *src, uint32_t size) {
     }
     
     return true;
+}
+
+// Code from: https://github.com/libsdl-org/SDL/blob/main/src/timer/unix/SDL_systimer.c
+void gl_start_ticking() {
+    clock_gettime(CLOCK_MONOTONIC, &g_start_ticks);
+}
+
+// Code from: https://github.com/libsdl-org/SDL/blob/main/src/timer/unix/SDL_systimer.c
+uint32_t gl_get_ticks() {
+    uint32_t ticks;
+    struct timespec now;
+    
+    clock_gettime(CLOCK_MONOTONIC, &now);
+    ticks = (now.tv_sec - g_start_ticks.tv_sec) * 1000 + (now.tv_nsec - g_start_ticks.tv_nsec) / 1000000;
+    return (ticks);
+}
+
+// Code from: https://github.com/libsdl-org/SDL/blob/main/src/timer/unix/SDL_systimer.c
+void gl_sleep(uint32_t ms) {
+    int was_error;
+    
+    struct timespec elapsed, tv;
+    elapsed.tv_sec = ms / 1000;
+    elapsed.tv_nsec = (ms % 1000) * 1000000;
+    
+    do {
+        errno = 0;
+        
+        tv.tv_sec = elapsed.tv_sec;
+        tv.tv_nsec = elapsed.tv_nsec;
+        
+        was_error = nanosleep(&tv, &elapsed);
+    } while (was_error && (errno == EINTR));
 }

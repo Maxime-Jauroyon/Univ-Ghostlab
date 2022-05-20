@@ -54,4 +54,10 @@ bool gl_is_ip_valid(const char *src);
 // Checks if a given C-string is a valid number format.
 bool gl_is_number_valid(const char *src, uint32_t size);
 
+void gl_start_ticking();
+
+uint32_t gl_get_ticks();
+
+void gl_sleep(uint32_t ms);
+
 #endif /* GHOSTLAB_UTILS_H */

@@ -43,7 +43,7 @@ void gl_log_vpush(const char *format, gl_log_type_t type, va_list args) {
 #if !GHOSTLAB_TUI
         printf("%s", gl_array_get_last(g_logs)->data);
 #else
-        if (gl_gui_started()) {
+        if (gl_ui_started()) {
             printf("%s", gl_array_get_last(g_logs)->data);
         }
 #endif

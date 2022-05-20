@@ -20,6 +20,8 @@ void gl_ui_end_render();
 // Frees a UI.
 void gl_ui_free();
 
+void gl_ui_wait_before_next_render();
+
 // Begins a UI section of a given title and height.
 void gl_igBegin(const char *title, float height);
 

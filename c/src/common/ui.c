@@ -15,6 +15,7 @@
 #endif
 #include <common/log.h>
 #include <common/array.h>
+#include <common/utils.h>
 #include <common/command.h>
 
 static float g_current_pos_y = 0.0f;
@@ -24,6 +25,8 @@ static bool g_console_show_warning = true;
 static bool g_console_show_error = true;
 static bool g_first_time = true;
 static bool g_started = false;
+static uint32_t g_start_time;
+static uint32_t g_end_time;
 #if GHOSTLAB_GUI
 static SDL_Window *g_window;
 static SDL_GLContext gl_context;
@@ -31,6 +34,10 @@ ImFontConfig *g_fontConfig;
 #endif
 
 int32_t gl_ui_create(const char *gui_title) {
+#if GHOSTLAB_GUI
+    gl_start_ticking();
+#endif
+    
     gl_assert(igDebugCheckVersionAndDataLayout(igGetVersion(), sizeof(ImGuiIO), sizeof(ImGuiStyle), sizeof(ImVec2), sizeof(ImVec4), sizeof(ImDrawVert), sizeof(ImDrawIdx)));
     igCreateContext(0);
     
@@ -86,6 +93,8 @@ int32_t gl_ui_create(const char *gui_title) {
 }
 
 void gl_ui_start_render(bool *quit) {
+    g_start_time = gl_get_ticks();
+    
     g_current_pos_y = 0.0f;
 
 #if GHOSTLAB_TUI
@@ -124,6 +133,8 @@ void gl_ui_end_render() {
     }
     SDL_GL_SwapWindow(g_window);
 #endif
+
+    gl_ui_wait_before_next_render();
 }
 
 void gl_ui_free() {
@@ -146,6 +157,19 @@ void gl_ui_free() {
     SDL_DestroyWindow(g_window);
     SDL_Quit();
 #endif
+}
+
+void gl_ui_wait_before_next_render() {
+    g_end_time = gl_get_ticks() - g_start_time;
+    
+    if (g_end_time < 0) {
+        return;
+    }
+    
+    int32_t sleep_duration = 16 - (int32_t)g_end_time;
+    if (sleep_duration > 0) {
+        gl_sleep(sleep_duration);
+    }
 }
 
 void gl_igBegin(const char *title, float height) {
