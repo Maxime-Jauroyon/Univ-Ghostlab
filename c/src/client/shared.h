@@ -32,24 +32,34 @@ extern char **g_players_message_list;
 extern char g_everyone[];
 extern char g_last_sent_message[201];
 
+// Connects the client to the server.
 int32_t gl_client_connect();
 
+// Sends a disconnect message to the server (and closes the socket if needed).
 void gl_client_disconnect(bool close_socket);
 
+// Adds a game to the list of games.
 struct gl_game_t *gl_client_add_game(uint8_t id);
 
+// Adds a player to the list of players of a game.
 struct gl_player_t *gl_client_add_player(struct gl_game_t *game, const char *id);
 
+// Returns the game in progress.
 struct gl_game_t *gl_client_get_game();
 
+// Returns the game with a given id.
 struct gl_game_t *gl_client_get_game_with_id(uint32_t id);
 
+// Returns the client's player.
 struct gl_player_t *gl_client_get_player();
 
+// Reloads the list of games.
 void gl_client_reload_games();
 
+// Reloads the maze data of a game.
 void gl_client_reload_game_maze_size(uint32_t game_id);
 
+// Reloads the players' data of a game.
 void gl_client_reload_game_players_data(uint32_t game_id);
 
 #endif /* GHOSTLAB_CLIENT_SHARED_H */

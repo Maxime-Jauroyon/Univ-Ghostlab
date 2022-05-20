@@ -11,9 +11,9 @@ static bool g_console_window_visible = true;
 
 void gl_server_draw() {
     while (!g_should_quit) {
-        gl_gui_start_render(&g_should_quit);
+        gl_ui_start_render(&g_should_quit);
         gl_server_draw_main_window();
-        gl_gui_end_render();
+        gl_ui_end_render();
     }
 }
 

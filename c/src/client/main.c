@@ -65,7 +65,7 @@ static int32_t gl_client_init(int argc, char **argv) {
     gl_message_set_mutex(g_main_mutex);
     gl_client_message_add_functions();
     
-    gl_gui_create("Ghostlab Client");
+    gl_ui_create("Ghostlab Client");
     
     if (gl_client_connect() == -1) {
         gl_client_server_down_popup_draw();
@@ -189,5 +189,5 @@ static void gl_client_free() {
     gl_log_free();
     
     gl_memory_check_for_leaks();
-    gl_gui_free();
+    gl_ui_free();
 }

@@ -48,7 +48,7 @@ static void message_regok(gl_message_t *msg, int32_t socket_id, void *user_data)
 }
 
 static void message_regno(gl_message_t *msg, int32_t socket_id, void *user_data) {
-    gl_client_error(2);
+    gl_client_ui_error(2);
 }
 
 static void message_unrok(gl_message_t *msg, int32_t socket_id, void *user_data) {

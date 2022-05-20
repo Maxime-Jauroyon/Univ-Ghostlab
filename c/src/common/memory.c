@@ -96,7 +96,7 @@ void gl_memory_check_for_leaks() {
     bool quit = g_allocated_ptrs == 0;
     
     while (!quit) {
-        gl_gui_start_render(&quit);
+        gl_ui_start_render(&quit);
     
         igOpenPopup("###Leaks", 0);
         
@@ -125,8 +125,8 @@ void gl_memory_check_for_leaks() {
     
             igEndPopup();
         }
-        
-        gl_gui_end_render();
+    
+        gl_ui_end_render();
     }
 #endif
     

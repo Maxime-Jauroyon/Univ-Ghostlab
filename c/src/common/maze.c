@@ -4,7 +4,7 @@
 #include <common/array.h>
 #include <common/memory.h>
 
-gl_maze_t *gl_maze_create(uint8_t base_width, uint8_t base_height) {
+gl_maze_t *gl_maze_generate(uint8_t base_width, uint8_t base_height) {
     uint8_t width = 2 * base_width + 1;
     uint8_t height = 2 * base_height + 1;
     uint8_t color_scheme[2][2] = {
@@ -13,8 +13,10 @@ gl_maze_t *gl_maze_create(uint8_t base_width, uint8_t base_height) {
     };
     gl_maze_element_t element_per_color[4] = {GL_MAZE_ELEMENT_PILLAR, GL_MAZE_ELEMENT_WALL_CLOSED, GL_MAZE_ELEMENT_WALL_CLOSED, GL_MAZE_ELEMENT_ROOM};
     uint8_t **grid = gl_maze_create_color_grid(width, height, (uint8_t *) color_scheme, 2, 2);
-    gl_maze_element_t **maze_grid = gl_maze_color_grid_to_maze_grid(grid, gl_color_to_maze_element_from_color, element_per_color, 4);
-    gl_maze_generate_from_grid(maze_grid, gl_initial_room_random, gl_wall_random);
+    gl_maze_element_t **maze_grid = gl_maze_color_to_grid(grid, gl_maze_default_color_to_grid,
+                                                          element_per_color, 4);
+    gl_maze_generate_elements(maze_grid, gl_maze_default_random_initial_room_position,
+                              gl_default_choose_random_wall);
 
     gl_maze_t *maze = gl_malloc(sizeof(*maze));
     maze->grid = maze_grid;
@@ -33,7 +35,7 @@ void gl_maze_free(gl_maze_t *maze) {
     gl_free(maze);
 }
 
-void gl_color_to_maze_element_from_color(gl_maze_element_t **maze, uint8_t **grid, uint8_t width, uint8_t height, const gl_maze_element_t *element_per_color, uint8_t size_element_per_color) {
+void gl_maze_default_color_to_grid(gl_maze_element_t **maze, uint8_t **grid, uint8_t width, uint8_t height, const gl_maze_element_t *element_per_color, uint8_t size_element_per_color) {
     for (uint32_t y = 0; y < height; y++) {
         for (uint32_t x = 0; x < width; x++) {
             maze[y][x] = element_per_color[grid[y][x]];
@@ -41,7 +43,7 @@ void gl_color_to_maze_element_from_color(gl_maze_element_t **maze, uint8_t **gri
     }
 }
 
-gl_pos_t gl_initial_room_random(gl_maze_element_t **maze, uint8_t width, uint8_t height) {
+gl_pos_t gl_maze_default_random_initial_room_position(gl_maze_element_t **maze, uint8_t width, uint8_t height) {
     gl_pos_t initial_pos;
     
     do {
@@ -52,7 +54,7 @@ gl_pos_t gl_initial_room_random(gl_maze_element_t **maze, uint8_t width, uint8_t
     return initial_pos;
 }
 
-uint32_t gl_wall_random(gl_pos_t *walls, uint32_t size) {
+uint32_t gl_default_choose_random_wall(gl_pos_t *walls, uint32_t size) {
     return rand() % size;
 }
 
@@ -72,7 +74,7 @@ uint8_t **gl_maze_create_color_grid(uint8_t width, uint8_t height, uint8_t *sche
     return grid;
 }
 
-gl_maze_element_t **gl_maze_color_grid_to_maze_grid(uint8_t **grid, void (*gl_color_to_maze_comparator)(gl_maze_element_t **, uint8_t**, uint8_t, uint8_t, const gl_maze_element_t*, uint8_t), const gl_maze_element_t* element_per_color, uint8_t size_element_per_color) {
+gl_maze_element_t **gl_maze_color_to_grid(uint8_t **grid, void (*gl_color_to_maze_comparator)(gl_maze_element_t **, uint8_t**, uint8_t, uint8_t, const gl_maze_element_t*, uint8_t), const gl_maze_element_t* element_per_color, uint8_t size_element_per_color) {
     if (!grid) {
         return 0;
     }
@@ -98,7 +100,7 @@ gl_maze_element_t **gl_maze_color_grid_to_maze_grid(uint8_t **grid, void (*gl_co
     return maze;
 }
 
-gl_maze_element_t **gl_maze_generate_from_grid_with_seed(gl_maze_element_t **maze, uint64_t seed, gl_pos_t (* initial_room_comparator)(gl_maze_element_t **, uint8_t, uint8_t), uint32_t (* wall_comparator)(gl_pos_t *, uint32_t)) {
+gl_maze_element_t **gl_maze_generate_elements_with_seed(gl_maze_element_t **maze, uint64_t seed, gl_pos_t (* initial_room_comparator)(gl_maze_element_t **, uint8_t, uint8_t), uint32_t (* wall_comparator)(gl_pos_t *, uint32_t)) {
     srand(seed);
     
     if (!maze) {
@@ -190,6 +192,6 @@ gl_maze_element_t **gl_maze_generate_from_grid_with_seed(gl_maze_element_t **maz
     return maze;
 }
 
-gl_maze_element_t **gl_maze_generate_from_grid(gl_maze_element_t **maze, gl_pos_t (* initial_room_comparator)(gl_maze_element_t **, uint8_t, uint8_t), uint32_t ( *wall_comparator)(gl_pos_t *, uint32_t)) {
-    return gl_maze_generate_from_grid_with_seed(maze, time(0), initial_room_comparator, wall_comparator);
+gl_maze_element_t **gl_maze_generate_elements(gl_maze_element_t **maze, gl_pos_t (* initial_room_comparator)(gl_maze_element_t **, uint8_t, uint8_t), uint32_t ( *wall_comparator)(gl_pos_t *, uint32_t)) {
+    return gl_maze_generate_elements_with_seed(maze, time(0), initial_room_comparator, wall_comparator);
 }

@@ -30,7 +30,7 @@ static SDL_GLContext gl_context;
 ImFontConfig *g_fontConfig;
 #endif
 
-int32_t gl_gui_create(const char *gui_title) {
+int32_t gl_ui_create(const char *gui_title) {
     gl_assert(igDebugCheckVersionAndDataLayout(igGetVersion(), sizeof(ImGuiIO), sizeof(ImGuiStyle), sizeof(ImVec2), sizeof(ImVec4), sizeof(ImDrawVert), sizeof(ImDrawIdx)));
     igCreateContext(0);
     
@@ -85,7 +85,7 @@ int32_t gl_gui_create(const char *gui_title) {
     return 0;
 }
 
-void gl_gui_start_render(bool *quit) {
+void gl_ui_start_render(bool *quit) {
     g_current_pos_y = 0.0f;
 
 #if GHOSTLAB_TUI
@@ -109,7 +109,7 @@ void gl_gui_start_render(bool *quit) {
     igNewFrame();
 }
 
-void gl_gui_end_render() {
+void gl_ui_end_render() {
     igRender();
     
 #if GHOSTLAB_TUI
@@ -126,7 +126,7 @@ void gl_gui_end_render() {
 #endif
 }
 
-void gl_gui_free() {
+void gl_ui_free() {
 #if GHOSTLAB_TUI
     igTuiShutdown();
 #elif GHOSTLAB_GUI
@@ -268,7 +268,7 @@ int32_t gl_igFilterWithSpaces(ImGuiInputTextCallbackData *data) {
     return 1;
 }
 
-bool gl_gui_started() {
+bool gl_ui_started() {
     return g_started;
 }
 

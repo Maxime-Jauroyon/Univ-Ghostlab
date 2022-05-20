@@ -872,13 +872,13 @@ int32_t gl_message_recv(int32_t fd, struct gl_message_t *dst, gl_message_protoco
         if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT8) {
             parameter = (gl_message_parameter_t) { .uint8_value = parameter_value_buf[0] };
         } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT16) {
-            uint16_t n = gl_uint8_to_uint16(parameter_value_buf, msg_param_def->conversion_type);
+            uint16_t n = gl_string_to_uint16(parameter_value_buf, msg_param_def->conversion_type);
             parameter = (gl_message_parameter_t) { .uint16_value = msg_param_def->has_max_uint_value && n > (uint16_t )msg_param_def->max_value_uint ? (uint16_t )msg_param_def->max_value_uint : n };
         } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT32) {
-            uint32_t n = gl_uint8_to_uint32(parameter_value_buf, msg_param_def->conversion_type);
+            uint32_t n = gl_string_to_uint32(parameter_value_buf, msg_param_def->conversion_type);
             parameter = (gl_message_parameter_t) { .uint32_value = msg_param_def->has_max_uint_value && n > (uint32_t )msg_param_def->max_value_uint ? (uint32_t )msg_param_def->max_value_uint : n };
         } else if (msg_param_def->value_type == GL_MESSAGE_PARAMETER_VALUE_TYPE_UINT64) {
-            uint64_t n = gl_uint8_to_uint64(parameter_value_buf, msg_param_def->conversion_type);
+            uint64_t n = gl_string_to_uint64(parameter_value_buf, msg_param_def->conversion_type);
             parameter = (gl_message_parameter_t) { .uint64_value = msg_param_def->has_max_uint_value && n > (uint64_t )msg_param_def->max_value_uint ? (uint64_t )msg_param_def->max_value_uint : n };
         } else {
             gl_assert(!msg_param_def->force_exact_length || msg_param_def->value_length == gl_array_get_size(parameter_value_buf));
@@ -996,14 +996,6 @@ static void internal_gl_message_execute(struct gl_message_t *msg, int32_t socket
     gl_message_free(msg);
 }
 
-void gl_message_execute(struct gl_message_t *msg, int32_t socket_id, void *user_data) {
-    internal_gl_message_execute(msg, socket_id, user_data, true);
-}
-
-void gl_message_execute_no_lock(struct gl_message_t *msg, int32_t socket_id, void *user_data) {
-    internal_gl_message_execute(msg, socket_id, user_data, false);
-}
-
 int32_t internal_gl_message_wait_and_execute(int32_t socket_id, gl_message_protocol_t protocol, bool should_lock) {
     gl_message_t msg = { 0 };
     int32_t r = gl_message_recv(socket_id, &msg, protocol);
@@ -1019,10 +1011,6 @@ int32_t internal_gl_message_wait_and_execute(int32_t socket_id, gl_message_proto
 
 int32_t gl_message_wait_and_execute(int32_t socket_id, gl_message_protocol_t protocol) {
     return internal_gl_message_wait_and_execute(socket_id, protocol, true);
-}
-
-int32_t gl_message_wait_and_execute_no_lock(int32_t socket_id, gl_message_protocol_t protocol) {
-    return internal_gl_message_wait_and_execute(socket_id, protocol, false);
 }
 
 gl_message_parameter_definition_t **gl_message_parameter_definitions() {

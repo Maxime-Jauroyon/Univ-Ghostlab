@@ -176,9 +176,9 @@ void gl_server_start_game_if_ready(struct gl_game_t *game) {
 void gl_server_start_game(struct gl_game_t *game) {
     gl_pos_t size = gl_game_get_maze_size(game);
     
-    game->maze = gl_maze_create(size.x, size.y);
+    game->maze = gl_maze_generate(size.x, size.y);
     game->ghosts = gl_game_generate_ghosts(game->maze, gl_array_get_size(game->players) + 1);
-    game->players = gl_game_generate_players_pos(game->maze, game->players, game->ghosts);
+    game->players = gl_game_generate_players(game->maze, game->players, game->ghosts);
     game->started = true;
     
     for (uint32_t i = 0; i < gl_array_get_size(game->players); i++) {

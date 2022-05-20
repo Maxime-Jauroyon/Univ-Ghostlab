@@ -22,7 +22,7 @@ static int32_t g_main_window_message_target = 0;
 
 void gl_client_draw() {
     while (!g_should_quit) {
-        gl_gui_start_render(&g_should_quit);
+        gl_ui_start_render(&g_should_quit);
     
         gl_client_main_window_draw();
         
@@ -34,7 +34,7 @@ void gl_client_draw() {
             gl_client_game_over_popup_draw();
         }
     
-        gl_gui_end_render();
+        gl_ui_end_render();
     }
 }
 
@@ -414,7 +414,7 @@ void gl_client_join_game_popup_draw() {
 void gl_client_server_down_popup_draw() {
     bool quit = false;
     while (!quit) {
-        gl_gui_start_render(&quit);
+        gl_ui_start_render(&quit);
         
         igOpenPopup("###ServerDown", 0);
         
@@ -432,8 +432,8 @@ void gl_client_server_down_popup_draw() {
             
             igEndPopup();
         }
-        
-        gl_gui_end_render();
+    
+        gl_ui_end_render();
     }
 }
 
@@ -468,15 +468,15 @@ void gl_client_game_over_popup_show() {
 
 void gl_client_create_game_popup_close() {
     g_create_game_popup_visible = false;
-    gl_client_error(0);
+    gl_client_ui_error(0);
 }
 
 void gl_client_join_game_popup_close() {
     g_join_game_popup_visible = false;
     g_join_game_popup_game_id = 0;
-    gl_client_error(0);
+    gl_client_ui_error(0);
 }
 
-void gl_client_error(uint32_t error) {
+void gl_client_ui_error(uint32_t error) {
     g_error = error;
 }

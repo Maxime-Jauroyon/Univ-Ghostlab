@@ -33,7 +33,7 @@ gl_ghost_t *gl_game_generate_ghosts(gl_maze_t *maze, uint8_t num_ghosts) {
     return ghosts;
 }
 
-gl_player_t *gl_game_generate_players_pos(struct gl_maze_t *maze, gl_player_t *players, gl_ghost_t *ghosts) {
+gl_player_t *gl_game_generate_players(struct gl_maze_t *maze, gl_player_t *players, gl_ghost_t *ghosts) {
     if (!players) {
         return 0;
     }

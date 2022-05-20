@@ -38,12 +38,14 @@
 // Asserts a condition that returns `-1` in case of error.
 #define gl_assert(condition) if (!(condition)) { return -1; } (void)0
 
+// Defines the list of data conversions that can be made.
 typedef enum gl_conversion_type_t {
     GL_CONVERSION_TYPE_AUTOMATIC,
     GL_CONVERSION_TYPE_BIG_ENDIAN,
     GL_CONVERSION_TYPE_LITTLE_ENDIAN
 } gl_conversion_type_t;
 
+// Defines a position (vector 2D).
 typedef struct gl_pos_t {
     uint32_t x;
     uint32_t y;

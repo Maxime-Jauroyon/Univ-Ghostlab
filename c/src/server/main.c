@@ -68,7 +68,7 @@ static int32_t gl_server_init(int argc, char **argv) {
     gl_message_set_mutex(g_main_mutex);
     gl_server_message_add_functions();
     
-    gl_gui_create("Ghostlab Server");
+    gl_ui_create("Ghostlab Server");
     
     g_tcp_acceptor_thread = gl_malloc(sizeof(pthread_t));
     pthread_create(g_tcp_acceptor_thread, 0, gl_thread_tcp_acceptor_main, 0);
@@ -183,5 +183,5 @@ static void gl_server_free() {
     gl_log_free();
     
     gl_memory_check_for_leaks();
-    gl_gui_free();
+    gl_ui_free();
 }

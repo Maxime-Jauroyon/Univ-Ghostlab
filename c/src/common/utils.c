@@ -25,7 +25,7 @@
 #endif
 #include <common/array.h>
 
-uint16_t gl_uint8_to_uint16(const uint8_t *n, gl_conversion_type_t conversion_type) {
+uint16_t gl_string_to_uint16(const uint8_t *n, gl_conversion_type_t conversion_type) {
     uint16_t r =
         (uint16_t)n[1] << 8 | // Put `n[1]` on the 8 to 16 bits of `r`;
         (uint16_t)n[0]; // Put `n[0]` on the 0 to 8 bits of `r`;
@@ -41,7 +41,7 @@ uint16_t gl_uint8_to_uint16(const uint8_t *n, gl_conversion_type_t conversion_ty
     return r;
 }
 
-uint32_t gl_uint8_to_uint32(const uint8_t *n, gl_conversion_type_t conversion_type) {
+uint32_t gl_string_to_uint32(const uint8_t *n, gl_conversion_type_t conversion_type) {
     uint32_t r =
         (uint32_t)n[3] << 24 | // Put `n[3]` on the 24 to 32 bits of `r`;
         (uint32_t)n[2] << 16 | // Put `n[2]` on the 16 to 24 bits of `r`;
@@ -59,7 +59,7 @@ uint32_t gl_uint8_to_uint32(const uint8_t *n, gl_conversion_type_t conversion_ty
     return r;
 }
 
-uint64_t gl_uint8_to_uint64(const uint8_t *n, gl_conversion_type_t conversion_type) {
+uint64_t gl_string_to_uint64(const uint8_t *n, gl_conversion_type_t conversion_type) {
     uint64_t r =
         (uint64_t)n[7] << 56 | // Put `n[7]` on the 56 to 64 bits of `r`;
         (uint64_t)n[6] << 48 | // Put `n[6]` on the 48 to 56 bits of `r`;
@@ -179,6 +179,9 @@ int32_t gl_uint8_array_recv_until_separator(int32_t fd, uint8_t **dst, uint8_t *
 }
 
 uint32_t gl_rand(uint32_t min, uint32_t max) {
+    if (min > max) {
+        return 0;
+    }
     if (max + 1 - min == 0) {
         return 0;
     }
