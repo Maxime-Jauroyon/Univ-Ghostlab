@@ -23,6 +23,27 @@ Ghostlab is an online matchmaking based game where you take upon yourself to bec
 - Robust network architecture.
 - Works on Linux (Ubuntu/Debian), macOS and Windows (WSL).
 
+## Architecture
+
+### C Sources
+
+The architecture uses the concept of concurrency to be able to use only blocking sockets :
+
+#### Server
+
+- Main thread: Draws and handles interactions with the user interface (in a loop which should run at least 60 times per second).
+- TCP Acceptor Thread: Waits and accepts new clients (on a TCP socket).
+- TCP Listener Thread: Waits and handles a client's messages (on a TCP connected socket).
+- Ghosts Handler Thread: Moves a random quantity of ghosts for each game in progress, after a random time (between 30 seconds and 90 seconds).
+
+#### Client
+
+- Main thread: Draws and handles interactions with the user interface (in a loop which should run at least 60 times per second).
+- TCP Listener Thread: Waits and handles the server's messages (on a TCP socket).
+- UDP Listener Thread: Waits and handles the UDP socket's messages.
+- General Multicast Listener Thread: Waits and handles the General Multicast's messages (this type of message can be send by the server to reach EVERY connected clients).
+- Game Multicast Listener Thread: Waits and handles the Game Multicast's messages (this type of message can be send by the server to reach EVERY connected clients of a specific game in progress).
+
 ## How To Use
 
 ### Compile And Launch (C Sources)
