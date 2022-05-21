@@ -279,6 +279,10 @@ static void message_multi(gl_message_t *msg, int32_t socket_id, void *user_data)
     if (!g_multicast_ip && !g_multicast_port) {
         g_multicast_ip = gl_cstring_create_from_ip(msg->parameters_value[0].string_value);
         g_multicast_port = gl_cstring_create_from_string(msg->parameters_value[1].string_value);
+    }
+    
+    if (!g_multicast_general_listener_thread) {
+        g_multicast_general_listener_thread = gl_malloc(sizeof(pthread_t));
         pthread_create(g_multicast_general_listener_thread, 0, gl_client_thread_multicast_general_listener_main, 0);
     }
 }

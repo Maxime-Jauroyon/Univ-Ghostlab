@@ -78,7 +78,9 @@ void gl_client_main_window_draw() {
     
                 igInputText("###NumberInput", g_main_window_movement, 4, ImGuiInputTextFlags_CallbackCharFilter, gl_igFilterNumbers, 0);
 
-                if (strlen(g_main_window_movement) == 0) {
+                bool cannot_move = strlen(g_main_window_movement) == 0;
+                
+                if (cannot_move) {
                     igPushItemFlag(ImGuiItemFlags_Disabled, true);
                     igPushStyleVarFloat(ImGuiStyleVar_Alpha, igGetStyle()->Alpha * 0.5f);
                 }
@@ -125,7 +127,7 @@ void gl_client_main_window_draw() {
                     gl_message_send_tcp(g_tcp_listener_socket, &msg);
                 }
     
-                if (strlen(g_main_window_movement) == 0) {
+                if (cannot_move) {
                     igPopStyleVar(1);
                     igPopItemFlag();
                 }
@@ -340,7 +342,9 @@ void gl_client_create_game_popup_draw() {
         
         igSameLine(0, -1);
     
-        if (strlen(g_temp_player_id) != 8) {
+        bool cannot_create = strlen(g_temp_player_id) != 8;
+        
+        if (cannot_create) {
             igPushItemFlag(ImGuiItemFlags_Disabled, true);
             igPushStyleVarFloat(ImGuiStyleVar_Alpha, igGetStyle()->Alpha * 0.5f);
         }
@@ -352,7 +356,7 @@ void gl_client_create_game_popup_draw() {
             gl_message_send_tcp(g_tcp_listener_socket, &msg);
         }
     
-        if (strlen(g_temp_player_id) != 8) {
+        if (cannot_create) {
             igPopItemFlag();
             igPopStyleVar(1);
         }
@@ -384,7 +388,9 @@ void gl_client_join_game_popup_draw() {
         
         igSameLine(0, -1);
     
-        if (strlen(g_temp_player_id) != 8) {
+        bool cannot_join = strlen(g_temp_player_id) != 8;
+        
+        if (cannot_join) {
             igPushItemFlag(ImGuiItemFlags_Disabled, true);
             igPushStyleVarFloat(ImGuiStyleVar_Alpha, igGetStyle()->Alpha * 0.5f);
         }
@@ -397,7 +403,7 @@ void gl_client_join_game_popup_draw() {
             gl_message_send_tcp(g_tcp_listener_socket, &msg);
         }
     
-        if (strlen(g_temp_player_id) != 8) {
+        if (cannot_join) {
             igPopItemFlag();
             igPopStyleVar(1);
         }
