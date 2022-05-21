@@ -75,7 +75,7 @@ static int32_t gl_socket_create_udp(const char *ip, const char *port, gl_socket_
         
         if (type == GL_SOCKET_TYPE_MULTICAST_RECEIVER) {
             int ok = 1;
-            if (setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &ok, sizeof(ok)) == -1) {
+            if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &ok, sizeof(ok)) == -1) {
                 goto error;
             }
         }
