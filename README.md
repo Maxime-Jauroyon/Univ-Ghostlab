@@ -81,7 +81,8 @@ The C sources uses CMake as a cross-platform build system, be sure to have it in
 - Alternatively, run `./c/build/client_tui` to launch the client in TUI mode.
 
 You should always run the server before the client.  
-The recommended user interface to launch with is the GUI mode.
+The recommended user interface to launch with is the GUI mode.  
+The TUI is mostly there for compatibility reasons and can be less stables due to the use of not thoroughly tested third party libraries that tends to have issues depending on your OS. If using this mode, do not quit the program through Ctrl+C or ncurses might bug! Use the quit button located in the file menu bar on the top-left of the window.
 
 ### Compile And Launch (Java Sources)
 
