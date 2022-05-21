@@ -14,5 +14,10 @@ void *gl_client_thread_tcp_listener_main(void *user_data) {
     
     gl_log_push("tcp listener thread stopped.\n");
     
+    if (g_use_legacy_protocol) {
+        g_should_quit = true;
+        g_is_server_down = true;
+    }
+    
     return 0;
 }
