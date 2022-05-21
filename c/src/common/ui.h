@@ -34,6 +34,9 @@ int32_t gl_igFilter(struct ImGuiInputTextCallbackData *data);
 // Filters an input text to allow alphanumerics characters and spaces.
 int32_t gl_igFilterWithSpaces(struct ImGuiInputTextCallbackData *data);
 
+// Filters an input text t o allow numerics characters only.
+int32_t gl_igFilterNumbers(struct ImGuiInputTextCallbackData *data);
+
 // Checks if the UI is started.
 bool gl_ui_started();
 

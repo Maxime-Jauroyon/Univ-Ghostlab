@@ -76,7 +76,7 @@ void gl_client_main_window_draw() {
     
                 igSameLine(0, -1);
     
-                igInputText("###NumberInput", g_main_window_movement, 4, ImGuiInputTextFlags_CharsDecimal, 0, 0);
+                igInputText("###NumberInput", g_main_window_movement, 4, ImGuiInputTextFlags_CallbackCharFilter, gl_igFilterNumbers, 0);
 
                 if (strlen(g_main_window_movement) == 0) {
                     igPushItemFlag(ImGuiItemFlags_Disabled, true);

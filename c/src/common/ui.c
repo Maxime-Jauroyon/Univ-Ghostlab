@@ -292,6 +292,16 @@ int32_t gl_igFilterWithSpaces(ImGuiInputTextCallbackData *data) {
     return 1;
 }
 
+int32_t gl_igFilterNumbers(ImGuiInputTextCallbackData *data) {
+    char e = (char)data->EventChar;
+    
+    if (e >= 48 && e <= 57) {
+        return 0;
+    }
+    
+    return 1;
+}
+
 bool gl_ui_started() {
     return g_started;
 }
