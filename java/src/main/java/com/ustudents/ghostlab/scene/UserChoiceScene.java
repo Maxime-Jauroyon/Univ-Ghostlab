@@ -54,6 +54,7 @@ public class UserChoiceScene extends Scene {
             ImGui.sameLine();
 
             if (ImGui.button("Back")) {
+                client.getUsernameChoiceContent().clear();
                 client.backToPreviousScene();
             }
         }
@@ -95,6 +96,7 @@ public class UserChoiceScene extends Scene {
                         client.addContentTologs("client: warning:", username, 1);
                         client.addContentTologs("client: warning:",
                         "your username does'nt respect the format (8 characters)", 1);
+                        client.backToPreviousScene();
                     }
                 }
             }else{
@@ -107,6 +109,7 @@ public class UserChoiceScene extends Scene {
                         client.addContentTologs("client: warning:", message, 1);
                         client.addContentTologs("client: warning:",
                     "Wrong format of message (between 0 to 200 characters)", 1);
+                        client.backToPreviousScene();
                     }
                 } 
             }

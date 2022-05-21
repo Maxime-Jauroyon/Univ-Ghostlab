@@ -94,7 +94,7 @@ public class InGameScene extends Scene{
 
             for(Player player : client.getGameModel().players()){
                 if(ImGui.collapsingHeader(player.getUsername())){
-                    if(ImGui.button("Send Private Message")){
+                    if(ImGui.button("Send Private Message##" + player.getUsername().substring(0,8))){
                         client.getUsernameChoiceContent().set(player.getUsername().substring(0,8));
                         client.setLastPressedButton(SceneData.BUTTON_PRIVATEMESSAGE);
                         client.setCurrentScene(SceneData.SCENE_USERCHOICE);
