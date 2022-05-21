@@ -40,10 +40,10 @@ void gl_log_vpush(const char *format, gl_log_type_t type, va_list args) {
     }
     
     if (strcmp(format + strlen(format) - 1, "\n") == 0) {
-#if !GHOSTLAB_TUI
+#if GHOSTLAB_GUI
         printf("%s", gl_array_get_last(g_logs)->data);
 #else
-        if (gl_ui_started()) {
+        if (!gl_ui_started()) {
             printf("%s", gl_array_get_last(g_logs)->data);
         }
 #endif
