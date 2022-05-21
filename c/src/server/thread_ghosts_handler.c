@@ -44,16 +44,15 @@ void *gl_thread_ghosts_handler_main(void *user_data) {
         pthread_mutex_lock(g_main_mutex);
         
         for (uint32_t i = 0; i < gl_array_get_size(g_games); i++) {
+            if (!g_games[i].started) {
+                continue;
+            }
+            
             uint32_t num_to_move = (rand() % 2 == 0 ? 1 : 0) + rand() % (gl_array_get_size(g_games[i].ghosts) + 1);
             
             uint32_t k = 0;
             while (gl_array_get_size(g_ghosts_pos) != num_to_move && k < 10) {
-                uint32_t pos = 0;
-                
-                if (gl_array_get_size(g_games[i].ghosts) > 0) {
-                    pos = rand() % gl_array_get_size(g_games[i].ghosts);
-                }
-                
+                uint32_t pos = rand() % gl_array_get_size(g_games[i].ghosts);
                 bool exists = false;
                 for (uint32_t j = 0; j < gl_array_get_size(g_ghosts_pos); j++) {
                     if (g_ghosts_pos[j] == pos) {
